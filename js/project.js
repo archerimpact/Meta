@@ -96,3 +96,5 @@ function loadProject(jsonFile) {
 
   // TODO(varsha): do rendering here
 }
+
+module.exports = Project
