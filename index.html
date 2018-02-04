@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
   <head>
 
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -14,35 +15,57 @@
 
     <link href="css/columns.css" rel="stylesheet">
 
-    <link rel="import" href="views/projects.html">
-    <link rel="import" href="views/detail.html">
-    <link rel="import" href="views/new.html">
-    <link rel="import" href="views/new-project.html">
-    
+    <link rel="import" href="sections/landing.html">
+    <link rel="import" href="sections/projects.html">
+    <link rel="import" href="sections/detail.html">
+    <link rel="import" href="sections/new.html">
+    <link rel="import" href="sections/settings.html">
+
   </head>
+
   <body>
-    <h1>Hello Archer! Welcome to the HRC team.</h1>
-    <!-- All of the Node.js APIs are available in this renderer process. -->
-    We are using Node.js <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
-    <br>
-    note that we are NOT going to use links like this!!! single page site!
-    <br>
-    Links to the <a href="views/view-project.html">Project View</a>
-    <br>
-    Links to the <a href="views/projects.html">Projects View</a> (ideas for better naming?)
 
-    <div class = "container">
-     <h1>This page is using Bootstrap and jQuery!</h1>
-     <h3 id = "click-counter"></h3>
-     <button class = "btn btn-success" id = "countbtn">Click here</button>
-     <script src = "./view.js" ></script>
-    </div>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a id="landing-menu" data-section="landing" class="navbar-brand" href="#">Archer X</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+              <a id="projects-menu" data-section="projects" class="nav-link" href="#">Projects
+                <!-- <span class="sr-only">(current)</span> -->
+                <!-- Uncomment this to mark some tab as the current tab -->
+              </a>
+            </li>
+            <li class="nav-item">
+              <a id="new-menu" data-section="new" class="nav-link" href="#">New</a>
+            </li>
+            <li class="nav-item">
+              <a id="settings-menu" data-section="settings" class="nav-link" href="#">Settings</a>
+            </li>
+            <!-- <li class="nav-item">
+              <a class="nav-link" href="#">Contact</a>
+            </li> -->
+          </ul>
+        </div>
+      </div>
+    </nav>
 
+    <div id="wrapper"></div>
+
+    <!-- Scripts -->
     <script>
-      // You can also require other files to run in this process
-      require('./renderer.js')
+      window.$ = window.jQuery = require('./vendor/jquery/jquery.min.js');
     </script>
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="main.js"></script>
+    <script>
+      require('./js/nav')
+    </script>
+
   </body>
 </html>
