@@ -1,7 +1,6 @@
 const electron = require('electron');
 const path = require('path');
 const fs = require('fs');
-const project = require('./project.js');
 
 class Storage {
   constructor(opts) {
@@ -10,9 +9,6 @@ class Storage {
 
     // Specify path name, for the saved projects file.
     this.path = path.join(userDataPath, 'saved-projects.json');
-
-    // Store mapping from project name to project path
-    this.projectPaths = new Object();
 
     // Load all prior saved projects.
     this.projects = populateProjects(this.path, opts.defaults);
@@ -24,47 +20,24 @@ class Storage {
   }
 
   // Save a project.
-  saveProject(projectName, projectDirectory) {
-    this.projects[projectName] = projectDirectory;
+  saveProject(projectName, data) {
+    this.projects[projectName] = data;
 
-    saveAll();
-  }
-
-  // Update an attribute of a project.
-  updateProject(projectName, attribute, text, newValue = null) {
-    var projectDirectory = this.projects[projectName];
-    var projectJson = path.join(projectDirectory, this.projectName + '.json');
-    var proj = project.loadProject(projectJson);
-
-    switch(attribute) {
-      case 'addImage':
-        proj.addImage(text, newValue);
-        break;
-      case 'removeImage':
-        proj.removeImage(text);
-        break;
-      case 'updateProjectName':
-        proj.updateProjectName(text);
-        break;
-      case 'updateDescription':
-        proj.updateDescription(text);
-        break;
-    }
-
-    proj.saveProject();
-  }
-
-  // Return the number of projects that have been saved
-  getNumberProjects() {
-    return Object.keys(this.projects).length;
-  }
-
-  // Saves all projects and updates saved-projects list
-  saveAll() {
     // We're not writing a server so there's not nearly the same IO demand on
     // the process. Also, if we used an async API and our app was quit before
     // the asynchronous write had a chance to complete, we might lose that data.
     // TODO(varsha): try/catch this.
+    fs.writeFileSync(this.path, JSON.stringify(this.projects));
+  }
+
+  // Update an attribute of a project.
+  updateProject(projectName, attribute, newValue) {
+    var proj = this.projects[projectName];
+
+    // Note that this assumes the project is formatted as a dictionary.
+    proj[attribute] = newValue;
+
+    // Save the update.
     fs.writeFileSync(this.path, JSON.stringify(this.projects));
   }
 }
