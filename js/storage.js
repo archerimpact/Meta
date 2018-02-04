@@ -8,37 +8,37 @@ class Storage {
     const userDataPath = (electron.app || electron.remote.app).getPath('userData');
 
     // Specify path name, for the saved projects file.
-    this.path = path.join(userDataPath, 'saved-projects.json');
+    this._path = path.join(userDataPath, 'saved-projects.json');
 
     // Load all prior saved projects.
-    this.projects = populateProjects(this.path, opts.defaults);
+    this._projects = populateProjects(this._path, opts.defaults);
   }
 
   // Return the value associated with a saved project (specified by string key).
   getProject(projectName) {
-    return this.projects[projectName];
+    return this._projects[projectName];
   }
 
   // Save a project.
   saveProject(projectName, data) {
-    this.projects[projectName] = data;
+    this._projects[projectName] = data;
 
     // We're not writing a server so there's not nearly the same IO demand on
     // the process. Also, if we used an async API and our app was quit before
     // the asynchronous write had a chance to complete, we might lose that data.
     // TODO(varsha): try/catch this.
-    fs.writeFileSync(this.path, JSON.stringify(this.projects));
+    fs.writeFileSync(this._path, JSON.stringify(this._projects));
   }
 
   // Update an attribute of a project.
   updateProject(projectName, attribute, newValue) {
-    var proj = this.projects[projectName];
+    var proj = this._projects[projectName];
 
     // Note that this assumes the project is formatted as a dictionary.
     proj[attribute] = newValue;
 
     // Save the update.
-    fs.writeFileSync(this.path, JSON.stringify(this.projects));
+    fs.writeFileSync(this._path, JSON.stringify(this._projects));
   }
 }
 
