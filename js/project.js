@@ -8,40 +8,40 @@ class Project {
 
   constructor(store) {
     // Retain storage instance
-    this.store = store;
+    this._store = store;
 
     // List of all images/videos associated with this project
-    this.images = new Object();
+    this._images = new Object();
 
     // Set default project name
-    this.projectName = 'New Project ' + storage.getNumberProjects();
+    this._projectName = 'New Project ' + storage.getNumberProjects();
 
     // Project description variable
-    this.description = '';
+    this._description = '';
 
     // Project timestamp
-    this.timestamp = Date.now();
+    this._timestamp = Date.now();
   }
 
   // Add an image/video to the project
-  addImage(name, data) {
-    var image = new Image(data);
-    this.image[name] = image;
+  addImage(name, path) {
+    var image = new Image(name, path, this);
+    this._image[name] = image;
   }
 
   // Remove an image/video from the project
   removeImage(name) {
-    delete this.image[name];
+    delete this._image[name];
   }
 
   // Update the project name
   updateProjectName(name) {
-    this.projectName = name;
+    this._projectName = name;
   }
 
   // Update the project description
   updateDescription(description) {
-    this.description = description;
+    this._description = description;
   }
 
   // TODO(varsha): Export the project to CSV
@@ -54,27 +54,27 @@ class Project {
     const userDataPath = (electron.app || electron.remote.app).getPath('userData');
 
     // Create directory for this project
-    var projectDirectory = path.join(userDataPath, this.projectName + '.json');
+    var projectDirectory = path.join(userDataPath, this._projectName + '.json');
     fs.makedir(projectDirectory);
 
     // Store all relevant images in the project directory
     var image;
-    for (image in Object.keys(this.images)) {
-      var imagePath = this.images[image];
+    for (image in Object.keys(this._images)) {
+      var imagePath = this._images[image];
       fs.writeFileSync(imagePath, JSON.stringify(image.toDict()));
     }
 
     // Call storage class
-    this.store.saveProject(this.projectName, projectDirectory);
+    this._store.saveProject(this._projectName, projectDirectory);
   }
 
   // Converts this class information to a dictionary
   toDict() {
     var projectDict = new Object();
-    projectDict['images'] = this.images;
-    projectDict['projectName'] = this.projectName;
-    projectDict['description'] = this.description;
-    projectDict['timestamp'] = this.timestamp;
+    projectDict['images'] = this._images;
+    projectDict['projectName'] = this._projectName;
+    projectDict['description'] = this._description;
+    projectDict['timestamp'] = this._timestamp;
   }
 
 }
@@ -92,7 +92,7 @@ function loadProject(jsonFile) {
   project.updateDescription(info['description']);
 
   // Load images.
-  project.images = info['images'];
+  project._images = info['images'];
 
   // TODO(varsha): do rendering here
 }
