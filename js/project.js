@@ -76,6 +76,8 @@ class Project {
   saveProject() {
     const userDataPath = (electron.app || electron.remote.app).getPath('userData');
 
+    console.log(userDataPath);
+
     // Create directory for this project
     var projectDirectory = path.join(userDataPath, this._projectName + '.json');
     fs.makedir(projectDirectory);
@@ -104,7 +106,7 @@ class Project {
 
   // Constructs instance of Image class for all images linked to this project,
   // using an input JSON file. To be used upon reloading a project.
-  function loadImages() {
+  loadImages() {
     var imagePath, image, rawData, info;
     var images = [];
 
