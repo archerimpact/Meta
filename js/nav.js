@@ -1,3 +1,9 @@
+// landing page
+let height = window.innerHeight - 54;
+let str = "height:" + String(height) +"px";
+document.getElementById("wrapper").setAttribute("style", str);
+
+// navigation
 window.navigation = window.navigation || {},
 function(n) {
  navigation.menu = {
