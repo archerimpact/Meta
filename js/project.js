@@ -1,15 +1,12 @@
 const electron = require('electron');
 const path = require('path');
 const fs = require('fs');
-const storage = require('./storage.js');
+const remote = require('electron').remote;
 const image = require('./image.js');
 
 class Project {
 
-  constructor(store, name, description) {
-    // Retain storage instance
-    this._store = store;
-
+  constructor(name, description) {
     // List of all images/videos associated with this project
     this._images = new Object();
 
@@ -91,7 +88,8 @@ class Project {
     }
 
     // Call storage class
-    this._store.saveProject(this._projectName, projectDirectory);
+    var storage = remote.getGlobal('sharedObj').store;
+    storage.saveProject(this._projectName, projectDirectory);
   }
 
   // Converts this class information to a dictionary
@@ -128,11 +126,11 @@ class Project {
 }
 
 // Constructs instance of Project class from JSON file.
-function loadProject(store, jsonFile) {
+function loadProject(jsonFile) {
   var rawData = fs.readFileSync(jsonFile);
   var info = JSON.parse(rawData);
 
-  var project = new Project(store, info['projectName'], info['description']);
+  var project = new Project(info['projectName'], info['description']);
 
   // Load images.
   project.setImageDict(info['images']);

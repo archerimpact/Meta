@@ -11,6 +11,16 @@ const url = require('url')
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
+// Instance of storage class. Will be used to ensure that files persist across
+// application instances.
+const storage = new Storage({
+  defaults: {}
+});
+
+// Set storage instance to be used across js files. All constants that should
+// be accessible to other scripts must go here.
+global.sharedObj = {store: storage};
+
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 800, height: 600})
