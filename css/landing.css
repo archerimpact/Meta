@@ -8,6 +8,9 @@ header.masthead {
   background-repeat: no-repeat;
   background-attachment: scroll;
   background-position: center center;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+  height: 100%;
 }
 
 header.masthead .intro-text {
@@ -50,4 +53,22 @@ header.masthead .intro-text .intro-heading {
     margin-bottom: 50px;
     font-family: 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
+}
+
+#landing {
+  height:100%;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+}
+
+.inner {
+  height:100%;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+}
+
+.section_template {
+  height: 100%;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
 }
