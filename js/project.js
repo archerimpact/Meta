@@ -6,42 +6,68 @@ const image = require('./image.js');
 
 class Project {
 
-  constructor(store) {
+  constructor(store, name, description) {
     // Retain storage instance
     this._store = store;
 
     // List of all images/videos associated with this project
     this._images = new Object();
 
-    // Set default project name
-    this._projectName = 'New Project ' + storage.getNumberProjects();
+    // Set project name
+    this._projectName = name;
 
-    // Project description variable
-    this._description = '';
+    // Set project description
+    this._description = description;
 
     // Project timestamp
-    this._timestamp = Date.now();
+    this._creation = Date.now();
+
+    // Store last modified timestamp
+    this._lastModified = Date.now();
   }
 
   // Add an image/video to the project
   addImage(name, path) {
     var image = new Image(name, path, this);
     this._image[name] = image;
+
+    setLastModified(Date.now());
   }
 
   // Remove an image/video from the project
   removeImage(name) {
     delete this._image[name];
+
+    setLastModified(Date.now());
   }
 
   // Update the project name
   updateProjectName(name) {
     this._projectName = name;
+
+    setLastModified(Date.now());
   }
 
   // Update the project description
   updateDescription(description) {
     this._description = description;
+
+    setLastModified(Date.now());
+  }
+
+  // Set images dictionary (to be used only for reloading)
+  setImages(imageDict) {
+    this._images = imageDict;
+  }
+
+  // Set creation timestamp (to be used only for reloading)
+  setCreation(timestamp) {
+    this._creation = timestamp;
+  }
+
+  // Update lastModified timestamp
+  setLastModified(timestamp) {
+    this._lastModified = timestamp;
   }
 
   // TODO(varsha): Export the project to CSV
@@ -74,27 +100,50 @@ class Project {
     projectDict['images'] = this._images;
     projectDict['projectName'] = this._projectName;
     projectDict['description'] = this._description;
-    projectDict['timestamp'] = this._timestamp;
+    projectDict['creation'] = this._creation;
+    projectDict['lastModified'] = this._lastModified;
+  }
+
+  // Constructs instance of Image class for all images linked to this project,
+  // using an input JSON file. To be used upon reloading a project.
+  function loadImages() {
+    var imagePath, image, rawData, info;
+    var images = [];
+
+    for (imagePath in Object.values(project._images)) {
+      rawData = fs.readFileSync(imagePath);
+      info = JSON.parse(rawData);
+
+      // Create image instance.
+      image = new Image(info['name'], info['path'], info['project']);
+      image.setMetadata(info['metadata']);
+
+      // Add image instance to list of images associated with this project.
+      images.push(image);
+    }
+
+    return images;
   }
 
 }
 
-function loadProject(jsonFile) {
+// Constructs instance of Project class from JSON file.
+function loadProject(store, jsonFile) {
   var rawData = fs.readFileSync(jsonFile);
   var info = JSON.parse(rawData);
 
-  var project = new Project();
-
-  // Load name.
-  project.updateProjectName(info['projectName']);
-
-  // Load description.
-  project.updateDescription(info['description']);
+  var project = new Project(store, info['projectName'], info['description']);
 
   // Load images.
-  project._images = info['images'];
+  project.setImageDict(info['images']);
 
-  // TODO(varsha): do rendering here
+  // Set creation timestamp.
+  project.setCreation(info['creation']);
+
+  // Set lastModified timestamp.
+  project.setLastModified(info['lastModified']);
+
+  return project;
 }
 
 module.exports = Project
