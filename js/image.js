@@ -1,17 +1,15 @@
 const electron = require('electron');
-const _name;
-const _path;
-const _project;
-const _metadata;
+var exif = require('exiftool');
+var fs = require('fs');
 
 class Image {
 
   //should take in a path/src, name, and project
   constructor(name, path, project) {
-      _name = setName(name);
-      _path = setPath(path);
-      _project = setProject(project);
-
+      this._name = setName(name);
+      this._path = setPath(path);
+      this._project = setProject(project);
+      this._metadata = getMetadata(path);
   }
 
   //set path
@@ -44,11 +42,25 @@ class Image {
     return _project;
   }
 
-  //need to define a variable initialized in constructor to get the metadata
-
-  getMetadata() {
-    //should call our metadata.js file
+  setMetadata(metadata) {
+    this._metadata = metadata;
   }
 
-  //save & load
+  getMetadata(path) {
+    fs.readFile(path, function (err, data) {
+      if (err) {
+        throw err;
+      } else {
+        exif.metadata(data, function (err, metadata) {
+          if (err) {
+            throw err;
+          } else {
+            return metadata;
+          }
+        });
+      }
+    });
+    return;
+  }
+
 }
