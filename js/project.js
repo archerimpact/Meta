@@ -2,7 +2,7 @@ const electron = require('electron');
 const path = require('path');
 const fs = require('fs');
 const remote = require('electron').remote;
-const image = require('./image.js');
+const Image = require('./image.js');
 
 class Project {
 
