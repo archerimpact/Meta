@@ -16,19 +16,21 @@
                 <a href="#">New Project</a>
               </h4>
 
-              <!-- Choose image -->
-              <script src="../js/choose-file.js"></script>
+              <!-- Choose image: TODO: take image selection out and put in details.html -->
+              <script src="./js/choose-file.js"></script>
               <input type="file" onchange="previewFile()"><br>
 			  <img src="">
 
               <form>
 			    Project Name:<br>
-			    <input type="text" name="name"><br>
+			    <input type="text" id="name" value="New Project"><br>
 			  </form>
               <div class="form-group">
                 <label for="description">Project Description:</label>
                 <textarea class="form-control" rows="5" id="description"></textarea>
               </div>
+              <script src="js/new.js"></script>
+              <button id="submit-new" class="btn btn-primary nav-link" data-section="detail" onclick="createProject()">Submit</button> 
             </div>
           </div>
         </div>
