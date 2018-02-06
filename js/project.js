@@ -80,7 +80,7 @@ class Project {
 
     // Create directory for this project
     var projectDirectory = path.join(userDataPath, this._projectName + '.json');
-    fs.makedir(projectDirectory);
+    fs.mkdir(projectDirectory);
 
     // Store all relevant images in the project directory
     var image;
