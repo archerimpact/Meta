@@ -9,7 +9,7 @@ const url = require('url')
 
 // Instance of storage class. Will be used to ensure that files persist across
 // application instances.
-const Storage = require('./js/storage.js')
+const Storage = require('./js/storage.js');
 const storage = new Storage({
   defaults: {}
 });

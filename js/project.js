@@ -146,4 +146,4 @@ function loadProject(jsonFile) {
   return project;
 }
 
-module.exports = Project
+exports.Project = Project
