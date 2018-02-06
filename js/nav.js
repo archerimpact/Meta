@@ -1,6 +1,6 @@
 // navigation
 window.navigation = window.navigation || {},
-function(n) {
+function(n, dest) {
  navigation.menu = {
    constants: {
      sectionTemplate: '.section-template',
@@ -24,6 +24,12 @@ function(n) {
          navigation.menu.hideAllSections()
          navigation.menu.showSection(event)
        }
+     })
+     document.body.addEventListener('redirect', function (event) {
+       navigation.menu.hideAllSections()
+       let section = event.detail
+       $('#' + section).show()
+       $('#' + section + ' section').show()
      })
    },
 
@@ -56,3 +62,8 @@ function(n) {
  })
 
 }(jQuery);
+
+function redirect(destination) {
+  var event = new CustomEvent('redirect', { detail: destination });
+  document.body.dispatchEvent(event);
+}
