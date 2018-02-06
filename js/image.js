@@ -1,5 +1,5 @@
 const electron = require('electron');
-var exif = require('exiftool');
+// var exif = require('exiftool');
 var fs = require('fs');
 
 class Image {

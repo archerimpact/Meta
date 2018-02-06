@@ -50,12 +50,12 @@ function previewFile(){
         };
     })();
 
-$("#new-project").submit(function(evt){
-  evt.preventDefault();
-  let name = $("#name-input")[0].value;
-  let desc = $("#desc-input")[0].value;
-  let files = $("#files-input")[0].value;
-  console.log(name);
-  console.log(desc);
-  console.log(files);
-});
+// $("#new-project").submit(function(evt){
+//   evt.preventDefault();
+//   let name = $("#name-input")[0].value;
+//   let desc = $("#desc-input")[0].value;
+//   let files = $("#files-input")[0].value;
+//   console.log(name);
+//   console.log(desc);
+//   console.log(files);
+// });

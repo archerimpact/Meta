@@ -3,8 +3,7 @@
     <div class="container">
 
       <!-- Page Heading -->
-      <h1 class="my-4">Create New Project
-      </h1>
+      <h1 class="my-4">Create New Project</h1>
 
       <div class="row">
         <div class="col-md-12">
@@ -22,40 +21,16 @@
               <label for="proj-input">Select Media </label>
               <!-- UNCOMMENT THE FOLLOWING LINES FOR DRAG AND DROP (NOTE: NOT IMPLEMENTED ON BACK END) -->
               <!-- <small>Drag onto the icon or click the box to select</small> -->
+              <!-- ALSO CONSIDER USING previewFile() TO SEE IMAGES -->
               <input type="file" id="files-input" class="form-control-file" id="proj-file-input" multiple style="display: inline">
               <!-- <img src="assets/upload.svg" id="upload" style="display: inline"> -->
             </div>
             <button type="submit" class="btn btn-primary mb-2">Create Project</button>
           </form>
-          <script src="./js/choose-file.js"></script>
-
-
-          <!-- <div class="card h-100">
-            <a href="#"><img class="card-img-top" src="http://placehold.it/700x400" alt=""></a>
-            <div class="card-body">
-              <h4 class="card-title">
-                <a href="#">New Project</a>
-              </h4> -->
-
-              <!-- Choose image -->
-              <!-- <script src="../js/choose-file.js"></script>
-              <input type="file" onchange="previewFile()"><br>
-			  <img src="">
-
-              <form>
-			    Project Name:<br>
-			    <input type="text" name="name"><br>
-			  </form>
-              <div class="form-group">
-                <label for="description">Project Description:</label>
-                <textarea class="form-control" rows="5" id="description"></textarea>
-              </div>
-            </div>
-          </div> -->
+          <script src="./js/new.js"></script>
+              <!-- Choose image: TODO: take image selection out and put in details.html -->
+          </div>
         </div>
       </div>
-      <!-- /.row -->
-
-    </div>
 </section>
 </template>

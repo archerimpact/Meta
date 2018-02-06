@@ -76,16 +76,20 @@ class Project {
   saveProject() {
     const userDataPath = (electron.app || electron.remote.app).getPath('userData');
 
+    console.log(userDataPath);
+
     // Create directory for this project
-    var projectDirectory = path.join(userDataPath, this._projectName + '.json');
-    fs.makedir(projectDirectory);
+    var projectDirectory = path.join(userDataPath, this._projectName);
+    fs.mkdir(projectDirectory);
+    var filePath = path.join(projectDirectory, this._projectName + '.json');
+    fs.writeFileSync(filePath, JSON.stringify(this.toDict()));
 
     // Store all relevant images in the project directory
-    var image;
-    for (image in Object.keys(this._images)) {
-      var imagePath = this._images[image];
-      fs.writeFileSync(imagePath, JSON.stringify(image.toDict()));
-    }
+    // var image;
+    // for (image in Object.keys(this._images)) {
+    //   var imagePath = this._images[image];
+    //   fs.writeFileSync(imagePath, JSON.stringify(image.toDict()));
+    // }
 
     // Call storage class
     var storage = remote.getGlobal('sharedObj').store;
@@ -100,11 +104,12 @@ class Project {
     projectDict['description'] = this._description;
     projectDict['creation'] = this._creation;
     projectDict['lastModified'] = this._lastModified;
+    return projectDict;
   }
 
   // Constructs instance of Image class for all images linked to this project,
   // using an input JSON file. To be used upon reloading a project.
-  function loadImages() {
+  loadImages() {
     var imagePath, image, rawData, info;
     var images = [];
 
@@ -144,4 +149,4 @@ function loadProject(jsonFile) {
   return project;
 }
 
-module.exports = Project
+exports.Project = Project
