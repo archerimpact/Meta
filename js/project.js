@@ -79,8 +79,10 @@ class Project {
     console.log(userDataPath);
 
     // Create directory for this project
-    var projectDirectory = path.join(userDataPath, this._projectName + '.json');
+    var projectDirectory = path.join(userDataPath, this._projectName);
     fs.mkdir(projectDirectory);
+    var filePath = path.join(projectDirectory, this._projectName + '.json');
+    fs.writeFileSync(filePath, JSON.stringify(this.toDict()));
 
     // Store all relevant images in the project directory
     // var image;
@@ -102,6 +104,7 @@ class Project {
     projectDict['description'] = this._description;
     projectDict['creation'] = this._creation;
     projectDict['lastModified'] = this._lastModified;
+    return projectDict;
   }
 
   // Constructs instance of Image class for all images linked to this project,
