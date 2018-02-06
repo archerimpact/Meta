@@ -1,5 +1,7 @@
 # gitignore file recommended by Github for Node dev env (we do not use all of these)
 
+.DS_Store
+
 # Logs
 logs
 *.log
