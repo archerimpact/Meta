@@ -83,11 +83,11 @@ class Project {
     fs.mkdir(projectDirectory);
 
     // Store all relevant images in the project directory
-    var image;
-    for (image in Object.keys(this._images)) {
-      var imagePath = this._images[image];
-      fs.writeFileSync(imagePath, JSON.stringify(image.toDict()));
-    }
+    // var image;
+    // for (image in Object.keys(this._images)) {
+    //   var imagePath = this._images[image];
+    //   fs.writeFileSync(imagePath, JSON.stringify(image.toDict()));
+    // }
 
     // Call storage class
     var storage = remote.getGlobal('sharedObj').store;
