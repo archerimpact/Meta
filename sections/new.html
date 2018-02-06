@@ -20,10 +20,12 @@
             <div class="form-group">
               <label for="proj-input">Select Media </label>
               <!-- UNCOMMENT THE FOLLOWING LINES FOR DRAG AND DROP (NOTE: NOT IMPLEMENTED ON BACK END) -->
-              <!-- <small>Drag onto the icon or click the box to select</small> -->
+              <small>Click or drag and drop</small>
+              <p></p>
               <!-- ALSO CONSIDER USING previewFile() TO SEE IMAGES -->
-              <input type="file" id="files-input" class="form-control-file" id="proj-file-input" multiple style="display: inline">
-              <!-- <img src="assets/upload.svg" id="upload" style="display: inline"> -->
+              <!-- <input type="file" id="files-input" class="form-control-file" id="proj-file-input" multiple style="display: inline"> -->
+              <img src="assets/upload.svg" id="upload" style="display: inline">
+              <div id="file-label"></div>
             </div>
             <button type="submit" class="btn btn-primary mb-2">Create Project</button>
           </form>
