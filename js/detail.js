@@ -8,7 +8,7 @@ class Detail {
 
   constructor(project) {
     // Store project
-    this._project =  project;
+    this._project = project;
 
     // Store images associated with the project
     this._images = project.loadImages();
