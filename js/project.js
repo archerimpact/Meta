@@ -21,6 +21,11 @@ class Project {
 
     // Store last modified timestamp
     this._lastModified = Date.now();
+
+    // Set project directory pathname
+    const userDataPath = (electron.app || electron.remote.app).getPath('userData');
+    console.log(userDataPath);
+    this._projectDirectory = path.join(userDataPath, this._projectName);
   }
 
   // Add an image/video to the project
@@ -74,11 +79,9 @@ class Project {
 
   // TODO(varsha): Eventually update the saving process, so that it is more efficient.
   saveProject() {
-    const userDataPath = (electron.app || electron.remote.app).getPath('userData');
 
     // Create directory for this project
-    var projectDirectory = path.join(userDataPath, this._projectName);
-    fs.mkdir(projectDirectory);
+    fs.mkdir(this._projectDirectory);
     var filePath = path.join(projectDirectory, this._projectName + '.json');
     fs.writeFileSync(filePath, JSON.stringify(this.toDict()));
 
@@ -126,6 +129,11 @@ class Project {
     return images;
   }
 
+  // Return project directory path.
+  getProjectDirectory() {
+    return this._projectDirectory;
+  }
+
 }
 
 // Constructs instance of Project class from JSON file.
@@ -145,6 +153,12 @@ function loadProject(jsonFile) {
   project.setLastModified(info['lastModified']);
 
   return project;
+}
+
+function getProjectJsonPath(projectName) {
+  const userDataPath = (electron.app || electron.remote.app).getPath('userData');
+  var projectDirectory = path.join(userDataPath, this._projectName);
+  return path.join(projectDirectory, projectName + '.json');
 }
 
 exports.Project = Project
