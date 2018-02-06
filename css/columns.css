@@ -21,3 +21,7 @@ body {
 .pagination {
   margin-bottom: 30px;
 }
+
+#upload {
+  height: 50px;
+}
