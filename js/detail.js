@@ -3,6 +3,8 @@ const path = require('path');
 const fs = require('fs');
 const remote = require('electron').remote;
 const Image = require('./image.js');
+const getProjectJsonPath = require('./project.js').getProjectJsonPath
+const loadProject = require('./project.js').loadProject
 
 class Detail {
 
@@ -21,9 +23,14 @@ class Detail {
 }
 
 function loadDetail(projectName){
-	var project = getProject(projectName);
+	var projectPath = getProjectJsonPath(projectName);
+	var project = loadProject(projectPath);
 	var detail = new Detail(project);
 	// iterate through images and add to html
+	redirect('detail');
 }
 
-module.exports = Detail
+module.exports = {
+	loadDetail: loadDetail,
+	Detail: Detail
+};

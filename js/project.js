@@ -82,7 +82,7 @@ class Project {
 
     // Create directory for this project
     fs.mkdir(this._projectDirectory);
-    var filePath = path.join(projectDirectory, this._projectName + '.json');
+    var filePath = path.join(this._projectDirectory, this._projectName + '.json');
     fs.writeFileSync(filePath, JSON.stringify(this.toDict()));
 
     // Store all relevant images in the project directory
@@ -94,7 +94,7 @@ class Project {
 
     // Call storage class
     var storage = remote.getGlobal('sharedObj').store;
-    storage.saveProject(this._projectName, projectDirectory);
+    storage.saveProject(this._projectName, this._projectDirectory);
   }
 
   // Converts this class information to a dictionary
@@ -157,8 +157,12 @@ function loadProject(jsonFile) {
 
 function getProjectJsonPath(projectName) {
   const userDataPath = (electron.app || electron.remote.app).getPath('userData');
-  var projectDirectory = path.join(userDataPath, this._projectName);
+  var projectDirectory = path.join(userDataPath, projectName);
   return path.join(projectDirectory, projectName + '.json');
 }
 
-exports.Project = Project
+module.exports = {
+  Project: Project,
+  loadProject: loadProject,
+  getProjectJsonPath: getProjectJsonPath
+}

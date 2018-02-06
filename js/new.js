@@ -1,5 +1,6 @@
 const ProjectF = require('./js/project.js')
 const Project = ProjectF.Project
+const loadDetail = require('./js/detail.js').loadDetail
 
 function createProject(){
 	var remote = electron.remote;
@@ -14,20 +15,26 @@ function createProject(){
 	} else if (name == "") {
 		// display: "Please give a project name"
         console.log("Please give a project name");
+        return
 	} else {
 		console.log(name);
 		console.log(desc);
 		console.log(files);
 		var proj = new Project(name, desc);
 		proj.saveProject();
+        return name;
 	}
 }
 
 $("#new-project").submit(function(e) {
 	e.preventDefault();
 	console.log(e);
-	createProject();
-	redirect('landing')
+	var projectName = createProject();
+    if (projectName) {
+        loadDetail(projectName);
+    } else {
+        console.log("project is null")
+    }
 });
 
 // (function () {
