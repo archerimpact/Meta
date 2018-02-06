@@ -18,7 +18,12 @@ class Detail {
   uploadImage(path) {
 
   }
+}
 
+function loadDetail(projectName){
+	var project = getProject(projectName);
+	var detail = new Detail(project);
+	// iterate through images and add to html
 }
 
 module.exports = Detail

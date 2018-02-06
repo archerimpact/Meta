@@ -76,8 +76,6 @@ class Project {
   saveProject() {
     const userDataPath = (electron.app || electron.remote.app).getPath('userData');
 
-    console.log(userDataPath);
-
     // Create directory for this project
     var projectDirectory = path.join(userDataPath, this._projectName);
     fs.mkdir(projectDirectory);
