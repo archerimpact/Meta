@@ -115,7 +115,7 @@ class Project {
     var imagePath, image, rawData, info;
     var images = [];
 
-    for (imagePath in Object.values(project._images)) {
+    for (imagePath in Object.values(this._images)) {
       rawData = fs.readFileSync(imagePath);
       info = JSON.parse(rawData);
 
@@ -145,7 +145,7 @@ function loadProject(jsonFile) {
   var project = new Project(info['projectName'], info['description']);
 
   // Load images.
-  project.setImageDict(info['images']);
+  project.setImages(info['images']);
 
   // Set creation timestamp.
   project.setCreation(info['creation']);

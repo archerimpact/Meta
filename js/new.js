@@ -12,17 +12,17 @@ function createProject(){
 	var desc = document.getElementById("desc-input").value;
 	// file paths stored in paths_global
 
-	if (store.getProject(name) != null) {
-		// display: "Project name already used. Please input new name"
-	} else if (name == "") {
-		// display: "Please give a project name"
+    if (!name) {
+        // display: "Please give a project name"
         console.log("Please give a project name");
+        return
+	} else if (store.getProject(name) != null) {
+		// display: "Project name already used. Please input new name"
+        console.log("Project name already used");
         return
 	} else {
 		console.log(name);
-		console.log(desc);
-		console.log(files);
-		
+		console.log(desc);		
 		var proj = new Project(name, desc);
 		proj.saveProject();
 		for (var index in paths_global) {
@@ -36,12 +36,11 @@ function createProject(){
 
 $("#new-project").submit(function(e) {
 	e.preventDefault();
-	console.log(e);
 	var projectName = createProject();
     if (projectName) {
         loadDetail(projectName);
     } else {
-        console.log("project is null")
+        console.log(projectName + ": project not created")
     }
 });
 

@@ -7,9 +7,9 @@ class Image {
 
   //should take in a path/src, name, and project
   constructor(name, path, project) {
-      this._name = setName(name);
-      this._path = setPath(path);
-      this._project = setProject(project);
+      this._name = name;
+      this._path = path;
+      this._project = project;
 
       var helper = this._path.split(".");
       if (helper[helper.length - 1] == "jpg" || helper[helper.length - 1] == "jpeg") {
