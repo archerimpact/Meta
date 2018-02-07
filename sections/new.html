@@ -3,64 +3,34 @@
     <div class="container">
 
       <!-- Page Heading -->
-      <h1 class="my-4">New Project
-        <small>Secondary Text</small>
-      </h1>
+      <h1 class="my-4">Create New Project</h1>
 
       <div class="row">
-        <div class="col-lg-4 col-sm-6 portfolio-item">
-          <div class="card h-100">
-            <a href="#"><img class="card-img-top" src="http://placehold.it/700x400" alt=""></a>
-            <div class="card-body">
-              <h4 class="card-title">
-                <a href="#">New Project</a>
-              </h4>
+        <div class="col-md-12">
 
-              <!-- Choose image -->
-              <script src="choose-file.js"></script>
-              <input type="file" onchange="previewFile()"><br>
-			  <img src="">
-
-              <form>
-			    Project Name:<br>
-			    <input type="text" name="name"><br>
-			  </form>
-              <div class="form-group">
-                <label for="description">Project Description:</label>
-                <textarea class="form-control" rows="5" id="description"></textarea>
-              </div>
+          <form id='new-project'>
+            <div class="form-group">
+              <label for="project-name"> Project Name </label>
+              <input type="text" id="name-input" class="form-control" id="proj-name-input" placeholder="Enter descriptive name">
             </div>
+            <div class=form-group>
+              <label for="project-desc"> Project Description </label>
+              <textarea type="text" id="desc-input" class="form-control" id="proj-desc-input" rows="3" placeholder="Describe the project"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="proj-input">Select Media </label>
+              <!-- UNCOMMENT THE FOLLOWING LINES FOR DRAG AND DROP (NOTE: NOT IMPLEMENTED ON BACK END) -->
+              <!-- <small>Drag onto the icon or click the box to select</small> -->
+              <!-- ALSO CONSIDER USING previewFile() TO SEE IMAGES -->
+              <input type="file" id="files-input" class="form-control-file" id="proj-file-input" multiple style="display: inline">
+              <!-- <img src="assets/upload.svg" id="upload" style="display: inline"> -->
+            </div>
+            <button type="submit" class="btn btn-primary mb-2">Create Project</button>
+          </form>
+          <script src="./js/new.js"></script>
+              <!-- Choose image: TODO: take image selection out and put in details.html -->
           </div>
         </div>
       </div>
-
-      <!-- /.row -->
-
-      <!-- Pagination -->
-      <ul class="pagination justify-content-center">
-        <li class="page-item">
-          <a class="page-link" href="#" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-            <span class="sr-only">Previous</span>
-          </a>
-        </li>
-        <li class="page-item">
-          <a class="page-link" href="#">1</a>
-        </li>
-        <li class="page-item">
-          <a class="page-link" href="#">2</a>
-        </li>
-        <li class="page-item">
-          <a class="page-link" href="#">3</a>
-        </li>
-        <li class="page-item">
-          <a class="page-link" href="#" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-            <span class="sr-only">Next</span>
-          </a>
-        </li>
-      </ul>
-
-    </div>
 </section>
 </template>
