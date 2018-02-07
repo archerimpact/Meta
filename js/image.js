@@ -1,6 +1,7 @@
 const electron = require('electron');
-// var exif = require('exiftool');
-var fs = require('fs');
+const exif_mov = require('exiftool');
+const fs = require('fs');
+const exif_jpg = require('exif-js');
 
 class Image {
 
@@ -9,7 +10,16 @@ class Image {
       this._name = setName(name);
       this._path = setPath(path);
       this._project = setProject(project);
-      this._metadata = getMetadata(path);
+
+      var helper = this._path.split(".");
+      if (helper[helper.length - 1] == "jpg" || helper[helper.length - 1] == "jpeg") {
+        this._metadata = getJpgMetdata(path);
+      } else if (helper[helper.length - 1] == "mov") {
+        this._metadata = getMovMetadata(path)
+      } else {
+        this._metadata = NULL;
+      }
+
   }
 
   //set path
@@ -46,21 +56,18 @@ class Image {
     this._metadata = metadata;
   }
 
-  getMetadata(path) {
-    fs.readFile(path, function (err, data) {
-      if (err) {
-        throw err;
-      } else {
-        exif.metadata(data, function (err, metadata) {
-          if (err) {
-            throw err;
-          } else {
-            return metadata;
-          }
-        });
-      }
+  getMovMetadata(path) {
+  //need to figure out if we need the entire path here
+    var image = fs.readFileSync(path);
+  }
+
+  //need to figure out if we need the entire path here.
+  getJpgMetdata(path) {
+    return exif_jpg.getData(path, function() {
+      var allMetaData = exif_jpg.getAllTags(this);
+      return allMetaData;
     });
-    return;
   }
 
 }
+exports.Image = Image;
