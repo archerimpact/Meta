@@ -82,7 +82,7 @@ class Project {
   saveProject() {
     // Create directory for this project
     fs.mkdir(this._projectDirectory);
-    var filePath = path.join(projectDirectory, this._projectName + '.json');
+    var filePath = path.join(this._projectDirectory, this._projectName + '.json');
     fs.writeFileSync(filePath, JSON.stringify(this.toDict()));
 
     // Store all relevant images in the project directory
@@ -94,7 +94,7 @@ class Project {
 
     // Call storage class
     var storage = remote.getGlobal('sharedObj').store;
-    storage.saveProject(this._projectName, projectDirectory);
+    storage.saveProject(this._projectName, this._projectDirectory);
   }
 
   // Converts this class information to a dictionary
