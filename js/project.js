@@ -80,6 +80,7 @@ class Project {
 
   // TODO(varsha): Eventually update the saving process, so that it is more efficient.
   saveProject() {
+
     // Create directory for this project
     fs.mkdir(this._projectDirectory);
     var filePath = path.join(this._projectDirectory, this._projectName + '.json');
@@ -114,7 +115,7 @@ class Project {
     var imagePath, image, rawData, info;
     var images = [];
 
-    for (imagePath in Object.values(project._images)) {
+    for (imagePath in Object.values(this._images)) {
       rawData = fs.readFileSync(imagePath);
       info = JSON.parse(rawData);
 
@@ -144,7 +145,7 @@ function loadProject(jsonFile) {
   var project = new Project(info['projectName'], info['description']);
 
   // Load images.
-  project.setImageDict(info['images']);
+  project.setImages(info['images']);
 
   // Set creation timestamp.
   project.setCreation(info['creation']);
@@ -157,8 +158,12 @@ function loadProject(jsonFile) {
 
 function getProjectJsonPath(projectName) {
   const userDataPath = (electron.app || electron.remote.app).getPath('userData');
-  var projectDirectory = path.join(userDataPath, this._projectName);
+  var projectDirectory = path.join(userDataPath, projectName);
   return path.join(projectDirectory, projectName + '.json');
 }
 
-exports.Project = Project
+module.exports = {
+  Project: Project,
+  loadProject: loadProject,
+  getProjectJsonPath: getProjectJsonPath
+}
