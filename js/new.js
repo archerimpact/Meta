@@ -65,13 +65,20 @@ function setupload() {
 
 	holder.onclick = () => {
 	  let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
+		if (!paths) {
+			return false;
+		}
 		paths_global = paths;
 		document.getElementById("file-label").innerHTML = String(paths_global.length) + " files selected"
 	}
 
 	holder.ondrop = (e) => {
 	    e.preventDefault();
-			paths_global = e.dataTransfer.files;
+			var paths = e.dataTransfer.files;
+			if (!paths) {
+				return false;
+			}
+			paths_global = paths;
 			document.getElementById("file-label").innerHTML = String(paths_global.length) + " files selected"
 	    return false;
 	};
