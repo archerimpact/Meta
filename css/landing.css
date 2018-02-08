@@ -8,12 +8,9 @@ header.masthead {
   background-repeat: no-repeat;
   background-attachment: scroll;
   background-position: center center;
-<<<<<<< HEAD
   padding-bottom: 0px;
   margin-bottom: 0px;
   height: 100%;
-=======
->>>>>>> master
 }
 
 header.masthead .intro-text {
@@ -57,7 +54,6 @@ header.masthead .intro-text .intro-heading {
     font-family: 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
 }
-<<<<<<< HEAD
 
 #landing {
   height:100%;
@@ -76,5 +72,3 @@ header.masthead .intro-text .intro-heading {
   margin-bottom: 0px;
   padding-bottom: 0px;
 }
-=======
->>>>>>> master
