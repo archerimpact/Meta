@@ -7,39 +7,6 @@ const getProjectJsonPath = require('./project.js').getProjectJsonPath
 const loadProject = require('./project.js').loadProject
 const Mustache = require('Mustache')
 
-
-class Detail {
-
-  constructor(project) {
-    // Store project
-    this._project = project;
-
-    // Store images associated with the project
-    this._images = project.loadImages();
-
-    this.addToHtml();
-  }
-
-  addToHtml() {
-	var projectName = this._project._projectName;
-	var projectDesc = this._project._description;
-	
-
-	var html = [
-	    '<div class="proj-header">',
-	        '<h1 class="name-header">' + projectName + '<h1>',
-	        '<h2 class="description-header">' + projectDesc + '<h2>',
-	    '</div>'
-	].join("\n");
-
-	$("header").append(html);
-  }
-  // Create 
-  uploadImage(path) {
-
-  }
-}
-
 function loadDetail(projectName){
 	clearDetailsHtml();
 	var projectPath = getProjectJsonPath(projectName);
@@ -56,19 +23,37 @@ function loadDetail(projectName){
 function loadImages(project){
 	// Add each image in project into details.html
 	var images = project.loadImages();
-	for (var i = 0; i < images.length; i++){
-		var image = images[i];
-		var data = {
-		    name: image._name,
-		    path: image._path,
-			exifData: null
-		}
+	for (var i = 0; i < 2; i++){
+		// var image = images[i];
+		// var data = {
+		//     name: image._name,
+		//     path: image._path,
+		// 	exifData: null
+		// }
 
 		var template = [
-		    '<div class="image-header">',
-		        '<h1 class="image-name">{{name}}<h1>',
-		        '<p>{{path}}</p>',
-		    '</div>'
+		    '<div id="detail-template" class="row">',
+		      '<div class="col-md-7">',
+		        '<a href="#">',
+		          '<img class="img-fluid rounded mb-3 mb-md-0" src="http://placehold.it/700x300" alt="">',
+		        '</a>',
+		      '</div>',
+		      '<div class="col-md-5">',
+		        '<h3>Media One</h3>',
+		        '<p>',
+		        '<div class="row">',
+		          '<div class="col-md-5">',
+		           ' key here',
+		          '</div>',
+		          '<div class="col-md-7">',
+		            'value here',
+		          '</div>',
+		        '</div>',
+		        '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laudantium veniam exercitationem expedita laborum at voluptate. Labore, voluptates totam at aut nemo deserunt rem magni pariatur quos perspiciatis atque eveniet unde.</p>',
+		        '<a class="btn btn-primary" href="#">View More</a>',
+		      '</div>',
+		    '</div>',
+		    '<hr>'
 		].join("\n");
 		// template: '<div ...>\n<h1 ...>{{title}}<h1>\n</div>'
 
@@ -97,6 +82,5 @@ function clearDetailsHtml(){
 }
 
 module.exports = {
-	loadDetail: loadDetail,
-	Detail: Detail
+	loadDetail: loadDetail
 };
