@@ -72,3 +72,7 @@ header.masthead .intro-text .intro-heading {
   margin-bottom: 0px;
   padding-bottom: 0px;
 }
+
+#wrapper {
+  height: 100%;
+}
