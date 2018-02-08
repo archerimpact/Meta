@@ -11,6 +11,7 @@ class Image {
       this._path = path;
       this._project = project;
 
+      console.log(this._path);
       var helper = this._path.split(".");
       if (helper[helper.length - 1] == "jpg" || helper[helper.length - 1] == "jpeg") {
         this._metadata = getJpgMetdata(path);
