@@ -9,17 +9,19 @@ class Image {
   constructor(name, path, project) {
       this._name = name;
       this._path = path;
-      this._project = project;
+      this._project = project.getProjectName();
 
-      var helper = this._path.split(".");
+      var helper = path.format(this._path).split(".");
       if (helper[helper.length - 1] == "jpg" || helper[helper.length - 1] == "jpeg") {
         this._metadata = getJpgMetdata(path);
       } else if (helper[helper.length - 1] == "mov") {
         this._metadata = getMovMetadata(path)
       } else {
-        this._metadata = NULL;
+        this._metadata = null;
       }
 
+      // Set image directory.
+      this._imageDirectory = path.join(project.getProjectDirectory(), 'images');
   }
 
   //set path
@@ -67,6 +69,31 @@ class Image {
       var allMetaData = exif_jpg.getAllTags(this);
       return allMetaData;
     });
+  }
+
+  // Save image.
+  saveImage() {
+    if (!fs.existsSync(this._imageDirectory)) {
+      fs.mkdir(this._imageDirectory);
+    }
+
+    var filePath = path.join(this._imageDirectory, this._name + '.json');
+    fs.writeFileSync(filePath, JSON.stringify(this.toDict()));
+  }
+
+  toDict() {
+    var imageDict = new Object();
+    imageDict['name'] = this._name;
+    imageDict['path'] = this._path;
+    imageDict['project'] = this._project;
+    imageDict['metadata'] = this._metadata;
+    imageDict['imageDirectory'] = this._imageDirectory;
+    return imageDict;
+  }
+
+  // Returns the path of this image file.
+  getImagePath() {
+    return path.join(this._imageDirectory, this._name + '.json');
   }
 
 }
