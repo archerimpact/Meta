@@ -1,11 +1,12 @@
-const electron = require('electron');
-const path = require('path');
-const fs = require('fs');
-const remote = require('electron').remote;
-const Image = require('./image.js');
+const electron = require('electron')
+const path = require('path')
+const fs = require('fs')
+const remote = require('electron').remote
+const Image = require('./image.js')
 const getProjectJsonPath = require('./project.js').getProjectJsonPath
 const loadProject = require('./project.js').loadProject
 const Mustache = require('Mustache')
+
 
 class Detail {
 
@@ -47,13 +48,9 @@ function loadDetail(projectName){
 	// var detail = new Detail(project);
 
 	redirect('detail');
-	loadHeader(project);
-	loadImages(project);
-}
-
-function loadHeader(project){
-	// Add header template with Name and Description into details.html
-
+  	//document.getElementById('name-header').innerHTML = document.getElementById('name-header').innerHTML.replace("name-pc", projectName).replace("description-pc", "description here");
+  	loadHeader(project);
+  	loadImages(project);
 }
 
 function loadImages(project){
@@ -67,23 +64,36 @@ function loadImages(project){
 			exifData: null
 		}
 
-		var imgTemplate = [
-		    '<div class="tutorial">',
-		        '<h1 class="tutorial-heading">{{name}}<h1>',
+		var template = [
+		    '<div class="image-header">',
+		        '<h1 class="image-name">{{name}}<h1>',
 		        '<p>{{path}}</p>',
 		    '</div>'
 		].join("\n");
 		// template: '<div ...>\n<h1 ...>{{title}}<h1>\n</div>'
 
-		var html = Mustache.render(imgTemplate, data);
-		$("#image-wrapper").append(html);
+		var filler = Mustache.render(template, data);
+		$("#image-wrapper").append(filler);
 	}
 
 }
 
+function loadHeader(project) {
+  template = [
+    "<h1 id='name-header' class='my-4'>{{projName}}",
+      "<small>{{projDesc}}</small>",
+    "</h1>",
+  ].join("\n");
+  data = {
+    projName: project._projectName,
+    projDesc: project._description,
+  }
+  var filler = Mustache.render(template, data);
+  $("#detail-header").append(filler);
+}
+
 function clearDetailsHtml(){
 	// clear previous projects on the html
-
 }
 
 module.exports = {

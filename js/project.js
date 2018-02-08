@@ -32,30 +32,33 @@ class Project {
   // Add an image/video to the project
   addImage(name, path) {
     var image = new Image(name, path, this);
-    this._image[name] = image;
+    this._images[name] = image.toDict();
 
-    setLastModified(Date.now());
+    console.log('added image: ' + image);
+    console.log(this._images);
+
+    this._lastModified = Date.now();
   }
 
   // Remove an image/video from the project
   removeImage(name) {
-    delete this._image[name];
+    delete this._images[name];
 
-    setLastModified(Date.now());
+    this._lastModified = Date.now();
   }
 
   // Update the project name
   updateProjectName(name) {
     this._projectName = name;
 
-    setLastModified(Date.now());
+    this._lastModified = Date.now();
   }
 
   // Update the project description
   updateDescription(description) {
     this._description = description;
 
-    setLastModified(Date.now());
+    this._lastModified = Date.now();
   }
 
   // Set images dictionary (to be used only for reloading)
@@ -84,14 +87,32 @@ class Project {
     // Create directory for this project
     fs.mkdir(this._projectDirectory);
     var filePath = path.join(this._projectDirectory, this._projectName + '.json');
-    fs.writeFileSync(filePath, JSON.stringify(this.toDict()));
 
-    // Store all relevant images in the project directory
-    // var image;
-    // for (image in Object.keys(this._images)) {
-    //   var imagePath = this._images[image];
-    //   fs.writeFileSync(imagePath, JSON.stringify(image.toDict()));
-    // }
+    // Save all images.
+    var imageDirectory = path.join(this._projectDirectory, 'images');
+    var imageDict = new Object();
+    console.log('saving project: ');
+    console.log(this._images);
+    for (var key in this._images) {
+      console.log(key);
+    }
+    for (var image in this._images) {
+      console.log('in for loopp');
+      console.log(image);
+      if (!fs.existsSync(imageDirectory)) {
+        fs.mkdir(imageDirectory);
+      }
+      var filePath = path.join(imageDirectory, image + '.json');
+      if (!fs.existsSync(filePath)) {
+        var dict_obj = this._images[image];
+        console.log(dict_obj);
+        fs.writeFileSync(filePath, JSON.stringify(dict_obj));
+      }
+      // console.log(this._images[image]);
+      imageDict[image] = this._images[image]['name'];
+    }
+
+    fs.writeFileSync(filePath, JSON.stringify(this.toDict()));
 
     // Call storage class
     var storage = remote.getGlobal('sharedObj').store;
@@ -133,6 +154,11 @@ class Project {
   // Return project directory path.
   getProjectDirectory() {
     return this._projectDirectory;
+  }
+
+  // Return project name.
+  getProjectName() {
+    return this._projectName;
   }
 
 }

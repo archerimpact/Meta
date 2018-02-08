@@ -22,14 +22,15 @@ function createProject(){
         return
 	} else {
 		console.log(name);
-		console.log(desc);		
+		console.log(desc);
+		console.log(paths_global);
 		var proj = new Project(name, desc);
-		proj.saveProject();
 		for (var index in paths_global) {
 			var split = paths_global[index].split("/");
 			var filename = split[split.length -1].split(".")[0];
 			proj.addImage(filename, path);
 		}
+		proj.saveProject();
         return name
 	}
 }
@@ -64,13 +65,20 @@ function setupload() {
 
 	holder.onclick = () => {
 	  let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
+		if (!paths) {
+			return false;
+		}
 		paths_global = paths;
 		document.getElementById("file-label").innerHTML = String(paths_global.length) + " files selected"
 	}
 
 	holder.ondrop = (e) => {
 	    e.preventDefault();
-			paths_global = e.dataTransfer.files;
+			var paths = e.dataTransfer.files;
+			if (!paths) {
+				return false;
+			}
+			paths_global = paths;
 			document.getElementById("file-label").innerHTML = String(paths_global.length) + " files selected"
 	    return false;
 	};
