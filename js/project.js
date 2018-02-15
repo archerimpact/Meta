@@ -32,7 +32,7 @@ class Project {
   // Add an image/video to the project
   addImage(name, path) {
     var image = new Image(name, path, this);
-    this._images[name] = image.toDict();
+    this._images[name] = image.getInfo();
 
     console.log('added image: ' + image);
     console.log(this._images);
@@ -106,7 +106,7 @@ class Project {
       if (!fs.existsSync(imageFilePath)) {
         var dict_obj = this._images[image];
         console.log(dict_obj);
-        fs.writeFileSync(imageFilePath, JSON.stringify(dict_obj));
+        //fs.writeFileSync(imageFilePath, JSON.stringify(dict_obj));
       }
       // console.log(this._images[image]);
       imageDict[image] = this._images[image]['name'];
@@ -121,6 +121,8 @@ class Project {
 
   // Converts this class information to a dictionary
   toDict() {
+    //when we call this function is when we get the circular part
+    //it's because of the images attribute
     var projectDict = new Object();
     projectDict['images'] = this._images;
     projectDict['projectName'] = this._projectName;
