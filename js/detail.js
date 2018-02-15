@@ -25,6 +25,8 @@ class Detail {
 
 function loadDetail(projectName){
 	var projectPath = getProjectJsonPath(projectName);
+  console.log("project path detail");
+  console.log(projectPath);
 	var project = loadProject(projectPath);
 	var detail = new Detail(project);
 	// iterate through images and add to html

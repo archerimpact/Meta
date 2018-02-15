@@ -76,7 +76,7 @@ class Image {
     var dict = new Object();
     dict['name'] = this._name;
     dict['path'] = this._path;
-    dict['project'] = this._project;
+    dict['project'] = this._project._projectName;
     dict['meta'] = this._metadata;
     return dict;
   }

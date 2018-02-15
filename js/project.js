@@ -31,6 +31,11 @@ class Project {
 
   // Add an image/video to the project
   addImage(name, path) {
+    console.log("checking if path undefined");
+    console.log(path === undefined);
+    console.log("okay so addimage called");
+    console.log("path");
+    console.log(path);
     var image = new Image(name, path, this);
     this._images[name] = image.getInfo();
 
@@ -93,20 +98,19 @@ class Project {
     var imageDict = new Object();
     console.log('saving project: ');
     console.log(this._images);
-    for (var key in this._images) {
-      console.log(key);
-    }
     for (var image in this._images) {
-      console.log('in for loopp');
+      console.log('in for loop');
       console.log(image);
       if (!fs.existsSync(imageDirectory)) {
         fs.mkdir(imageDirectory);
       }
       var imageFilePath = path.join(imageDirectory, image + '.json');
+      console.log("image file path");
+      console.log(imageFilePath);
       if (!fs.existsSync(imageFilePath)) {
         var dict_obj = this._images[image];
         console.log(dict_obj);
-        //fs.writeFileSync(imageFilePath, JSON.stringify(dict_obj));
+        fs.writeFileSync(imageFilePath, JSON.stringify(dict_obj));
       }
       // console.log(this._images[image]);
       imageDict[image] = this._images[image]['name'];
@@ -138,13 +142,18 @@ class Project {
     var imagePath, image, rawData, info;
     var images = [];
 
-    for (imagePath in Object.values(this._images)) {
-      rawData = fs.readFileSync(imagePath);
-      info = JSON.parse(rawData);
+    for (imagePath in this._images) {
+      console.log("imagePath");
+      console.log(imagePath);
+      console.log(this._images[imagePath]);
+
+      //rawData = fs.readFileSync(imagePath);
+      //info = JSON.parse(rawData);
 
       // Create image instance.
-      image = new Image(info['name'], info['path'], info['project']);
-      image.setMetadata(info['metadata']);
+      // image = new Image(info['name'], info['path'], info['project']);
+      // image.setMetadata(info['metadata']);
+      image = this._images[imagePath];
 
       // Add image instance to list of images associated with this project.
       images.push(image);
