@@ -66,8 +66,12 @@ class Image {
 
   //need to figure out if we need the entire path here.
   getJpgMetdata(path) {
-    return exif_jpg.getData(path, function() {
+    console.log("path in jpg meta");
+    console.log(path);
+    return exif_jpg.getImageData(path, function() {
       var allMetaData = exif_jpg.getAllTags(this);
+      console.log("metadata");
+      console.log(allMetaData);
       return allMetaData;
     });
   }

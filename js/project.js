@@ -25,22 +25,13 @@ class Project {
 
     // Set project directory pathname
     const userDataPath = (electron.app || electron.remote.app).getPath('userData');
-    console.log(userDataPath);
     this._projectDirectory = path.join(userDataPath, this._projectName);
   }
 
   // Add an image/video to the project
   addImage(name, path) {
-    console.log("checking if path undefined");
-    console.log(path === undefined);
-    console.log("okay so addimage called");
-    console.log("path");
-    console.log(path);
     var image = new Image(name, path, this);
     this._images[name] = image.getInfo();
-
-    console.log('added image: ' + image);
-    console.log(this._images);
 
     this._lastModified = Date.now();
   }
@@ -96,11 +87,7 @@ class Project {
     // Save all images.
     var imageDirectory = path.join(this._projectDirectory, 'images');
     var imageDict = new Object();
-    console.log('saving project: ');
-    console.log(this._images);
     for (var image in this._images) {
-      console.log('in for loop');
-      console.log(image);
       if (!fs.existsSync(imageDirectory)) {
         fs.mkdir(imageDirectory);
       }

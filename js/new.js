@@ -26,7 +26,6 @@ function createProject(){
 		console.log(paths_global);
 		var proj = new Project(name, desc);
 		for (var index in paths_global) {
-			console.log("in the for loop new.js")
 			var split = paths_global[index].split("/");
 			var filename = split[split.length -1].split(".")[0];
 			proj.addImage(filename, paths_global[index]);
@@ -39,8 +38,6 @@ function createProject(){
 $("#new-project").submit(function(e) {
 	e.preventDefault();
 	var projectName = createProject();
-	console.log("project name");
-	console.log(projectName);
     if (projectName) {
         loadDetail(projectName);
     } else {
