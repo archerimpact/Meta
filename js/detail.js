@@ -23,6 +23,7 @@ function loadDetail(projectName){
 function loadImages(project){
 	// Add each image in project into details.html
 	var images = project.loadImages();
+	// for (var i = 0; i < len(images); i++){
 	for (var i = 0; i < 2; i++){
 		// var image = images[i];
 		// var data = {
