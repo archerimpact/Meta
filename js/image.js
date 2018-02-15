@@ -12,12 +12,12 @@ class Image {
       this._project = project.getProjectName();
 
       var helper = path.format(this._path).split(".");
-      if (helper[helper.length - 1] == "jpg" || helper[helper.length - 1] == "jpeg") {
+      if (helper[helper.length - 1] == "jpg" || helper[helper.length - 1] == "jpeg" || helper[helper.length - 1] == "JPG" || helper[helper.length - 1] == "JPEG") {
         this._metadata = getJpgMetdata(path);
       } else if (helper[helper.length - 1] == "mov") {
         this._metadata = getMovMetadata(path)
       } else {
-        this._metadata = null;
+        this._metadata = getJpgMetdata(path);
       }
 
       // Set image directory.
@@ -84,7 +84,7 @@ class Image {
   toDict() {
     var imageDict = new Object();
     imageDict['name'] = this._name;
-    imageDict['path'] = this._path;
+    imageDict['path'] = path.format(this._path);
     imageDict['project'] = this._project;
     imageDict['metadata'] = this._metadata;
     imageDict['imageDirectory'] = this._imageDirectory;

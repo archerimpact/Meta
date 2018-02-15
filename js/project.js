@@ -86,7 +86,7 @@ class Project {
 
     // Create directory for this project
     fs.mkdir(this._projectDirectory);
-    var filePath = path.join(this._projectDirectory, this._projectName + '.json');
+    var projectFilePath = path.join(this._projectDirectory, this._projectName + '.json');
 
     // Save all images.
     var imageDirectory = path.join(this._projectDirectory, 'images');
@@ -102,17 +102,17 @@ class Project {
       if (!fs.existsSync(imageDirectory)) {
         fs.mkdir(imageDirectory);
       }
-      var filePath = path.join(imageDirectory, image + '.json');
-      if (!fs.existsSync(filePath)) {
+      var imageFilePath = path.join(imageDirectory, image + '.json');
+      if (!fs.existsSync(imageFilePath)) {
         var dict_obj = this._images[image];
         console.log(dict_obj);
-        fs.writeFileSync(filePath, JSON.stringify(dict_obj));
+        fs.writeFileSync(imageFilePath, JSON.stringify(dict_obj));
       }
       // console.log(this._images[image]);
       imageDict[image] = this._images[image]['name'];
     }
 
-    fs.writeFileSync(filePath, JSON.stringify(this.toDict()));
+    fs.writeFileSync(projectFilePath, JSON.stringify(this.toDict()));
 
     // Call storage class
     var storage = remote.getGlobal('sharedObj').store;
