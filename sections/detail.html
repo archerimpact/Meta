@@ -6,36 +6,24 @@
 
     <!-- Page Heading -->
     <div id="detail-header"></div>
-
-    <div id="image-wrapper"></div>
     
-    <div id="detail-body"></div>
-    
-    <!-- Project One -->
-    <div id="detail-template" class="row">
-      <div class="col-md-7">
-        <a href="#">
-          <img class="img-fluid rounded mb-3 mb-md-0" src="http://placehold.it/700x300" alt="">
-        </a>
-      </div>
-      <div class="col-md-5">
-        <h3>Media One</h3>
-        <p>
-        <div class="row">
-          <div class="col-md-5">
-            key here
-          </div>
-          <div class="col-md-7">
-            value here
-          </div>
-        </div>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laudantium veniam exercitationem expedita laborum at voluptate. Labore, voluptates totam at aut nemo deserunt rem magni pariatur quos perspiciatis atque eveniet unde.</p>
-        <a class="btn btn-primary" href="#">View More</a>
-      </div>
+    <div class="form-group">
+      <label for="proj-input">Select Media </label>
+      <!-- UNCOMMENT THE FOLLOWING LINES FOR DRAG AND DROP (NOTE: NOT IMPLEMENTED ON BACK END) -->
+      <small>Click or drag and drop</small>
+      <p></p>
+      <!-- ALSO CONSIDER USING previewFile() TO SEE IMAGES -->
+      <!-- <input type="file" id="files-input" class="form-control-file" id="proj-file-input" multiple style="display: inline"> -->
+      <img src="assets/upload.svg" id="upload" style="display: inline">
+      <div id="file-label"></div>
     </div>
-    <!-- /.row -->
+    <button type="submit" class="btn btn-primary mb-2">Add Image</button>
 
     <hr>
+
+    <div id="image-wrapper"></div>
+
+    <div id="detail-body"></div>
     
   </div>
   <!-- /.container -->

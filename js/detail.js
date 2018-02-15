@@ -29,8 +29,16 @@ function loadImages(project){
 		// var data = {
 		//     name: image._name,
 		//     path: image._path,
+		//     phone: image._phone,
 		// 	exifData: null
 		// }
+
+		var data = {
+		    name: "Image #" + i,
+		    path: "image._path",
+		    phone: "image._phone",
+			exifData: null
+		}
 
 		var template = [
 		    '<div id="detail-template" class="row">',
@@ -40,17 +48,16 @@ function loadImages(project){
 		        '</a>',
 		      '</div>',
 		      '<div class="col-md-5">',
-		        '<h3>Media One</h3>',
+		        '<h3>{{name}}</h3>',
 		        '<p>',
 		        '<div class="row">',
 		          '<div class="col-md-5">',
-		           ' key here',
+		           'Phone: {{phone}}',
 		          '</div>',
 		          '<div class="col-md-7">',
-		            'value here',
+		            'Other Metadata: {{exifData}}',
 		          '</div>',
 		        '</div>',
-		        '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laudantium veniam exercitationem expedita laborum at voluptate. Labore, voluptates totam at aut nemo deserunt rem magni pariatur quos perspiciatis atque eveniet unde.</p>',
 		        '<a class="btn btn-primary" href="#">View More</a>',
 		      '</div>',
 		    '</div>',
@@ -80,6 +87,8 @@ function loadHeader(project) {
 
 function clearDetailsHtml(){
 	// clear previous projects on the html
+	document.getElementById("detail-header").innerHTML = ""
+	document.getElementById("image-wrapper").innerHTML = ""
 }
 
 module.exports = {
