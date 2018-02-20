@@ -14,7 +14,7 @@ class Image {
       var helper = path.format(this._path).split(".");
       if (helper[helper.length - 1] == "jpg" || helper[helper.length - 1] == "jpeg" || helper[helper.length - 1] == "JPG" || helper[helper.length - 1] == "JPEG") {
         this._metadata = getJpgMetdata(path);
-      } else if (helper[helper.length - 1] == "mov") {
+      } else if (helper && helper[helper.length - 1] == "mov") {
         this._metadata = getMovMetadata(path)
       } else {
         this._metadata = getJpgMetdata(path);
@@ -26,32 +26,32 @@ class Image {
 
   //set path
   setPath(path) {
-    _path = path;
+    this._path = path;
   }
 
   //get path
   getPath() {
-    return _path;
+    return this._path;
   }
 
   //set name
   setName(name) {
-    _name = name;
+    this._name = name;
   }
 
   //get name
   getName() {
-    return _name;
+    return this._name;
   }
 
   //set project
   setProject(project) {
-    _project = project;
+    this._project = project;
   }
 
   //get project
   getProject() {
-    return _project;
+    return this._project;
   }
 
   setMetadata(metadata) {

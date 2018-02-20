@@ -29,6 +29,17 @@ class Project {
     this._projectDirectory = path.join(userDataPath, this._projectName);
   }
 
+  getImages() {
+    return this._images;
+  }
+
+  getName() {
+    return this._projectName;
+  }
+  getDescription() {
+    return this._description;
+  }
+
   // Add an image/video to the project
   addImage(name, path) {
     var image = new Image(name, path, this);
