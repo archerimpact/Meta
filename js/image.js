@@ -11,14 +11,14 @@ class Image {
       this._path = path;
       this._project = project.getProjectName();
 
-      var helper = path.format(this._path).split(".");
-      if (helper[helper.length - 1] == "jpg" || helper[helper.length - 1] == "jpeg" || helper[helper.length - 1] == "JPG" || helper[helper.length - 1] == "JPEG") {
-        this._metadata = getJpgMetdata(path);
-      } else if (helper && helper[helper.length - 1] == "mov") {
-        this._metadata = getMovMetadata(path)
-      } else {
-        this._metadata = getJpgMetdata(path);
-      }
+      // var helper = path.format(this._path).split(".");
+      // if (helper[helper.length - 1] == "jpg" || helper[helper.length - 1] == "jpeg" || helper[helper.length - 1] == "JPG" || helper[helper.length - 1] == "JPEG") {
+      //   this._metadata = getJpgMetdata(path);
+      // } else if (helper && helper[helper.length - 1] == "mov") {
+      //   this._metadata = getMovMetadata(path)
+      // } else {
+      //   this._metadata = getJpgMetdata(path);
+      // }
 
       // Set image directory.
       this._imageDirectory = path.join(project.getProjectDirectory(), 'images');
