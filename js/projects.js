@@ -30,8 +30,12 @@ var lib = storage.getAllProjects()
 for (var proj in lib) {
   var projectPath = lib[proj] + '/' + proj + '.json';
 	var project = loadProject(projectPath);
-  // uncomment this when images working
-  // var imgsrc = project.getImages()[0];
-  // console.log(project.getImages());
-  showProject(project.getName(), project.getDescription(), "https://static1.squarespace.com/static/5a6557ae692ebe609770a2a7/t/5a67a1be0852291d033bb08b/1518849801599/?format=1500w");// "https://upload.wikimedia.org/wikipedia/commons/d/d1/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg");
+  if (!project) {
+    storage.deleteProject(proj);
+  } else {
+    // uncomment this when images working
+    // var imgsrc = project.getImages()[0];
+    // console.log(project.getImages());
+    showProject(project.getName(), project.getDescription(), "https://static1.squarespace.com/static/5a6557ae692ebe609770a2a7/t/5a67a1be0852291d033bb08b/1518849801599/?format=1500w");// "https://upload.wikimedia.org/wikipedia/commons/d/d1/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg");
+  }
 }
