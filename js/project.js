@@ -4,6 +4,8 @@ const fs = require('fs');
 const remote = require('electron').remote;
 const Images = require('./image.js');
 const Image = Images.Image;
+var csvWriter = require('csv-write-stream');
+const writer = csvWriter();
 
 class Project {
 
@@ -74,7 +76,9 @@ class Project {
 
   // TODO(varsha): Export the project to CSV
   exportToCsv() {
-
+    writer.pipe(fs.createWriteStream(path.join(this.getProjectDirectory(), this.getProjectName() + ".csv")));
+    writer.write(this.toDict());
+    writer.end();
   }
 
   // TODO(varsha): Eventually update the saving process, so that it is more efficient.
