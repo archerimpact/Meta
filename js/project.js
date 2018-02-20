@@ -200,7 +200,7 @@ function loadProject(jsonFile) {
 
 function getProjectJsonPath(projectName) {
   const userDataPath = (electron.app || electron.remote.app).getPath('userData');
-  var projectDirectory = path.join(userDataPath, projectName);
+  var projectDirectory = path.join(userDataPath, projectName.toString());
   return path.join(projectDirectory, projectName + '.json');
 }
 

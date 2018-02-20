@@ -40,7 +40,8 @@ $("#new-project").submit(function(e) {
 	var projectName = createProject();
     if (projectName) {
     	clearNew();
-        loadDetail(projectName);
+      loadDetail(projectName);
+			refreshProjects();
     } else {
         console.log(projectName + ": project not created")
     }
