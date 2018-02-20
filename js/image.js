@@ -2,6 +2,7 @@ const electron = require('electron');
 const exif_mov = require('exiftool');
 const fs = require('fs');
 const exif_jpg = require('exif-js');
+const ExifImage = require('exif').ExifImage;
 
 class Image {
 
@@ -20,7 +21,7 @@ class Image {
         console.log(this._metadata);
       } else {
         this._metadata = this.getJpgMetdata(path);
-        console.log(this._metadata);
+        console.log('metadata: ' + this._metadata);
       }
 
   }
@@ -68,12 +69,30 @@ class Image {
   getJpgMetdata(path) {
     console.log("path in jpg meta");
     console.log(path);
-    return exif_jpg.getImageData(path, function() {
-      var allMetaData = exif_jpg.getAllTags(this);
-      console.log("metadata");
-      console.log(allMetaData);
-      return allMetaData;
-    });
+    try {
+      var img = new ExifImage({ image : path }, function (error, exifData) {
+          if (error)
+              console.log('Error: '+error.message);
+          else {
+              console.log(exifData['exif']); // Do something with your data!
+              var exif = exifData['exif'];
+              console.log(exif);
+              return exif;
+          }
+      });
+      return img.exifData.exif;
+    } catch (error) {
+        console.log('Error: ' + error.message);
+    }
+
+    // return exif_jpg.getAllTags(this);
+    // exif_jpg.EXIF.getData(path, function() {
+    //   var allMetaData = exif_jpg.getAllTags(this);
+    //   console.log("metadata");
+    //   console.log(allMetaData);
+    //   return allMetaData;
+    // });
+    // return exif_jpg.EXIF.findEXIFinJPEG(path);
   }
 
   getInfo() {
