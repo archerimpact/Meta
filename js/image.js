@@ -11,45 +11,48 @@ class Image {
       this._path = path;
       this._project = project;
 
-      var helper = this._path.split(".");
-      if (helper[helper.length - 1] == "jpg" || helper[helper.length - 1] == "jpeg") {
+      var helper = null;
+      if (this._path && typeof this._path === 'string') {
+        helper = this._path.split('.');
+      }
+      if (helper && (helper[helper.length - 1] == "jpg" || helper[helper.length - 1] == "jpeg")) {
         this._metadata = getJpgMetdata(path);
-      } else if (helper[helper.length - 1] == "mov") {
+      } else if (helper && helper[helper.length - 1] == "mov") {
         this._metadata = getMovMetadata(path)
       } else {
-        this._metadata = NULL;
+        this._metadata = null;
       }
 
   }
 
   //set path
   setPath(path) {
-    _path = path;
+    this._path = path;
   }
 
   //get path
   getPath() {
-    return _path;
+    return this._path;
   }
 
   //set name
   setName(name) {
-    _name = name;
+    this._name = name;
   }
 
   //get name
   getName() {
-    return _name;
+    return this._name;
   }
 
   //set project
   setProject(project) {
-    _project = project;
+    this._project = project;
   }
 
   //get project
   getProject() {
-    return _project;
+    return this._project;
   }
 
   setMetadata(metadata) {

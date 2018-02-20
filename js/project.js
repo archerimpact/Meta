@@ -29,33 +29,44 @@ class Project {
     this._projectDirectory = path.join(userDataPath, this._projectName);
   }
 
+  getImages() {
+    return this._images;
+  }
+
+  getName() {
+    return this._projectName;
+  }
+  getDescription() {
+    return this._description;
+  }
+
   // Add an image/video to the project
   addImage(name, path) {
     var image = new Image(name, path, this);
-    this._image[name] = image;
+    this._images[name] = image;
 
-    setLastModified(Date.now());
+    this.setLastModified(Date.now());
   }
 
   // Remove an image/video from the project
   removeImage(name) {
-    delete this._image[name];
+    delete this._images[name];
 
-    setLastModified(Date.now());
+    this.setLastModified(Date.now());
   }
 
   // Update the project name
   updateProjectName(name) {
     this._projectName = name;
 
-    setLastModified(Date.now());
+    this.setLastModified(Date.now());
   }
 
   // Update the project description
   updateDescription(description) {
     this._description = description;
 
-    setLastModified(Date.now());
+    this.setLastModified(Date.now());
   }
 
   // Set images dictionary (to be used only for reloading)

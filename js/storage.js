@@ -12,11 +12,16 @@ class Storage {
 
     // Load all prior saved projects.
     this._projects = populateProjects(this._path, opts.defaults);
+
   }
 
   // Return the value associated with a saved project (specified by string key).
   getProject(projectName) {
     return this._projects[projectName];
+  }
+
+  getAllProjects() {
+    return this._projects;
   }
 
   // Save a project.
@@ -28,6 +33,7 @@ class Storage {
     // the asynchronous write had a chance to complete, we might lose that data.
     // TODO(varsha): try/catch this.
     fs.writeFileSync(this._path, JSON.stringify(this._projects));
+
   }
 
   // Update an attribute of a project.
@@ -39,6 +45,16 @@ class Storage {
 
     // Save the update.
     fs.writeFileSync(this._path, JSON.stringify(this._projects));
+  }
+
+}
+
+function loadPathOrCreateEmpty(path) {
+  try {
+    return JSON.parse(fs.readFileSync(path));
+  } catch (error) {
+    fs.writeFileSync(path, JSON.stringify({}));
+    return {};
   }
 }
 
