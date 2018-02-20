@@ -25,8 +25,12 @@ class Project {
 
     // Set project directory pathname
     const userDataPath = (electron.app || electron.remote.app).getPath('userData');
-    console.log(userDataPath);
-    this._projectDirectory = path.join(userDataPath, this._projectName);
+    var projectPath = path.join(userDataPath, "Projects");
+    console.log(projectPath);
+    if (!fs.existsSync(projectPath)) {
+        fs.mkdir(projectPath);
+      }
+    this._projectDirectory = path.join(projectPath, this._projectName);
   }
 
   getImages() {
@@ -107,21 +111,21 @@ class Project {
     for (var key in this._images) {
       console.log(key);
     }
-    for (var image in this._images) {
-      console.log('in for loopp');
-      console.log(image);
-      if (!fs.existsSync(imageDirectory)) {
-        fs.mkdir(imageDirectory);
-      }
-      var imageFilePath = path.join(imageDirectory, image + '.json');
-      if (!fs.existsSync(imageFilePath)) {
-        var dict_obj = this._images[image];
-        console.log(dict_obj);
-        fs.writeFileSync(imageFilePath, JSON.stringify(dict_obj));
-      }
-      // console.log(this._images[image]);
-      imageDict[image] = this._images[image]['name'];
-    }
+    // for (var image in this._images) {
+    //   console.log('in for loopp');
+    //   console.log(image);
+    //   if (!fs.existsSync(imageDirectory)) {
+    //     fs.mkdir(imageDirectory);
+    //   }
+    //   var imageFilePath = path.join(imageDirectory, image + '.json');
+    //   if (!fs.existsSync(imageFilePath)) {
+    //     var dict_obj = this._images[image];
+    //     console.log(dict_obj);
+    //     fs.writeFileSync(imageFilePath, JSON.stringify(dict_obj));
+    //   }
+    //   // console.log(this._images[image]);
+    //   imageDict[image] = this._images[image]['name'];
+    // }
 
     fs.writeFileSync(projectFilePath, JSON.stringify(this.toDict()));
 
@@ -195,7 +199,8 @@ function loadProject(jsonFile) {
 
 function getProjectJsonPath(projectName) {
   const userDataPath = (electron.app || electron.remote.app).getPath('userData');
-  var projectDirectory = path.join(userDataPath, projectName);
+  var projectPath = path.join(userDataPath, "Projects");
+  var projectDirectory = path.join(projectPath, projectName);
   return path.join(projectDirectory, projectName + '.json');
 }
 
