@@ -10,6 +10,7 @@ class Image {
       this._name = name;
       this._path = path;
       this._project = project.getProjectName();
+      this._metadata = null;
 
       // var helper = path.format(this._path).split(".");
       // if (helper[helper.length - 1] == "jpg" || helper[helper.length - 1] == "jpeg" || helper[helper.length - 1] == "JPG" || helper[helper.length - 1] == "JPEG") {
@@ -56,6 +57,10 @@ class Image {
 
   setMetadata(metadata) {
     this._metadata = metadata;
+  }
+
+  getMetadata() {
+    return this._metadata;
   }
 
   getMovMetadata(path) {

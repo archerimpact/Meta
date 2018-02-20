@@ -25,19 +25,29 @@ function loadImages(project){
 	var images = project.loadImages();
 	// for (var i = 0; i < len(images); i++){
 	for (var i = 0; i < 2; i++){
-		// var image = images[i];
-		// var data = {
-		//     name: image._name,
-		//     path: image._path,
-		//     phone: image._phone,
-		// 	exifData: null
-		// }
-
 		var data = {
 		    name: "Image #" + i,
 		    path: "image._path",
 		    phone: "image._phone",
 			exifData: null
+		}
+
+		// var image = images[i];
+		// var data = image.getMetadata();
+		// data[name] = image.getName();
+		// data[path] = image.getPath();
+		col1 = '';
+		col2 = '';
+		count = 0;
+		for (var key in data) {
+			if (count == 0) {
+				col1 += key + ': ' + data[key] + '<br>';
+				count = 1;
+			} else {
+				col2 += key + ': ' + data[key] + '<br>';
+				count = 0;
+			}
+			
 		}
 
 		var template = [
@@ -52,10 +62,10 @@ function loadImages(project){
 		        '<p>',
 		        '<div class="row">',
 		          '<div class="col-md-5">',
-		           'Phone: {{phone}}',
+		          	col1,
 		          '</div>',
 		          '<div class="col-md-7">',
-		            'Other Metadata: {{exifData}}',
+		          	col2,
 		          '</div>',
 		        '</div>',
 		        '<a class="btn btn-primary" href="#">View More</a>',
