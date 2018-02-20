@@ -22,14 +22,15 @@ function createProject(){
         return
 	} else {
 		console.log(name);
-		console.log(desc);		
+		console.log(desc);
+		console.log(paths_global);
 		var proj = new Project(name, desc);
-		proj.saveProject();
 		for (var index in paths_global) {
 			var split = paths_global[index].split("/");
 			var filename = split[split.length -1].split(".")[0];
 			proj.addImage(filename, path);
 		}
+		proj.saveProject();
         return name
 	}
 }

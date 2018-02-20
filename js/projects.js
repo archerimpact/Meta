@@ -25,10 +25,12 @@ function showProject(name, desc, imgsrc) {
   $("#projects-body").append(filler);
 }
 
+// use this sort of thing
+var lib = storage.getAllProjects()
 for (var proj in lib) {
   var projectPath = lib[proj] + '/' + proj + '.json';
 	var project = loadProject(projectPath);
-  // uncomment this when images workings
+  // uncomment this when images working
   // var imgsrc = project.getImages()[0];
   // console.log(project.getImages());
   showProject(project.getName(), project.getDescription(), "https://upload.wikimedia.org/wikipedia/commons/d/d1/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg");
