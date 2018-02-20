@@ -39,11 +39,18 @@ $("#new-project").submit(function(e) {
 	e.preventDefault();
 	var projectName = createProject();
     if (projectName) {
+    	clearNew();
         loadDetail(projectName);
     } else {
         console.log(projectName + ": project not created")
     }
 });
+
+function clearNew() {
+	document.getElementById("name-input").value = ""
+	document.getElementById("desc-input").value = ""
+	document.getElementById("files-input").value = ""
+}
 
 function setupload() {
 	var holder = document.getElementById('upload');
