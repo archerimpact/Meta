@@ -26,7 +26,6 @@ class Project {
     // Set project directory pathname
     const userDataPath = (electron.app || electron.remote.app).getPath('userData');
     var projectPath = path.join(userDataPath, "Projects");
-    console.log(projectPath);
     if (!fs.existsSync(projectPath)) {
       fs.mkdir(projectPath);
     }
@@ -106,8 +105,6 @@ class Project {
     // Save all images.
     var imageDirectory = path.join(this._projectDirectory, 'images');
     var imageDict = new Object();
-    console.log('saving project: ');
-    console.log(this._images);
     for (var key in this._images) {
       console.log(key);
     }

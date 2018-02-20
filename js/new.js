@@ -21,9 +21,6 @@ function createProject(){
         console.log("Project name already used");
         return
 	} else {
-		console.log(name);
-		console.log(desc);
-		console.log(paths_global);
 		var proj = new Project(name, desc);
 		for (var index in paths_global) {
 			var split = paths_global[index].split("/");

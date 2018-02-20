@@ -23,7 +23,7 @@ function loadDetail(projectName){
 function loadImages(project){
 	// Add each image in project into details.html
 	var images = project.loadImages();
-	// for (var i = 0; i < len(images); i++){
+	// for (image in images){
 	for (var i = 0; i < 2; i++){
 		var data = {
 		    name: "Image #" + i,
@@ -32,7 +32,6 @@ function loadImages(project){
 			exifData: null
 		}
 
-		// var image = images[i];
 		// var data = image.getMetadata();
 		// data[name] = image.getName();
 		// data[path] = image.getPath();
@@ -60,15 +59,15 @@ function loadImages(project){
 		      '<div class="col-md-8">',
 		        '<h3>{{name}}</h3>',
 		        '<p>',
-		        '<div class="row">',
-		          '<div class="col-md-5">',
+		        '<div id="metadata" class="row collapse">',
+		          '<div class="col-md-6">',
 		          	col1,
 		          '</div>',
-		          '<div class="col-md-7">',
+		          '<div class="col-md-6">',
 		          	col2,
 		          '</div>',
 		        '</div>',
-		        '<a class="btn btn-primary" href="#">View More</a>',
+		        '<span><button data-toggle="collapse" data-target="#metadata">Collapse</button></span>',
 		      '</div>',
 		    '</div>',
 		    '<hr>'
