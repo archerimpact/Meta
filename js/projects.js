@@ -8,10 +8,10 @@ function showProject(name, desc, imgsrc) {
         "<a href='#'><img class='card-img-top' src='{{imgsrc}}' alt=''></a>",
         "<div class='card-body'>",
           "<h4 class='card-title'>",
-            "<a href='#'>{{name}}</a>",
+            "<a onclick='loadDetail({{name}})' href='#'>{{name}}</a>",
           "</h4>",
           "<p class='card-text'>{{desc}}</p>",
-          "<a class='btn btn-primary' href='#'>View</a>",
+          "<a class='btn btn-primary' onclick='loadDetail({{name}})' href='#'>View</a>",
         "</div>",
       "</div>",
     "</div>",
@@ -26,16 +26,25 @@ function showProject(name, desc, imgsrc) {
 }
 
 // use this sort of thing
-var lib = storage.getAllProjects()
-for (var proj in lib) {
-  var projectPath = lib[proj] + '/' + proj + '.json';
-	var project = loadProject(projectPath);
-  if (!project) {
-    storage.deleteProject(proj);
-  } else {
-    // uncomment this when images working
-    // var imgsrc = project.getImages()[0];
-    // console.log(project.getImages());
-    showProject(project.getName(), project.getDescription(), "https://static1.squarespace.com/static/5a6557ae692ebe609770a2a7/t/5a67a1be0852291d033bb08b/1518849801599/?format=1500w");// "https://upload.wikimedia.org/wikipedia/commons/d/d1/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg");
+
+function populateProjectsScreen() {
+  var lib = storage.getAllProjects()
+  for (var proj in lib) {
+    var projectPath = lib[proj] + '/' + proj + '.json';
+  	var project = loadProject(projectPath);
+    if (!project) {
+      storage.deleteProject(proj);
+    } else {
+      // uncomment this when images working
+      // var imgsrc = project.getImages()[0];
+      // console.log(project.getImages());
+      showProject(project.getName(), project.getDescription(), "https://static1.squarespace.com/static/5a6557ae692ebe609770a2a7/t/5a67a1be0852291d033bb08b/1518849801599/?format=1500w");// "https://upload.wikimedia.org/wikipedia/commons/d/d1/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg");
+    }
   }
+}
+populateProjectsScreen()
+
+function refreshProjects() {
+  document.getElementById("projects-body").innerHTML = "";
+  populateProjectsScreen()
 }

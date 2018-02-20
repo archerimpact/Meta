@@ -52,12 +52,12 @@ function loadImages(project){
 
 		var template = [
 		    '<div id="detail-template" class="row">',
-		      '<div class="col-md-7">',
+		      '<div class="col-md-4">',
 		        '<a href="#">',
 		          '<img class="img-fluid rounded mb-3 mb-md-0" src="http://placehold.it/700x300" alt="">',
 		        '</a>',
 		      '</div>',
-		      '<div class="col-md-5">',
+		      '<div class="col-md-8">',
 		        '<h3>{{name}}</h3>',
 		        '<p>',
 		        '<div class="row">',
