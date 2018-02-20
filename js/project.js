@@ -28,8 +28,8 @@ class Project {
     var projectPath = path.join(userDataPath, "Projects");
     console.log(projectPath);
     if (!fs.existsSync(projectPath)) {
-        fs.mkdir(projectPath);
-      }
+      fs.mkdir(projectPath);
+    }
     this._projectDirectory = path.join(projectPath, this._projectName);
   }
 
