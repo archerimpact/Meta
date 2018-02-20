@@ -180,7 +180,12 @@ class Project {
 
 // Constructs instance of Project class from JSON file.
 function loadProject(jsonFile) {
-  var rawData = fs.readFileSync(jsonFile);
+  try {
+    var rawData = fs.readFileSync(jsonFile);
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
   var info = JSON.parse(rawData);
 
   var project = new Project(info['projectName'], info['description']);

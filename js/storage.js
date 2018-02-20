@@ -47,6 +47,11 @@ class Storage {
     fs.writeFileSync(this._path, JSON.stringify(this._projects));
   }
 
+  deleteProject(projectName) {
+    delete this._projects[projectName]
+    fs.writeFileSync(this._path, JSON.stringify(this._projects));
+  }
+
 }
 
 function loadPathOrCreateEmpty(path) {
