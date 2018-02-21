@@ -12,14 +12,16 @@ function createProject(){
 	var desc = document.getElementById("desc-input").value;
 	// file paths stored in paths_global
 
-    if (!name) {
-        // display: "Please give a project name"
-        console.log("Please give a project name");
-        return
+  if (!name) {
+    // display: "Please give a project name"
+    console.log("Please give a project name");
+		alert("Please provide a project name");
+    return
 	} else if (store.getProject(name) != null) {
 		// display: "Project name already used. Please input new name"
-        console.log("Project name already used");
-        return
+    console.log("Project name already used");
+		alert("Project name already in use");
+    return
 	} else {
 		console.log(name);
 		console.log(desc);
@@ -31,7 +33,7 @@ function createProject(){
 			proj.addImage(filename, path);
 		}
 		proj.saveProject();
-        return name
+  	return name
 	}
 }
 
