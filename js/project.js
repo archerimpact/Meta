@@ -4,8 +4,8 @@ const fs = require('fs');
 const remote = require('electron').remote;
 const Images = require('./image.js');
 const Image = Images.Image;
-var csvWriter = require('csv-write-stream');
-const writer = csvWriter();
+// var csvWriter = require('csv-write-stream');
+// const writer = csvWriter();
 
 class Project {
 
