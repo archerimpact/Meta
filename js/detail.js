@@ -35,15 +35,14 @@ function loadImages(project){
 		// var data = image.getMetadata();
 		// data[name] = image.getName();
 		// data[path] = image.getPath();
-		col1 = '';
-		col2 = '';
+		mdata = '';
 		count = 0;
 		for (var key in data) {
 			if (count == 0) {
-				col1 += key + ': ' + data[key] + '<br>';
+				mdata += '<tr><td>' + key + ': ' + data[key] + '</td>';
 				count = 1;
 			} else {
-				col2 += key + ': ' + data[key] + '<br>';
+				mdata += '<td>' + key + ': ' + data[key] + '</td></tr>';
 				count = 0;
 			}
 			
@@ -59,15 +58,12 @@ function loadImages(project){
 		      '<div class="col-md-8">',
 		        '<h3>{{name}}</h3>',
 		        '<p>',
-		        '<div id="metadata" class="row collapse">',
-		          '<div class="col-md-6">',
-		          	col1,
-		          '</div>',
-		          '<div class="col-md-6">',
-		          	col2,
-		          '</div>',
-		        '</div>',
-		        '<span><button data-toggle="collapse" data-target="#metadata">Collapse</button></span>',
+		        '<div id="metadata" class="container collapse">',
+				  '<table class="table table-bordered">',
+				  	mdata,
+				  '</table>',
+				'</div>',
+		        '<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#metadata">Metadata</button></span>',
 		      '</div>',
 		    '</div>',
 		    '<hr>'
