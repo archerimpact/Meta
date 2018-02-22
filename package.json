@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "audio-metadata": "^0.3.0",
+    "csv-write-stream": "^2.0.0",
+    "exif": "^0.6.0",
     "exif-js": "^2.3.0",
     "exiftool": "0.0.3",
     "extract-iptc": "^0.1.3",

@@ -4,6 +4,8 @@ const fs = require('fs');
 const remote = require('electron').remote;
 const Images = require('./image.js');
 const Image = Images.Image;
+// var csvWriter = require('csv-write-stream');
+// const writer = csvWriter();
 
 class Project {
 
@@ -25,6 +27,7 @@ class Project {
 
     // Set project directory pathname
     const userDataPath = (electron.app || electron.remote.app).getPath('userData');
+
     var projectPath = path.join(userDataPath, "Projects");
     if (!fs.existsSync(projectPath)) {
       fs.mkdir(projectPath);
@@ -46,11 +49,15 @@ class Project {
   // Add an image/video to the project
   addImage(name, path) {
     var image = new Image(name, path, this);
-    this._images[name] = image.toDict();
+
+    this._images[name] = image.getInfo();
+
+    //this._images[name] = image.toDict();
     addImageAppData(image);
 
     console.log('added image: ' + image);
     console.log(this._images);
+
 
     this._lastModified = Date.now();
   }
@@ -98,7 +105,9 @@ class Project {
 
   // TODO(varsha): Export the project to CSV
   exportToCsv() {
-
+    writer.pipe(fs.createWriteStream(path.join(this.getProjectDirectory(), this.getProjectName() + ".csv")));
+    writer.write(this.toDict());
+    writer.end();
   }
 
   // TODO(varsha): Eventually update the saving process, so that it is more efficient.
@@ -111,24 +120,42 @@ class Project {
     // Save all images.
     var imageDirectory = path.join(this._projectDirectory, 'images');
     var imageDict = new Object();
-    for (var key in this._images) {
-      console.log(key);
+
+    for (var image in this._images) {
+      if (!fs.existsSync(imageDirectory)) {
+        fs.mkdir(imageDirectory);
+      }
+      var imageFilePath = path.join(imageDirectory, image + '.json');
+      console.log("image file path");
+      console.log(imageFilePath);
+      if (!fs.existsSync(imageFilePath)) {
+        var dict_obj = this._images[image];
+        console.log(dict_obj);
+        fs.writeFileSync(imageFilePath, JSON.stringify(dict_obj));
+      }
+      // console.log(this._images[image]);
+      imageDict[image] = this._images[image]['name'];
     }
-    // for (var image in this._images) {
-    //   console.log('in for loopp');
-    //   console.log(image);
-    //   if (!fs.existsSync(imageDirectory)) {
-    //     fs.mkdir(imageDirectory);
-    //   }
-    //   var imageFilePath = path.join(imageDirectory, image + '.json');
-    //   if (!fs.existsSync(imageFilePath)) {
-    //     var dict_obj = this._images[image];
-    //     console.log(dict_obj);
-    //     fs.writeFileSync(imageFilePath, JSON.stringify(dict_obj));
-    //   }
-    //   // console.log(this._images[image]);
-    //   imageDict[image] = this._images[image]['name'];
-    // }
+// =======
+//     for (var key in this._images) {
+//       console.log(key);
+//     }
+//     // for (var image in this._images) {
+//     //   console.log('in for loopp');
+//     //   console.log(image);
+//     //   if (!fs.existsSync(imageDirectory)) {
+//     //     fs.mkdir(imageDirectory);
+//     //   }
+//     //   var imageFilePath = path.join(imageDirectory, image + '.json');
+//     //   if (!fs.existsSync(imageFilePath)) {
+//     //     var dict_obj = this._images[image];
+//     //     console.log(dict_obj);
+//     //     fs.writeFileSync(imageFilePath, JSON.stringify(dict_obj));
+//     //   }
+//     //   // console.log(this._images[image]);
+//     //   imageDict[image] = this._images[image]['name'];
+//     // }
+// >>>>>>> master
 
     fs.writeFileSync(projectFilePath, JSON.stringify(this.toDict()));
 
@@ -139,6 +166,8 @@ class Project {
 
   // Converts this class information to a dictionary
   toDict() {
+    //when we call this function is when we get the circular part
+    //it's because of the images attribute
     var projectDict = new Object();
     projectDict['images'] = this._images;
     projectDict['projectName'] = this._projectName;
@@ -154,13 +183,18 @@ class Project {
     var imagePath, image, rawData, info;
     var images = [];
 
-    for (imagePath in Object.values(this._images)) {
-      rawData = fs.readFileSync(imagePath);
-      info = JSON.parse(rawData);
+    for (imagePath in this._images) {
+      console.log("imagePath");
+      console.log(imagePath);
+      console.log(this._images[imagePath]);
+
+      //rawData = fs.readFileSync(imagePath);
+      //info = JSON.parse(rawData);
 
       // Create image instance.
-      image = new Image(info['name'], info['path'], info['project']);
-      image.setMetadata(info['metadata']);
+      // image = new Image(info['name'], info['path'], info['project']);
+      // image.setMetadata(info['metadata']);
+      image = this._images[imagePath];
 
       // Add image instance to list of images associated with this project.
       images.push(image);

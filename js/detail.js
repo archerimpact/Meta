@@ -10,6 +10,8 @@ const Mustache = require('Mustache')
 function loadDetail(projectName){
 	clearDetailsHtml();
 	var projectPath = getProjectJsonPath(projectName);
+  console.log("project path detail");
+  console.log(projectPath);
 	var project = loadProject(projectPath);
 	// Should we drop the Detail class??
 	// var detail = new Detail(project);

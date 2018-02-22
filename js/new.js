@@ -27,10 +27,10 @@ function createProject(){
 		for (var index in paths_global) {
 			var split = paths_global[index].split("/");
 			var filename = split[split.length -1].split(".")[0];
-			proj.addImage(filename, path);
+			proj.addImage(filename, paths_global[index]);
 		}
 		proj.saveProject();
-  		return name
+    return name;
 	}
 }
 
