@@ -1,5 +1,6 @@
 const Mustache = require('Mustache');
 const loadProject = require('./js/project.js').loadProject
+const remote = require('electron').remote;
 
 function showProject(name, desc, imgsrc) {
   template = [
@@ -8,27 +9,34 @@ function showProject(name, desc, imgsrc) {
         "<a href='#'><img class='card-img-top' src='{{imgsrc}}' alt=''></a>",
         "<div class='card-body'>",
           "<h4 class='card-title'>",
-            "<a onclick='loadDetail({{name}})' href='#'>{{name}}</a>",
+            "<a id='link-{{name}}' href='#'>{{name}}</a>",
           "</h4>",
           "<p class='card-text'>{{desc}}</p>",
-          "<a class='btn btn-primary' onclick='loadDetail({{name}})' href='#'>View</a>",
+          "<a class='btn btn-primary' id='btn-{{name}}' href='#'>View</a>",
         "</div>",
       "</div>",
     "</div>",
   ].join("\n");
   data = {
-    name: name,
+    name: name.toString(),
     desc: desc,
     imgsrc: imgsrc,
   };
   var filler = Mustache.render(template, data);
   $("#projects-body").append(filler);
+  document.getElementById('link-' + name.toString()).onclick = function() {
+    loadDetail(name.toString());
+  };
+  document.getElementById('btn-' + name.toString()).onclick = function() {
+    loadDetail(name.toString());
+  };
 }
 
 // use this sort of thing
 
 function populateProjectsScreen() {
-  var lib = storage.getAllProjects()
+  var storage = remote.getGlobal('sharedObj').store;
+  var lib = storage.getAllProjects();
   for (var proj in lib) {
     var projectPath = lib[proj] + '/' + proj + '.json';
   	var project = loadProject(projectPath);
