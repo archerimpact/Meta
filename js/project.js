@@ -27,15 +27,44 @@ class Project {
 
     // Set project directory pathname
     const userDataPath = (electron.app || electron.remote.app).getPath('userData');
-    this._projectDirectory = path.join(userDataPath, this._projectName);
+
+    var projectPath = path.join(userDataPath, "Projects");
+    if (!fs.existsSync(projectPath)) {
+      fs.mkdir(projectPath);
+    }
+    this._projectDirectory = path.join(projectPath, this._projectName);
+  }
+
+  getImages() {
+    return this._images;
+  }
+
+  getName() {
+    return this._projectName;
+  }
+  getDescription() {
+    return this._description;
   }
 
   // Add an image/video to the project
   addImage(name, path) {
     var image = new Image(name, path, this);
+
     this._images[name] = image.getInfo();
 
+    //this._images[name] = image.toDict();
+    addImageAppData(image);
+
+    console.log('added image: ' + image);
+    console.log(this._images);
+
+
     this._lastModified = Date.now();
+  }
+
+  // Add a copy of the image to project/image/ folder inside the AppData
+  addImageAppData(image) {
+
   }
 
   // Remove an image/video from the project
@@ -91,6 +120,7 @@ class Project {
     // Save all images.
     var imageDirectory = path.join(this._projectDirectory, 'images');
     var imageDict = new Object();
+
     for (var image in this._images) {
       if (!fs.existsSync(imageDirectory)) {
         fs.mkdir(imageDirectory);
@@ -106,6 +136,26 @@ class Project {
       // console.log(this._images[image]);
       imageDict[image] = this._images[image]['name'];
     }
+// =======
+//     for (var key in this._images) {
+//       console.log(key);
+//     }
+//     // for (var image in this._images) {
+//     //   console.log('in for loopp');
+//     //   console.log(image);
+//     //   if (!fs.existsSync(imageDirectory)) {
+//     //     fs.mkdir(imageDirectory);
+//     //   }
+//     //   var imageFilePath = path.join(imageDirectory, image + '.json');
+//     //   if (!fs.existsSync(imageFilePath)) {
+//     //     var dict_obj = this._images[image];
+//     //     console.log(dict_obj);
+//     //     fs.writeFileSync(imageFilePath, JSON.stringify(dict_obj));
+//     //   }
+//     //   // console.log(this._images[image]);
+//     //   imageDict[image] = this._images[image]['name'];
+//     // }
+// >>>>>>> master
 
     fs.writeFileSync(projectFilePath, JSON.stringify(this.toDict()));
 
@@ -167,7 +217,12 @@ class Project {
 
 // Constructs instance of Project class from JSON file.
 function loadProject(jsonFile) {
-  var rawData = fs.readFileSync(jsonFile);
+  try {
+    var rawData = fs.readFileSync(jsonFile);
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
   var info = JSON.parse(rawData);
 
   var project = new Project(info['projectName'], info['description']);
@@ -186,7 +241,8 @@ function loadProject(jsonFile) {
 
 function getProjectJsonPath(projectName) {
   const userDataPath = (electron.app || electron.remote.app).getPath('userData');
-  var projectDirectory = path.join(userDataPath, projectName);
+  var projectPath = path.join(userDataPath, "Projects");
+  var projectDirectory = path.join(projectPath, projectName.toString());
   return path.join(projectDirectory, projectName + '.json');
 }
 

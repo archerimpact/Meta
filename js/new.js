@@ -12,18 +12,17 @@ function createProject(){
 	var desc = document.getElementById("desc-input").value;
 	// file paths stored in paths_global
 
-    if (!name) {
-        // display: "Please give a project name"
-        console.log("Please give a project name");
-        return
+	if (!name) {
+		// display: "Please give a project name"
+		console.log("Please give a project name");
+		alert("Please provide a project name");
+		return
 	} else if (store.getProject(name) != null) {
 		// display: "Project name already used. Please input new name"
-        console.log("Project name already used");
-        return
+    	console.log("Project name already used");
+		alert("Project name already in use");
+    	return
 	} else {
-		console.log(name);
-		console.log(desc);
-		console.log(paths_global);
 		var proj = new Project(name, desc);
 		for (var index in paths_global) {
 			var split = paths_global[index].split("/");
@@ -39,11 +38,19 @@ $("#new-project").submit(function(e) {
 	e.preventDefault();
 	var projectName = createProject();
     if (projectName) {
-        loadDetail(projectName);
+    	clearNew();
+      	loadDetail(projectName);
+		refreshProjects();
     } else {
         console.log(projectName + ": project not created")
     }
 });
+
+function clearNew() {
+	document.getElementById("name-input").value = ""
+	document.getElementById("desc-input").value = ""
+	document.getElementById("files-input").value = ""
+}
 
 function setupload() {
 	var holder = document.getElementById('upload');

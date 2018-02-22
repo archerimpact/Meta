@@ -28,6 +28,7 @@ class Image {
         this._metadata = consolidate_metadata(image_data, thumbnail_data, exif_data, gps_data, interop_data, maker_data);
         console.log('metadata: ' + this._metadata);
       }
+      this._project = project.getProjectName();
 
   }
 
@@ -63,6 +64,10 @@ class Image {
 
   setMetadata(metadata) {
     this._metadata = metadata;
+  }
+
+  getMetadata() {
+    return this._metadata;
   }
 
   getMovMetadata(path) {
