@@ -47,11 +47,17 @@ class Project {
   addImage(name, path) {
     var image = new Image(name, path, this);
     this._images[name] = image.toDict();
+    addImageAppData(image);
 
     console.log('added image: ' + image);
     console.log(this._images);
 
     this._lastModified = Date.now();
+  }
+
+  // Add a copy of the image to project/image/ folder inside the AppData
+  addImageAppData(image) {
+
   }
 
   // Remove an image/video from the project

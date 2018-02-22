@@ -24,9 +24,9 @@ function loadImages(project){
 	// Add each image in project into details.html
 	var images = project.loadImages();
 	// for (image in images){
-	for (var i = 0; i < 2; i++){
+	for (var id = 0; id < 2; id++){
 		var data = {
-		    name: "Image #" + i,
+		    name: "Image #" + id,
 		    path: "image._path",
 		    phone: "image._phone",
 			exifData: null
@@ -58,12 +58,12 @@ function loadImages(project){
 		      '<div class="col-md-8">',
 		        '<h3>{{name}}</h3>',
 		        '<p>',
-		        '<div id="metadata" class="container collapse">',
+		        '<div id="metadata' + id +' " class="container collapse">',
 				  '<table class="table table-bordered">',
 				  	mdata,
 				  '</table>',
 				'</div>',
-		        '<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#metadata">Metadata</button></span>',
+		        '<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#metadata' + id + ' ">Metadata</button></span>',
 		      '</div>',
 		    '</div>',
 		    '<hr>'

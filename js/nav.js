@@ -64,6 +64,9 @@ function(n, dest) {
 }(jQuery);
 
 function redirect(destination) {
+  if (destination == "projects") {
+    refreshProjects();
+  }
   var event = new CustomEvent('redirect', { detail: destination });
   document.body.dispatchEvent(event);
 }
