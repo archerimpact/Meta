@@ -84,24 +84,18 @@ class Image {
           else {
               var data = JSON.stringify(exifData);
               var parsed = JSON.parse(data);
-              console.log(parsed);
-              console.log(exifData['exif']['ApertureValue']);
               var rtn = {};
               var types = ['exif', 'image', 'gps'];
               for (var ind in types) {
                 var type = types[ind];
-                console.log(type);
                 for (var key in exifData[type]) {
                   var val = exifData[type][key];
-                  console.log(val);
                   if (val.constructor.name === 'Number' || val.constructor.name ==='String') {
                     rtn[key] = val;
                   }
                 }
               }
               //do something with rtn
-              console.log("returning")
-              console.log(rtn)
               displayInfo(rtn);
           }
       });
@@ -109,15 +103,15 @@ class Image {
         console.log('Exif Error: ' + error.message);
     }
   }
-}
 
-getInfo() {
-  var dict = new Object();
-  dict['name'] = this._name;
-  dict['path'] = this._path;
-  dict['project'] = this._project._projectName;
-  dict['meta'] = this._metadata;
-  return dict;
+  getInfo() {
+    var dict = new Object();
+    dict['name'] = this._name;
+    dict['path'] = this._path;
+    dict['project'] = this._project._projectName;
+    dict['meta'] = this._metadata;
+    return dict;
+  }
 }
 
 function displayInfo(dict) {

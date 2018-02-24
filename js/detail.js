@@ -25,21 +25,21 @@ function loadDetail(projectName){
 function loadImages(project){
 	// Add each image in project into details.html
 	var images = project.loadImages();
-	// for (image in images){
-	for (var id = 0; id < 2; id++){
-		var data = {
-		    name: "Image #" + id,
-		    path: "image._path",
-		    phone: "image._phone",
-			exifData: null
-		}
+	console.log('loadImages')
+	for (var image in images) {
+		// var data = {
+		//     name: "Image #" + id,
+		//     path: "image._path",
+		//     phone: "image._phone",
+		// 	exifData: null
+		// }
 
-		// var data = image.getMetadata();
-		// data[name] = image.getName();
-		// data[path] = image.getPath();
+		var data = image.getInfo();
 		mdata = '';
 		count = 0;
-		for (var key in data) {
+		console.log('starting add metadata')
+		for (var key in data['meta']) {
+			console.log('metadata')
 			if (count == 0) {
 				mdata += '<tr><td>' + key + ': ' + data[key] + '</td>';
 				count = 1;

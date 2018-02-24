@@ -24,13 +24,15 @@ function createProject(){
     	return
 	} else {
 		var proj = new Project(name, desc);
+		console.log('creating proj')
 		for (var index in paths_global) {
+			console.log("adding image")
 			var split = paths_global[index].split("/");
 			var filename = split[split.length -1].split(".")[0];
 			proj.addImage(filename, paths_global[index]);
 		}
 		proj.saveProject();
-    return name;
+    	return name;
 	}
 }
 
@@ -49,7 +51,7 @@ $("#new-project").submit(function(e) {
 function clearNew() {
 	document.getElementById("name-input").value = ""
 	document.getElementById("desc-input").value = ""
-	document.getElementById("files-input").value = ""
+	//document.getElementById("files-input").value = ""
 }
 
 function setupload() {
@@ -77,7 +79,7 @@ function setupload() {
 		}
 		paths_global = paths;
 		document.getElementById("file-label").innerHTML = String(paths_global.length) + " files selected"
-	}
+	};
 
 	holder.ondrop = (e) => {
 	    e.preventDefault();

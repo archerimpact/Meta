@@ -53,7 +53,7 @@ class Project {
     this._images[name] = image.getInfo();
 
     //this._images[name] = image.toDict();
-    addImageAppData(image);
+    this.addImageAppData(image);
 
     console.log('added image: ' + image);
     console.log(this._images);
@@ -64,7 +64,7 @@ class Project {
 
   // Add a copy of the image to project/image/ folder inside the AppData
   addImageAppData(image) {
-
+    return
   }
 
   // Remove an image/video from the project
