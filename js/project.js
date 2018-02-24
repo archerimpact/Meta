@@ -53,7 +53,7 @@ class Project {
     this._images[name] = image.getInfo();
 
     //this._images[name] = image.toDict();
-    addImageAppData(image);
+    this.addImageAppData(image);
 
     console.log('added image: ' + image);
     console.log(this._images);
@@ -136,26 +136,6 @@ class Project {
       // console.log(this._images[image]);
       imageDict[image] = this._images[image]['name'];
     }
-// =======
-//     for (var key in this._images) {
-//       console.log(key);
-//     }
-//     // for (var image in this._images) {
-//     //   console.log('in for loopp');
-//     //   console.log(image);
-//     //   if (!fs.existsSync(imageDirectory)) {
-//     //     fs.mkdir(imageDirectory);
-//     //   }
-//     //   var imageFilePath = path.join(imageDirectory, image + '.json');
-//     //   if (!fs.existsSync(imageFilePath)) {
-//     //     var dict_obj = this._images[image];
-//     //     console.log(dict_obj);
-//     //     fs.writeFileSync(imageFilePath, JSON.stringify(dict_obj));
-//     //   }
-//     //   // console.log(this._images[image]);
-//     //   imageDict[image] = this._images[image]['name'];
-//     // }
-// >>>>>>> master
 
     fs.writeFileSync(projectFilePath, JSON.stringify(this.toDict()));
 

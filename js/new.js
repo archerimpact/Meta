@@ -23,7 +23,9 @@ function createProject(){
 		alert("Project name already in use");
     	return
 	} else {
+		console.log("creating project");
 		var proj = new Project(name, desc);
+		console.log(paths_global);
 		for (var index in paths_global) {
 			var split = paths_global[index].split("/");
 			var filename = split[split.length -1].split(".")[0];
@@ -49,12 +51,13 @@ $("#new-project").submit(function(e) {
 function clearNew() {
 	document.getElementById("name-input").value = ""
 	document.getElementById("desc-input").value = ""
-	document.getElementById("files-input").value = ""
 }
 
 function setupload() {
+	console.log('setting upload');
 	var holder = document.getElementById('upload');
 	if (!holder) {
+		console.log('upload element does not exist');
 	  return false;
 	}
 
@@ -71,13 +74,14 @@ function setupload() {
 	};
 
 	holder.onclick = () => {
+		console.log('clicked');
 	  let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
 		if (!paths) {
 			return false;
 		}
 		paths_global = paths;
 		document.getElementById("file-label").innerHTML = String(paths_global.length) + " files selected"
-	}
+	};
 
 	holder.ondrop = (e) => {
 	    e.preventDefault();

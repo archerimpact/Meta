@@ -11,21 +11,22 @@ class Image {
       this._name = name;
       this._path = path;
       this._project = project;
+      this._metadata = {};
 
       var helper = this._path.toString().split(".");
       if (helper[helper.length - 1] == "jpg" || helper[helper.length - 1] == "jpeg") {
-        this.getExif(path);
+        this.getExif(path, this._metadata);
       } else if (helper[helper.length - 1] == "mov") {
         this._metadata = this.getMovMetadata(path)
         console.log(this._metadata);
       } else {
-        var exif_data = this.getExif(path);
-        var image_data = this.getImageData(path);
-        var thumbnail_data = this.getThumbnailData(path);
-        var gps_data = this.getGPSData(path);
-        var interop_data = this.getInteropData(path);
-        var maker_data = this.getMakerData(path);
-        this._metadata = consolidate_metadata(image_data, thumbnail_data, exif_data, gps_data, interop_data, maker_data);
+        var exif_data = this.getExif(path, this._metadata);
+        // var image_data = this.getImageData(path);
+        // var thumbnail_data = this.getThumbnailData(path);
+        // var gps_data = this.getGPSData(path);
+        // var interop_data = this.getInteropData(path);
+        // var maker_data = this.getMakerData(path);
+        // this._metadata = consolidate_metadata(image_data, thumbnail_data, exif_data, gps_data, interop_data, maker_data);
         console.log('metadata: ' + this._metadata);
       }
       this._project = project.getProjectName();
@@ -76,17 +77,12 @@ class Image {
   }
 
   //need to figure out if we need the entire path here.
-  getExif(path) {
+  getExif(path, dictToModify) {
     try {
       new ExifImage({ image : path }, function (error, exifData) {
           if (error)
               console.log('Error: '+error.message);
           else {
-              var data = JSON.stringify(exifData);
-              var parsed = JSON.parse(data);
-              console.log(parsed);
-              console.log(exifData['exif']['ApertureValue']);
-              var rtn = {};
               var types = ['exif', 'image', 'gps'];
               for (var ind in types) {
                 var type = types[ind];
@@ -95,29 +91,30 @@ class Image {
                   var val = exifData[type][key];
                   console.log(val);
                   if (val.constructor.name === 'Number' || val.constructor.name ==='String') {
-                    rtn[key] = val;
+                    dictToModify[key] = val;
                   }
                 }
               }
-              //do something with rtn
-              console.log("returning")
-              console.log(rtn)
-              displayInfo(rtn);
+              // rtn contains a 1-level dict of all the data
+              // should be reshaped to maintain the hierarchy once its working
+              displayInfo(dictToModify);
+              // make this work!
+              // setMetadata(rtn);
           }
       });
     } catch (error) {
         console.log('Exif Error: ' + error.message);
     }
   }
-}
 
-getInfo() {
-  var dict = new Object();
-  dict['name'] = this._name;
-  dict['path'] = this._path;
-  dict['project'] = this._project._projectName;
-  dict['meta'] = this._metadata;
-  return dict;
+  getInfo() {
+    var dict = new Object();
+    dict['name'] = this._name;
+    dict['path'] = this._path;
+    dict['project'] = this._project._projectName;
+    dict['meta'] = this._metadata;
+    return dict;
+  }
 }
 
 function displayInfo(dict) {
