@@ -23,8 +23,13 @@ function createProject(){
 		alert("Project name already in use");
     	return
 	} else {
+		console.log("creating project");
 		var proj = new Project(name, desc);
+<<<<<<< HEAD
 		console.log('creating proj')
+=======
+		console.log(paths_global);
+>>>>>>> 6d3eb9c1ed7240c46635692d67ffa73c6a0dd32a
 		for (var index in paths_global) {
 			console.log("adding image")
 			var split = paths_global[index].split("/");
@@ -55,8 +60,10 @@ function clearNew() {
 }
 
 function setupload() {
+	console.log('setting upload');
 	var holder = document.getElementById('upload');
 	if (!holder) {
+		console.log('upload element does not exist');
 	  return false;
 	}
 
@@ -73,6 +80,7 @@ function setupload() {
 	};
 
 	holder.onclick = () => {
+		console.log('clicked');
 	  let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
 		if (!paths) {
 			return false;
