@@ -87,14 +87,36 @@ function loadImages(project){
 }
 
 function insertDetailTemplate(data, id) {
-	mdata = '';
+	imgdata = '';
+	exifdata = '';
+	gpsdata = '';
 	count = 0;
-	for (var key in data.exifData) {
+	for (var key in data.exifData.image) {
 		if (count == 0) {
-			mdata += '<tr><td>' + key + ': ' + data.exifData[key] + '</td>';
+			imgdata += '<tr><td>' + key + ': ' + data.exifData.image[key] + '</td>';
 			count = 1;
 		} else {
-			mdata += '<td>' + key + ': ' + data.exifData[key] + '</td></tr>';
+			imgdata += '<td>' + key + ': ' + data.exifData.image[key] + '</td></tr>';
+			count = 0;
+		}
+	}
+	count = 0;
+	for (var key in data.exifData.exif) {
+		if (count == 0) {
+			exifdata += '<tr><td>' + key + ': ' + data.exifData.exif[key] + '</td>';
+			count = 1;
+		} else {
+			exifdata += '<td>' + key + ': ' + data.exifData.exif[key] + '</td></tr>';
+			count = 0;
+		}
+	}
+	count = 0;
+	for (var key in data.exifData.gps) {
+		if (count == 0) {
+			gpsdata += '<tr><td>' + key + ': ' + data.exifData.gps[key] + '</td>';
+			count = 1;
+		} else {
+			gpsdata += '<td>' + key + ': ' + data.exifData.gps[key] + '</td></tr>';
 			count = 0;
 		}
 	}
@@ -109,12 +131,25 @@ function insertDetailTemplate(data, id) {
 				'<div class="col-md-8">',
 					'<h3>{{name}}</h3>',
 					'<p>',
-					'<div id="metadata' + id +' " class="container collapse">',
-				'<table class="table table-bordered">',
-					mdata,
-				'</table>',
-			'</div>',
-					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#metadata' + id + ' ">Metadata</button></span>',
+					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#imagedata' + id + ' ">Image Info</button></span>',
+					'<div id="imagedata' + id +' " class="container collapse">',
+						'<table class="table table-bordered">',
+							imgdata,
+						'</table>',
+					'</div>',
+					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#exifdata' + id + ' ">Exif Data</button></span>',
+					'<div id="exifdata' + id +' " class="container collapse">',
+						'<table class="table table-bordered">',
+							exifdata,
+						'</table>',
+					'</div>',
+					'<br><br>',
+					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#gpsdata' + id + ' ">GPS Data</button></span>',
+					'<div id="gpsdata' + id +' " class="container collapse">',
+						'<table class="table table-bordered">',
+							gpsdata,
+						'</table>',
+					'</div>',
 				'</div>',
 			'</div>',
 			'<hr>'
@@ -156,15 +191,23 @@ function detailExifDisplay(imgpath, name) {
 							'path': imgpath,
 							'exifData': {},
 						};
+
 						var types = ['exif', 'image', 'gps'];
 						for (var ind in types) {
 							var type = types[ind];
-							for (var key in exifData[type]) {
-								var val = exifData[type][key];
-								if (val.constructor.name === 'Number' || val.constructor.name ==='String') {
-									data['exifData'][key] = val;
-								}
+							data.exifData[type] = exifData[type];
+							if (!data.exifData[type]) {
+								data.exifData[type] = {};
 							}
+							if ('MakerNote' in data.exifData.exif) {
+								delete data.exifData.exif['MakerNote'];
+							}
+							// for (var key in exifData[type]) {
+							// 	var val = exifData[type][key];
+							// 	if (val.constructor.name === 'Number' || val.constructor.name ==='String') {
+							// 		data['exifData'][key] = val;
+							// 	}
+							// }
 						}
 						insertDetailTemplate(data, name);
 				}
