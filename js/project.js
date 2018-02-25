@@ -4,8 +4,7 @@ const fs = require('fs');
 const remote = require('electron').remote;
 const Images = require('./image.js');
 const Image = Images.Image;
-// var csvWriter = require('csv-write-stream');
-// const writer = csvWriter();
+const { creatCsvFile, downloadFile, detectionClientType } = require('download-csv');
 
 class Project {
 
@@ -62,6 +61,11 @@ class Project {
     this._lastModified = Date.now();
   }
 
+  // Add image data to the data List
+  addData(data) {
+    this._data.push(data);
+  }
+
   // Add a copy of the image to project/image/ folder inside the AppData
   addImageAppData(image) {
 
@@ -101,13 +105,6 @@ class Project {
   // Update lastModified timestamp
   setLastModified(timestamp) {
     this._lastModified = timestamp;
-  }
-
-  // TODO(varsha): Export the project to CSV
-  exportToCsv() {
-    writer.pipe(fs.createWriteStream(path.join(this.getProjectDirectory(), this.getProjectName() + ".csv")));
-    writer.write(this.toDict());
-    writer.end();
   }
 
   // TODO(varsha): Eventually update the saving process, so that it is more efficient.

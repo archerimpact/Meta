@@ -8,6 +8,8 @@ const loadProject = require('./project.js').loadProject
 const Mustache = require('Mustache')
 const ExifImage = require('exif').ExifImage;
 
+var _data = [];
+
 function loadDetail(projectName){
 	clearDetailsHtml();
 	var projectPath = getProjectJsonPath(projectName);
@@ -88,8 +90,10 @@ function loadImages(project){
 
 function insertDetailTemplate(data, id) {
 	mdata = '';
+	var dataForCsv = {};
 	count = 0;
 	for (var key in data.exifData) {
+		dataForCsv[key] = data.exifData[key];
 		if (count == 0) {
 			mdata += '<tr><td>' + key + ': ' + data.exifData[key] + '</td>';
 			count = 1;
@@ -98,6 +102,8 @@ function insertDetailTemplate(data, id) {
 			count = 0;
 		}
 	}
+
+	_data.push(dataForCsv);
 
 	var template = [
 			'<div id="detail-template" class="row">',
@@ -129,6 +135,9 @@ function loadHeader(project) {
   template = [
     "<h1 id='name-header' class='my-4'>{{projName}}",
       "<small>{{projDesc}}</small>",
+			"<button type='' class='btn btn-primary float-right mb-2' id='export{{projName}}'>",
+				"Export to CSV",
+			"</button>",
     "</h1>",
   ].join("\n");
   data = {
@@ -137,6 +146,24 @@ function loadHeader(project) {
   }
   var filler = Mustache.render(template, data);
   $("#detail-header").append(filler);
+	$("#export" + project._projectName).click(function() {
+		electron.remote.dialog.showSaveDialog(function(filename, bookmark) {
+			var csvString = "";
+			for (var row = 0; row < _data.length; row++) {
+				if (row == 0) {
+					csvString += Object.keys(_data[row]).map(function(k) {
+						return k;
+					}).join(',');
+					csvString += "\n";
+				}
+				csvString += Object.keys(_data[row]).map(function(k){
+				    return _data[row][k];
+				}).join(',');
+				csvString += "\n";
+			}
+			fs.writeFileSync(filename, csvString);
+		});
+	});
 }
 
 function clearDetailsHtml(){
