@@ -56,6 +56,7 @@ function clearNew() {
 	document.getElementById("name-input").value = ""
 	document.getElementById("desc-input").value = ""
 	//document.getElementById("files-input").value = ""
+	document.getElementById("file-label").innerHTML = ""
 }
 
 function setupload() {
