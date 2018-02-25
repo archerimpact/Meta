@@ -10,8 +10,6 @@ const Mustache = require('Mustache')
 function loadDetail(projectName){
 	clearDetailsHtml();
 	var projectPath = getProjectJsonPath(projectName);
-  console.log("project path detail");
-  console.log(projectPath);
 	var project = loadProject(projectPath);
 	// Should we drop the Detail class??
 	// var detail = new Detail(project);
@@ -24,9 +22,11 @@ function loadDetail(projectName){
 
 function loadImages(project){
 	// Add each image in project into details.html
-	var images = project.loadImages();
-	console.log('loadImages')
+	var images = project.getImages();
+	console.log(images)
+	var id = 0;
 	for (var image in images) {
+		id++;
 		// var data = {
 		//     name: "Image #" + id,
 		//     path: "image._path",
@@ -34,17 +34,16 @@ function loadImages(project){
 		// 	exifData: null
 		// }
 
-		var data = image.getInfo();
-		mdata = '';
-		count = 0;
+		var mdata = '';
+		var count = 0;
 		console.log('starting add metadata')
-		for (var key in data['meta']) {
+		for (var key in image['meta']) {
 			console.log('metadata')
 			if (count == 0) {
-				mdata += '<tr><td>' + key + ': ' + data[key] + '</td>';
+				mdata += '<tr><td>' + key + ': ' + image[key] + '</td>';
 				count = 1;
 			} else {
-				mdata += '<td>' + key + ': ' + data[key] + '</td></tr>';
+				mdata += '<td>' + key + ': ' + image[key] + '</td></tr>';
 				count = 0;
 			}
 			
@@ -60,7 +59,7 @@ function loadImages(project){
 		      '<div class="col-md-8">',
 		        '<h3>{{name}}</h3>',
 		        '<p>',
-		        '<div id="metadata' + id +' " class="container collapse">',
+		        '<div id="metadata' + image['name'] + id +' " class="container collapse">',
 				  '<table class="table table-bordered">',
 				  	mdata,
 				  '</table>',
