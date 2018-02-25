@@ -206,7 +206,7 @@ function loadHeader(project) {
 				csvString += rowString.slice(0, rowString.length - 1);
 				csvString += "\n";
 			}
-			fs.writeFileSync(filename, csvString);
+			fs.writeFileSync(filename+".csv", csvString);
 		});
 	});
 }
