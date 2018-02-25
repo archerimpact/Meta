@@ -89,16 +89,40 @@ function loadImages(project){
 }
 
 function insertDetailTemplate(data, id) {
-	mdata = '';
-	var dataForCsv = {};
+	imgdata = '';
+	exifdata = '';
+	gpsdata = '';
 	count = 0;
-	for (var key in data.exifData) {
-		dataForCsv[key] = data.exifData[key];
+	var dataForCsv = {};
+	for (var key in data.exifData.image) {
+		dataForCsv[key] = data.exifData.image[key];
 		if (count == 0) {
-			mdata += '<tr><td>' + key + ': ' + data.exifData[key] + '</td>';
+			imgdata += '<tr><td>' + key + ': ' + data.exifData.image[key] + '</td>';
 			count = 1;
 		} else {
-			mdata += '<td>' + key + ': ' + data.exifData[key] + '</td></tr>';
+			imgdata += '<td>' + key + ': ' + data.exifData.image[key] + '</td></tr>';
+			count = 0;
+		}
+	}
+	count = 0;
+	for (var key in data.exifData.exif) {
+		dataForCsv[key] = data.exifData.exif[key];
+		if (count == 0) {
+			exifdata += '<tr><td>' + key + ': ' + data.exifData.exif[key] + '</td>';
+			count = 1;
+		} else {
+			exifdata += '<td>' + key + ': ' + data.exifData.exif[key] + '</td></tr>';
+			count = 0;
+		}
+	}
+	count = 0;
+	for (var key in data.exifData.gps) {
+		dataForCsv[key] = data.exifData.exif[key];
+		if (count == 0) {
+			gpsdata += '<tr><td>' + key + ': ' + data.exifData.gps[key] + '</td>';
+			count = 1;
+		} else {
+			gpsdata += '<td>' + key + ': ' + data.exifData.gps[key] + '</td></tr>';
 			count = 0;
 		}
 	}
@@ -115,12 +139,25 @@ function insertDetailTemplate(data, id) {
 				'<div class="col-md-8">',
 					'<h3>{{name}}</h3>',
 					'<p>',
-					'<div id="metadata' + id +' " class="container collapse">',
-				'<table class="table table-bordered">',
-					mdata,
-				'</table>',
-			'</div>',
-					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#metadata' + id + ' ">Metadata</button></span>',
+					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#imagedata' + id + ' ">Image Info</button></span>',
+					'<div id="imagedata' + id +' " class="container collapse">',
+						'<table class="table table-bordered">',
+							imgdata,
+						'</table>',
+					'</div>',
+					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#exifdata' + id + ' ">Exif Data</button></span>',
+					'<div id="exifdata' + id +' " class="container collapse">',
+						'<table class="table table-bordered">',
+							exifdata,
+						'</table>',
+					'</div>',
+					'<br><br>',
+					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#gpsdata' + id + ' ">GPS Data</button></span>',
+					'<div id="gpsdata' + id +' " class="container collapse">',
+						'<table class="table table-bordered">',
+							gpsdata,
+						'</table>',
+					'</div>',
 				'</div>',
 			'</div>',
 			'<hr>'
@@ -149,16 +186,24 @@ function loadHeader(project) {
 	$("#export" + project._projectName).click(function() {
 		electron.remote.dialog.showSaveDialog(function(filename, bookmark) {
 			var csvString = "";
+			var keys = new Set();
 			for (var row = 0; row < _data.length; row++) {
-				if (row == 0) {
-					csvString += Object.keys(_data[row]).map(function(k) {
-						return k;
-					}).join(',');
-					csvString += "\n";
-				}
-				csvString += Object.keys(_data[row]).map(function(k){
-				    return _data[row][k];
-				}).join(',');
+				Object.keys(_data[row]).map(function(key) {
+					keys.add(key);
+				});
+			}
+			var csvHeader = "";
+			keys.forEach(function(k) {
+				csvHeader += k + ",";
+			});
+			csvString += csvHeader.slice(0, csvHeader.length - 1);
+			csvString += "\n";
+			var rowString = "";
+			for (var row = 0; row < _data.length; row++) {
+				keys.forEach(function(k) {
+					rowString += _data[row][k] + ",";
+				});
+				csvString += rowString.slice(0, rowString.length - 1);
 				csvString += "\n";
 			}
 			fs.writeFileSync(filename, csvString);
@@ -183,15 +228,23 @@ function detailExifDisplay(imgpath, name) {
 							'path': imgpath,
 							'exifData': {},
 						};
+
 						var types = ['exif', 'image', 'gps'];
 						for (var ind in types) {
 							var type = types[ind];
-							for (var key in exifData[type]) {
-								var val = exifData[type][key];
-								if (val.constructor.name === 'Number' || val.constructor.name ==='String') {
-									data['exifData'][key] = val;
-								}
+							data.exifData[type] = exifData[type];
+							if (!data.exifData[type]) {
+								data.exifData[type] = {};
 							}
+							if ('MakerNote' in data.exifData.exif) {
+								delete data.exifData.exif['MakerNote'];
+							}
+							// for (var key in exifData[type]) {
+							// 	var val = exifData[type][key];
+							// 	if (val.constructor.name === 'Number' || val.constructor.name ==='String') {
+							// 		data['exifData'][key] = val;
+							// 	}
+							// }
 						}
 						insertDetailTemplate(data, name);
 				}
