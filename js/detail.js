@@ -9,11 +9,14 @@ const Mustache = require('Mustache')
 const ExifImage = require('exif').ExifImage;
 
 var _data = [];
+var _currentProj;
+var paths_global;
 
 function loadDetail(projectName){
 	clearDetailsHtml();
 	var projectPath = getProjectJsonPath(projectName);
 	var project = loadProject(projectPath);
+	_currentProj = project;
 	// Should we drop the Detail class??
 	// var detail = new Detail(project);
 
@@ -34,9 +37,9 @@ function loadImages(project){
 	// Add each image in project into details.html
 	var images = project.getImages();
 	console.log(images)
-	var id = 0;
+	var id = image.len - 1;
 	for (var image in images) {
-		id++;
+		id--;
 		// var data = {
 		//     name: "Image #" + id,
 		//     path: "image._path",
@@ -44,47 +47,51 @@ function loadImages(project){
 		// 	exifData: null
 		// }
 
-		var mdata = '';
-		var count = 0;
-		console.log('starting add metadata')
-		for (var key in image['meta']) {
-			console.log('metadata')
-			if (count == 0) {
-				mdata += '<tr><td>' + key + ': ' + image[key] + '</td>';
-				count = 1;
-			} else {
-				mdata += '<td>' + key + ': ' + image[key] + '</td></tr>';
-				count = 0;
-			}
-
-		}
-
-		var template = [
-		    '<div id="detail-template" class="row">',
-		      '<div class="col-md-4">',
-		        '<a href="#">',
-		          '<img class="img-fluid rounded mb-3 mb-md-0" src="http://placehold.it/700x300" alt="">',
-		        '</a>',
-		      '</div>',
-		      '<div class="col-md-8">',
-		        '<h3>{{name}}</h3>',
-		        '<p>',
-		        '<div id="metadata' + image['name'] + id +' " class="container collapse">',
-				  '<table class="table table-bordered">',
-				  	mdata,
-				  '</table>',
-				'</div>',
-		        '<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#metadata' + id + ' ">Metadata</button></span>',
-		      '</div>',
-		    '</div>',
-		    '<hr>'
-		].join("\n");
-		// template: '<div ...>\n<h1 ...>{{title}}<h1>\n</div>'
-
-		var filler = Mustache.render(template, data);
-		$("#image-wrapper").append(filler);
+		insertImage(image, id);
 	}
 
+}
+
+function insertImage(image, id) {
+	var mdata = '';
+	var count = 0;
+	console.log('starting add metadata')
+	for (var key in image['meta']) {
+		console.log('metadata')
+		if (count == 0) {
+			mdata += '<tr><td>' + key + ': ' + image[key] + '</td>';
+			count = 1;
+		} else {
+			mdata += '<td>' + key + ': ' + image[key] + '</td></tr>';
+			count = 0;
+		}
+
+	}
+
+	var template = [
+	    '<div id="detail-template" class="row">',
+	      '<div class="col-md-4">',
+	        '<a href="#">',
+	          '<img class="img-fluid rounded mb-3 mb-md-0" src="http://placehold.it/700x300" alt="">',
+	        '</a>',
+	      '</div>',
+	      '<div class="col-md-8">',
+	        '<h3>{{name}}</h3>',
+	        '<p>',
+	        '<div id="metadata' + image['name'] + id +' " class="container collapse">',
+			  '<table class="table table-bordered">',
+			  	mdata,
+			  '</table>',
+			'</div>',
+	        '<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#metadata' + id + ' ">Metadata</button></span>',
+	      '</div>',
+	    '</div>',
+	    '<hr>'
+	].join("\n");
+	// template: '<div ...>\n<h1 ...>{{title}}<h1>\n</div>'
+
+	var filler = Mustache.render(template, data);
+	$("#image-wrapper").append(filler);
 }
 
 function insertDetailTemplate(data, id) {
@@ -210,10 +217,11 @@ function loadHeader(project) {
 	});
 }
 
-function clearDetailsHtml(){
+function clearDetailsHtml() {
 	// clear previous projects on the html
 	document.getElementById("detail-header").innerHTML = ""
 	document.getElementById("image-wrapper").innerHTML = ""
+	document.getElementById("file-label2").innerHTML = ""
 }
 
 function detailExifDisplay(imgpath, name) {
@@ -252,6 +260,76 @@ function detailExifDisplay(imgpath, name) {
 			console.log('Exif Error: ' + error.message);
 	}
 }
+
+$("#add-image").submit(function(e) {
+	e.preventDefault();
+	if (_currentProj)
+	var proj = _currentProj;
+	console.log(proj);
+	for (var index in paths_global) {
+		var filename = path.basename(paths_global[index]).split(".")[0];
+		proj.addImage(filename, paths_global[index]);
+		proj.saveProject();
+	}
+
+	clearDetailsHtml();
+	loadDetail(proj.getName());
+	paths_global = [];
+
+	// var projectName = createProject();
+ //    if (projectName) {
+ //    	clearNew();
+ //      	loadDetail(projectName);
+	// 	refreshProjects();
+ //    } else {
+ //        console.log(projectName + ": project not created")
+ //    }
+
+});
+
+function setuploadDetails() {
+	console.log('setting upload');
+	var holder = document.getElementById('upload2');
+	if (!holder) {
+		console.log('upload element does not exist');
+	  return false;
+	}
+
+	holder.ondragover = () => {
+	    return false;
+	};
+
+	holder.ondragleave = () => {
+	    return false;
+	};
+
+	holder.ondragend = () => {
+	    return false;
+	};
+
+	holder.onclick = () => {
+		console.log('clicked');
+	  let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
+		if (!paths) {
+			return false;
+		}
+		paths_global = paths;
+		document.getElementById("file-label2").innerHTML = String(paths_global.length) + " files selected"
+	};
+
+	holder.ondrop = (e) => {
+	    e.preventDefault();
+			var paths = e.dataTransfer.files;
+			if (!paths) {
+				return false;
+			}
+			paths_global = paths;
+			document.getElementById("file-label2").innerHTML = String(paths_global.length) + " files selected"
+	    return false;
+	};
+}
+
+setuploadDetails();
 
 module.exports = {
 	loadDetail: loadDetail

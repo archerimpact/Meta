@@ -107,7 +107,9 @@ class Project {
   saveProject() {
 
     // Create directory for this project
-    fs.mkdir(this._projectDirectory);
+    if (!fs.existsSync(this._projectDirectory)) {
+      fs.mkdir(this._projectDirectory);
+    }
     var projectFilePath = path.join(this._projectDirectory, this._projectName + '.json');
 
     // Save all images.
