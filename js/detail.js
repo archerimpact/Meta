@@ -93,6 +93,10 @@ function insertDetailTemplate(data, id) {
 	exifdata = '';
 	gpsdata = '';
 	count = 0;
+	if (data.error) {
+		insertErrorTemplate(data, id);
+		return;
+	}
 	var dataForCsv = {};
 	for (var key in data.exifData.image) {
 		dataForCsv[key] = data.exifData.image[key];
@@ -168,12 +172,41 @@ function insertDetailTemplate(data, id) {
 	$("#image-wrapper").append(filler);
 }
 
+function insertErrorTemplate(data, id) {
+	var template = [
+			'<div id="detail-template" class="row">',
+				'<div class="col-md-4">',
+					'<a href="#">',
+						'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">',
+					'</a>',
+				'</div>',
+				'<div class="col-md-8">',
+					'<h3>{{name}}</h3>',
+					'<p>',
+					'<div id="imagedata' + id +' ">',
+							'<br>',
+							'<strong>Sorry! </strong>' + data.error,
+					'</div>',
+				'</div>',
+			'</div>',
+			'<hr>'
+	].join("\n");
+	// template: '<div ...>\n<h1 ...>{{title}}<h1>\n</div>'
+
+	var filler = Mustache.render(template, data);
+	$("#image-wrapper").append(filler);
+}
+
 function loadHeader(project) {
   template = [
     "<h1 id='name-header' class='my-4'>{{projName}}",
       "<small>{{projDesc}}</small>",
 			"<button type='' class='btn btn-primary float-right mb-2' id='export{{projName}}'>",
 				"Export to CSV",
+			"</button>",
+			'<br>',
+			"<button type='' class='btn btn-danger float-right mb-2' id='delete{{projName}}'>",
+				"Delete Project",
 			"</button>",
     "</h1>",
   ].join("\n");
@@ -183,6 +216,7 @@ function loadHeader(project) {
   }
   var filler = Mustache.render(template, data);
   $("#detail-header").append(filler);
+
 	$("#export" + project._projectName).click(function() {
 		electron.remote.dialog.showSaveDialog(function(filename, bookmark) {
 			var csvString = "";
@@ -209,6 +243,11 @@ function loadHeader(project) {
 			fs.writeFileSync(filename, csvString);
 		});
 	});
+
+	$("#delete" + project._projectName).click(function() {
+		project.eliminate();
+		redirect('projects');
+	});
 }
 
 function clearDetailsHtml(){
@@ -220,15 +259,16 @@ function clearDetailsHtml(){
 function detailExifDisplay(imgpath, name) {
 	try {
 		new ExifImage({ image : imgpath }, function (error, exifData) {
-				if (error)
-						console.log('Error: '+error.message);
-				else {
-						var data = {
-							'name': name,
-							'path': imgpath,
-							'exifData': {},
-						};
-
+				var data = {
+					'name': name,
+					'path': imgpath,
+					'exifData': {},
+					'error': "",
+				};
+				if (error) {
+						console.log('Error: ' + error.message);
+						data.error = error.message;
+				} else {
 						var types = ['exif', 'image', 'gps'];
 						for (var ind in types) {
 							var type = types[ind];
@@ -236,9 +276,11 @@ function detailExifDisplay(imgpath, name) {
 							if (!data.exifData[type]) {
 								data.exifData[type] = {};
 							}
-							if ('MakerNote' in data.exifData.exif) {
-								delete data.exifData.exif['MakerNote'];
-							}
+							// these are not web-formatted and look like random symbols
+							// consider looking into formatting these
+							delete data.exifData.exif['MakerNote'];
+							delete data.exifData.exif['UserComment'];
+
 							// for (var key in exifData[type]) {
 							// 	var val = exifData[type][key];
 							// 	if (val.constructor.name === 'Number' || val.constructor.name ==='String') {
@@ -246,8 +288,8 @@ function detailExifDisplay(imgpath, name) {
 							// 	}
 							// }
 						}
-						insertDetailTemplate(data, name);
 				}
+				insertDetailTemplate(data, name);
 		});
 	} catch (error) {
 			console.log('Exif Error: ' + error.message);
