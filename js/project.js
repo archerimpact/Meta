@@ -36,7 +36,9 @@ class Project {
   }
 
   getImages() {
-    return this._images;
+    return Object.values(this._images).map(function(v) {
+      return v['path'];
+    });
   }
 
   getName() {

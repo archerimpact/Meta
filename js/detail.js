@@ -97,7 +97,7 @@ function insertDetailTemplate(data, id) {
 		insertErrorTemplate(data, id);
 		return;
 	}
-	var dataForCsv = {};
+	var dataForCsv = {'Image Name': id};
 	for (var key in data.exifData.image) {
 		dataForCsv[key] = data.exifData.image[key];
 		if (count == 0) {
@@ -235,12 +235,22 @@ function loadHeader(project) {
 			var rowString = "";
 			for (var row = 0; row < _data.length; row++) {
 				keys.forEach(function(k) {
-					rowString += _data[row][k] + ",";
+					if (_data[row][k] != undefined) {
+						var value = _data[row][k].toString();
+						if (value.includes(',')) {
+							rowString += '"' + value + '",';
+						} else {
+							rowString += _data[row][k] + ",";
+						}
+					}
+					else {
+						rowString += ",";
+					}
 				});
 				csvString += rowString.slice(0, rowString.length - 1);
 				csvString += "\n";
 			}
-			fs.writeFileSync(filename, csvString);
+			fs.writeFileSync(filename+".csv", csvString);
 		});
 	});
 
