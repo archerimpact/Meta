@@ -202,7 +202,6 @@ function loadHeader(project) {
 			for (var row = 0; row < _data.length; row++) {
 				keys.forEach(function(k) {
 					if (_data[row][k] != undefined) {
-						console.log(k + ", " + _data[row][k]);
 						var value = _data[row][k].toString();
 						if (value.includes(',')) {
 							rowString += '"' + value + '",';
