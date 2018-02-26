@@ -5,6 +5,7 @@ const remote = require('electron').remote;
 const Images = require('./image.js');
 const Image = Images.Image;
 const { creatCsvFile, downloadFile, detectionClientType } = require('download-csv');
+const rimraf = require('rimraf');
 
 class Project {
 
@@ -35,7 +36,9 @@ class Project {
   }
 
   getImages() {
-    return this._images;
+    return Object.values(this._images).map(function(v) {
+      return v['path'];
+    });
   }
 
   getName() {
@@ -134,6 +137,16 @@ class Project {
     // Call storage class
     var storage = remote.getGlobal('sharedObj').store;
     storage.saveProject(this._projectName, this._projectDirectory);
+  }
+
+  eliminate() {
+    var name = this._projectName;
+    rimraf(this._projectDirectory, function () {
+      console.log('Project ' + name + ' eliminated');
+    });
+
+    var storage = remote.getGlobal('sharedObj').store;
+    storage.deleteProject(this._projectName);
   }
 
   // Converts this class information to a dictionary

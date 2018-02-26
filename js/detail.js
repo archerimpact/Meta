@@ -99,7 +99,11 @@ function insertDetailTemplate(data, id) {
 	exifdata = '';
 	gpsdata = '';
 	count = 0;
-	var dataForCsv = {};
+	if (data.error) {
+		insertErrorTemplate(data, id);
+		return;
+	}
+	var dataForCsv = {'Image Name': id};
 	for (var key in data.exifData.image) {
 		dataForCsv[key] = data.exifData.image[key];
 		if (count == 0) {
@@ -144,25 +148,50 @@ function insertDetailTemplate(data, id) {
 				'</div>',
 				'<div class="col-md-8">',
 					'<h3>{{name}}</h3>',
-					'<p>',
 					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#imagedata' + id + ' ">Image Info</button></span>',
 					'<div id="imagedata' + id +' " class="container collapse">',
 						'<table class="table table-bordered">',
 							imgdata,
 						'</table>',
 					'</div>',
+					'<br>',
 					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#exifdata' + id + ' ">Exif Data</button></span>',
 					'<div id="exifdata' + id +' " class="container collapse">',
 						'<table class="table table-bordered">',
 							exifdata,
 						'</table>',
 					'</div>',
-					'<br><br>',
+					'<br>',
 					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#gpsdata' + id + ' ">GPS Data</button></span>',
 					'<div id="gpsdata' + id +' " class="container collapse">',
 						'<table class="table table-bordered">',
 							gpsdata,
 						'</table>',
+					'</div>',
+				'</div>',
+			'</div>',
+			'<hr>'
+	].join("\n");
+	// template: '<div ...>\n<h1 ...>{{title}}<h1>\n</div>'
+
+	var filler = Mustache.render(template, data);
+	$("#image-wrapper").append(filler);
+}
+
+function insertErrorTemplate(data, id) {
+	var template = [
+			'<div id="detail-template" class="row">',
+				'<div class="col-md-4">',
+					'<a href="#">',
+						'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">',
+					'</a>',
+				'</div>',
+				'<div class="col-md-8">',
+					'<h3>{{name}}</h3>',
+					'<p>',
+					'<div id="imagedata' + id +' ">',
+							'<br>',
+							'<strong>Sorry! </strong>' + data.error,
 					'</div>',
 				'</div>',
 			'</div>',
@@ -181,6 +210,10 @@ function loadHeader(project) {
 			"<button type='' class='btn btn-primary float-right mb-2' id='export{{projName}}'>",
 				"Export to CSV",
 			"</button>",
+			'<br>',
+			"<button type='' class='btn btn-danger float-right mb-2' id='delete{{projName}}'>",
+				"Delete Project",
+			"</button>",
     "</h1>",
   ].join("\n");
   data = {
@@ -189,6 +222,7 @@ function loadHeader(project) {
   }
   var filler = Mustache.render(template, data);
   $("#detail-header").append(filler);
+
 	$("#export" + project._projectName).click(function() {
 		electron.remote.dialog.showSaveDialog(function(filename, bookmark) {
 			var csvString = "";
@@ -207,13 +241,28 @@ function loadHeader(project) {
 			var rowString = "";
 			for (var row = 0; row < _data.length; row++) {
 				keys.forEach(function(k) {
-					rowString += _data[row][k] + ",";
+					if (_data[row][k] != undefined) {
+						var value = _data[row][k].toString();
+						if (value.includes(',')) {
+							rowString += '"' + value + '",';
+						} else {
+							rowString += _data[row][k] + ",";
+						}
+					}
+					else {
+						rowString += ",";
+					}
 				});
 				csvString += rowString.slice(0, rowString.length - 1);
 				csvString += "\n";
 			}
-			fs.writeFileSync(filename, csvString);
+			fs.writeFileSync(filename+".csv", csvString);
 		});
+	});
+
+	$("#delete" + project._projectName).click(function() {
+		project.eliminate();
+		redirect('projects');
 	});
 }
 
@@ -227,15 +276,16 @@ function clearDetailsHtml() {
 function detailExifDisplay(imgpath, name) {
 	try {
 		new ExifImage({ image : imgpath }, function (error, exifData) {
-				if (error)
-						console.log('Error: '+error.message);
-				else {
-						var data = {
-							'name': name,
-							'path': imgpath,
-							'exifData': {},
-						};
-
+				var data = {
+					'name': name,
+					'path': imgpath,
+					'exifData': {},
+					'error': "",
+				};
+				if (error) {
+						console.log('Error: ' + error.message);
+						data.error = error.message;
+				} else {
 						var types = ['exif', 'image', 'gps'];
 						for (var ind in types) {
 							var type = types[ind];
@@ -243,9 +293,11 @@ function detailExifDisplay(imgpath, name) {
 							if (!data.exifData[type]) {
 								data.exifData[type] = {};
 							}
-							if ('MakerNote' in data.exifData.exif) {
-								delete data.exifData.exif['MakerNote'];
-							}
+							// these are not web-formatted and look like random symbols
+							// consider looking into formatting these
+							delete data.exifData.exif['MakerNote'];
+							delete data.exifData.exif['UserComment'];
+
 							// for (var key in exifData[type]) {
 							// 	var val = exifData[type][key];
 							// 	if (val.constructor.name === 'Number' || val.constructor.name ==='String') {
@@ -253,8 +305,8 @@ function detailExifDisplay(imgpath, name) {
 							// 	}
 							// }
 						}
-						insertDetailTemplate(data, name);
 				}
+				insertDetailTemplate(data, name);
 		});
 	} catch (error) {
 			console.log('Exif Error: ' + error.message);

@@ -1,10 +1,11 @@
 header.masthead {
   text-align: center;
-  color: black;
-  background:
-      linear-gradient(217deg, rgba(255,0,0,.4), rgba(255,0,0,0) 70.71%),
+  color: white;
+  /* background: */
+      /* linear-gradient(217deg, rgba(255,0,0,.4), rgba(255,0,0,0) 70.71%),
       linear-gradient(127deg, rgba(0,255,0,.4), rgba(0,255,0,0) 70.71%),
-      linear-gradient(336deg, rgba(0,0,255,.4), rgba(0,0,255,0) 70.71%);
+      linear-gradient(336deg, rgba(0,0,255,.4), rgba(0,0,255,0) 70.71%); */
+  background-color: #2E507F;
   background-repeat: no-repeat;
   background-attachment: scroll;
   background-position: center center;

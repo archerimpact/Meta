@@ -1,6 +1,7 @@
 const Mustache = require('Mustache');
 const loadProject = require('./js/project.js').loadProject
 const remote = require('electron').remote;
+const fs = require('fs');
 
 function showProject(name, desc, imgsrc) {
   template = [
@@ -44,9 +45,11 @@ function populateProjectsScreen() {
       storage.deleteProject(proj);
     } else {
       // uncomment this when images working
-      // var imgsrc = project.getImages()[0];
-      // console.log(project.getImages());
-      showProject(project.getName(), project.getDescription(), "https://static1.squarespace.com/static/5a6557ae692ebe609770a2a7/t/5a67a1be0852291d033bb08b/1518849801599/?format=1500w");// "https://upload.wikimedia.org/wikipedia/commons/d/d1/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg");
+      var imgsrc = project.getImages()[0];
+      if (!fs.existsSync(imgsrc)) {
+        imgsrc = "https://static1.squarespace.com/static/5a6557ae692ebe609770a2a7/t/5a67a1be0852291d033bb08b/1518849801599/?format=1500w";
+      }
+      showProject(project.getName(), project.getDescription(), imgsrc);// "https://upload.wikimedia.org/wikipedia/commons/d/d1/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg");
     }
   }
 }
