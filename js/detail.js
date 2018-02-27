@@ -315,7 +315,11 @@ function detailExifDisplay(imgpath, name) {
 
 $("#add-image").submit(function(e) {
 	e.preventDefault();
-	if (_currentProj)
+	if (!paths_global) {
+		console.log('Please select images');
+		alert('Please select images');
+		return;
+	}
 	var proj = _currentProj;
 	console.log(proj);
 	for (var index in paths_global) {
@@ -326,7 +330,7 @@ $("#add-image").submit(function(e) {
 
 	clearDetailsHtml();
 	loadDetail(proj.getName());
-	paths_global = [];
+	paths_global = null;
 
 	// var projectName = createProject();
  //    if (projectName) {
