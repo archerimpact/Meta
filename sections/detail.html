@@ -5,21 +5,25 @@
   <div class="container">
 
     <!-- Page Heading -->
-    <div id="detail-header"></div>
-    
-    <form id="add-image">
-      <div class="form-group">
-        <label for="image-input">Select Media </label>
-        <small>Click or drag and drop</small>
-        <p></p>
-        <!-- ALSO CONSIDER USING previewFile() TO SEE IMAGES -->
-        <!-- <input type="file" id="files-input" class="form-control-file" id="proj-file-input" multiple style="display: inline"> -->
-        <img src="assets/upload.svg" id="upload2" style="display: inline">
-        <div id="file-label2"></div>
+    <div class="row">
+      <div id="detail-header" class="col-md-8"></div>
+      
+      <div class="col-md-4">
+        <br>
+        <form id="add-image">
+          <div class="form-group">
+            <label for="image-input">Select Media </label>
+            <small>Click or drag and drop</small>
+            <br>
+            <!-- ALSO CONSIDER USING previewFile() TO SEE IMAGES -->
+            <!-- <input type="file" id="files-input" class="form-control-file" id="proj-file-input" multiple style="display: inline"> -->
+            <img src="assets/upload.svg" id="upload2" style="display: inline">
+            <div id="file-label2"></div>
+          </div>
+          <button type="submit" class="btn btn-primary mb-2">Add Image</button>
+        </form>
       </div>
-      <button type="submit" class="btn btn-primary mb-2">Add Image</button>
-    </form>
-    
+    </div>
 
     <hr>
 

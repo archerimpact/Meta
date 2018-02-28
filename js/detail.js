@@ -205,16 +205,19 @@ function insertErrorTemplate(data, id) {
 
 function loadHeader(project) {
   template = [
-    "<h1 id='name-header' class='my-4'>{{projName}}",
+    "<h2 id='name-header' class='my-4'>{{projName}}",
       "<small>{{projDesc}}</small>",
-			"<button type='' class='btn btn-primary float-right mb-2' id='export{{projName}}'>",
-				"Export to CSV",
-			"</button>",
-			'<br>',
-			"<button type='' class='btn btn-danger float-right mb-2' id='delete{{projName}}'>",
-				"Delete Project",
-			"</button>",
-    "</h1>",
+    "</h2>",
+    "<div class='row pl-3'>",
+		"<button type='' class='btn btn-primary float-left mb-2' id='export{{projName}}'>",
+			"Export to CSV",
+		"</button>",
+	"</div>",
+    "<div class='row pl-3'>",
+		"<button type='' class='btn btn-danger float-left mb-2' id='delete{{projName}}'>",
+			"Delete Project",
+		"</button>",
+	"</div>"
   ].join("\n");
   data = {
     projName: project._projectName,
