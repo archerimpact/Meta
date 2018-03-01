@@ -205,19 +205,18 @@ function insertErrorTemplate(data, id) {
 
 function loadHeader(project) {
   template = [
-    "<h2 id='name-header' class='my-4'>{{projName}}",
-      "<small>{{projDesc}}</small>",
-    "</h2>",
-    "<div class='row pl-3'>",
-		"<button type='' class='btn btn-primary float-left mb-2' id='export{{projName}}'>",
-			"Export to CSV",
-		"</button>",
-	"</div>",
-    "<div class='row pl-3'>",
-		"<button type='' class='btn btn-danger float-left mb-2' id='delete{{projName}}'>",
-			"Delete Project",
-		"</button>",
-	"</div>"
+    "<h1 id='name-header' class='my-4'>{{projName}}",
+      	"<small>{{projDesc}}</small>",
+			"<button type='' class='btn btn-primary float-right mb-2' id='export{{projName}}'>",
+				"Export to CSV",
+			"</button>",
+			'<br>',
+			"<button type='' class='btn btn-danger float-right mb-2' id='delete{{projName}}'>",
+				"Delete Project",
+			"</button>",
+			"<br>",
+			"<button type='' id='upload{{projName}}' class='btn btn-primary float-right mb-2'>Add Image</button>",
+    "</h1>",
   ].join("\n");
   data = {
     projName: project._projectName,
@@ -267,13 +266,26 @@ function loadHeader(project) {
 		project.eliminate();
 		redirect('projects');
 	});
+
+	$("#upload" + project._projectName).click(function() {
+		console.log('hello');
+		let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
+		for (var index in paths) {
+			var filename = path.basename(paths[index]).split(".")[0];
+			project.addImage(filename, paths[index]);
+			project.saveProject();
+		}
+
+		clearDetailsHtml();
+		loadDetail(project.getName());
+	});
 }
 
 function clearDetailsHtml() {
 	// clear previous projects on the html
 	document.getElementById("detail-header").innerHTML = ""
 	document.getElementById("image-wrapper").innerHTML = ""
-	document.getElementById("file-label2").innerHTML = ""
+	// document.getElementById("file-label2").innerHTML = ""
 }
 
 function detailExifDisplay(imgpath, name) {
@@ -346,49 +358,49 @@ $("#add-image").submit(function(e) {
 
 });
 
-function setuploadDetails() {
-	console.log('setting upload');
-	var holder = document.getElementById('upload2');
-	if (!holder) {
-		console.log('upload element does not exist');
-	  return false;
-	}
+// function setuploadDetails() {
+// 	console.log('setting upload');
+// 	var holder = document.getElementById('upload2');
+// 	if (!holder) {
+// 		console.log('upload element does not exist');
+// 	  return false;
+// 	}
 
-	holder.ondragover = () => {
-	    return false;
-	};
+// 	holder.ondragover = () => {
+// 	    return false;
+// 	};
 
-	holder.ondragleave = () => {
-	    return false;
-	};
+// 	holder.ondragleave = () => {
+// 	    return false;
+// 	};
 
-	holder.ondragend = () => {
-	    return false;
-	};
+// 	holder.ondragend = () => {
+// 	    return false;
+// 	};
 
-	holder.onclick = () => {
-		console.log('clicked');
-	  let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
-		if (!paths) {
-			return false;
-		}
-		paths_global = paths;
-		document.getElementById("file-label2").innerHTML = String(paths_global.length) + " files selected"
-	};
+// 	holder.onclick = () => {
+// 		console.log('clicked');
+// 	  	let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
+// 		if (!paths) {
+// 			return false;
+// 		}
+// 		paths_global = paths;
+// 		document.getElementById("file-label2").innerHTML = String(paths_global.length) + " files selected"
+// 	};
 
-	holder.ondrop = (e) => {
-	    e.preventDefault();
-			var paths = e.dataTransfer.files;
-			if (!paths) {
-				return false;
-			}
-			paths_global = paths;
-			document.getElementById("file-label2").innerHTML = String(paths_global.length) + " files selected"
-	    return false;
-	};
-}
+// 	holder.ondrop = (e) => {
+// 	    e.preventDefault();
+// 			var paths = e.dataTransfer.files;
+// 			if (!paths) {
+// 				return false;
+// 			}
+// 			paths_global = paths;
+// 			document.getElementById("file-label2").innerHTML = String(paths_global.length) + " files selected"
+// 	    return false;
+// 	};
+// }
 
-setuploadDetails();
+// setuploadDetails();
 
 module.exports = {
 	loadDetail: loadDetail
