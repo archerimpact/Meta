@@ -159,7 +159,7 @@ function insertDetailTemplate(data, id) {
 							'<a class="dropdown-item" href="#">Star</a>',
 						'</div>',
 					'</div>',
-					'<p>',
+					'<br>',
 					'<br>',
 					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#imagedata' + id + ' ">Image Info</button></span>',
 					'<div id="imagedata' + id +' " class="container collapse">',
@@ -234,6 +234,7 @@ function loadHeader(project) {
 		"<br>",
 		"<button type='' id='upload{{projName}}' class='btn btn-primary float-right mb-2'>Add Image</button>",
     "</h1>",
+		"<br>",
   ].join("\n");
   data = {
     projName: project._projectName,
