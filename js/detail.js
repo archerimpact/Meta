@@ -9,13 +9,14 @@ const Mustache = require('Mustache')
 const ExifImage = require('exif').ExifImage;
 
 var _data = [];
+var _currentProj;
+var paths_global;
 
 function loadDetail(projectName){
 	clearDetailsHtml();
 	var projectPath = getProjectJsonPath(projectName);
-  console.log("project path detail");
-  console.log(projectPath);
 	var project = loadProject(projectPath);
+	_currentProj = project;
 	// Should we drop the Detail class??
 	// var detail = new Detail(project);
 
@@ -34,58 +35,63 @@ function loadDetail(projectName){
 
 function loadImages(project){
 	// Add each image in project into details.html
-	var images = project.loadImages();
-	// for (image in images){
-	for (var id = 0; id < 2; id++){
-		var data = {
-		    name: "Image #" + id,
-		    path: "image._path",
-		    phone: "image._phone",
-			exifData: null
-		}
+	var images = project.getImages();
+	console.log(images)
+	var id = image.len - 1;
+	for (var image in images) {
+		id--;
+		// var data = {
+		//     name: "Image #" + id,
+		//     path: "image._path",
+		//     phone: "image._phone",
+		// 	exifData: null
+		// }
 
-		// var data = image.getMetadata();
-		// data[name] = image.getName();
-		// data[path] = image.getPath();
-		mdata = '';
-		count = 0;
-		for (var key in data) {
-			if (count == 0) {
-				mdata += '<tr><td>' + key + ': ' + data[key] + '</td>';
-				count = 1;
-			} else {
-				mdata += '<td>' + key + ': ' + data[key] + '</td></tr>';
-				count = 0;
-			}
-
-		}
-
-		var template = [
-		    '<div id="detail-template" class="row">',
-		      '<div class="col-md-4">',
-		        '<a href="#">',
-		          '<img class="img-fluid rounded mb-3 mb-md-0" src="http://placehold.it/700x300" alt="">',
-		        '</a>',
-		      '</div>',
-		      '<div class="col-md-8">',
-		        '<h3>{{name}}</h3>',
-		        '<p>',
-		        '<div id="metadata' + id +' " class="container collapse">',
-				  '<table class="table table-bordered">',
-				  	mdata,
-				  '</table>',
-				'</div>',
-		        '<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#metadata' + id + ' ">Metadata</button></span>',
-		      '</div>',
-		    '</div>',
-		    '<hr>'
-		].join("\n");
-		// template: '<div ...>\n<h1 ...>{{title}}<h1>\n</div>'
-
-		var filler = Mustache.render(template, data);
-		$("#image-wrapper").append(filler);
+		insertImage(image, id);
 	}
 
+}
+
+function insertImage(image, id) {
+	var mdata = '';
+	var count = 0;
+	console.log('starting add metadata')
+	for (var key in image['meta']) {
+		console.log('metadata')
+		if (count == 0) {
+			mdata += '<tr><td>' + key + ': ' + image[key] + '</td>';
+			count = 1;
+		} else {
+			mdata += '<td>' + key + ': ' + image[key] + '</td></tr>';
+			count = 0;
+		}
+
+	}
+
+	var template = [
+	    '<div id="detail-template" class="row">',
+	      '<div class="col-md-4">',
+	        '<a href="#">',
+	          '<img class="img-fluid rounded mb-3 mb-md-0" src="http://placehold.it/700x300" alt="">',
+	        '</a>',
+	      '</div>',
+	      '<div class="col-md-8">',
+	        '<h3>{{name}}</h3>',
+	        '<p>',
+	        '<div id="metadata' + image['name'] + id +' " class="container collapse">',
+			  '<table class="table table-bordered">',
+			  	mdata,
+			  '</table>',
+			'</div>',
+	        '<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#metadata' + id + ' ">Metadata</button></span>',
+	      '</div>',
+	    '</div>',
+	    '<hr>'
+	].join("\n");
+	// template: '<div ...>\n<h1 ...>{{title}}<h1>\n</div>'
+
+	var filler = Mustache.render(template, data);
+	$("#image-wrapper").append(filler);
 }
 
 function insertDetailTemplate(data, id) {
@@ -161,13 +167,14 @@ function insertDetailTemplate(data, id) {
 							imgdata,
 						'</table>',
 					'</div>',
+					'<br>',
 					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#exifdata' + id + ' ">Exif Data</button></span>',
 					'<div id="exifdata' + id +' " class="container collapse">',
 						'<table class="table table-bordered">',
 							exifdata,
 						'</table>',
 					'</div>',
-					'<br><br>',
+					'<br>',
 					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#gpsdata' + id + ' ">GPS Data</button></span>',
 					'<div id="gpsdata' + id +' " class="container collapse">',
 						'<table class="table table-bordered">',
@@ -216,14 +223,16 @@ function insertErrorTemplate(data, id) {
 function loadHeader(project) {
   template = [
     "<h1 id='name-header' class='my-4'>{{projName}}",
-      "<small>{{projDesc}}</small>",
-			"<button type='' class='btn btn-primary float-right mb-2' id='export{{projName}}'>",
-				"Export to CSV",
-			"</button>",
-			'<br>',
-			"<button type='' class='btn btn-danger float-right mb-2' id='delete{{projName}}'>",
-				"Delete Project",
-			"</button>",
+      	"<small>{{projDesc}}</small>",
+		"<button type='' class='btn btn-primary float-right mb-2' id='export{{projName}}'>",
+			"Export to CSV",
+		"</button>",
+		'<br>',
+		"<button type='' class='btn btn-danger float-right mb-2' id='delete{{projName}}'>",
+			"Delete Project",
+		"</button>",
+		"<br>",
+		"<button type='' id='upload{{projName}}' class='btn btn-primary float-right mb-2'>Add Image</button>",
     "</h1>",
   ].join("\n");
   data = {
@@ -274,12 +283,26 @@ function loadHeader(project) {
 		project.eliminate();
 		redirect('projects');
 	});
+
+	$("#upload" + project._projectName).click(function() {
+		console.log('hello');
+		let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
+		for (var index in paths) {
+			var filename = path.basename(paths[index]).split(".")[0];
+			project.addImage(filename, paths[index]);
+			project.saveProject();
+		}
+
+		clearDetailsHtml();
+		loadDetail(project.getName());
+	});
 }
 
-function clearDetailsHtml(){
+function clearDetailsHtml() {
 	// clear previous projects on the html
 	document.getElementById("detail-header").innerHTML = ""
 	document.getElementById("image-wrapper").innerHTML = ""
+	// document.getElementById("file-label2").innerHTML = ""
 }
 
 function detailExifDisplay(imgpath, name) {
@@ -321,6 +344,80 @@ function detailExifDisplay(imgpath, name) {
 			console.log('Exif Error: ' + error.message);
 	}
 }
+
+$("#add-image").submit(function(e) {
+	e.preventDefault();
+	if (!paths_global) {
+		console.log('Please select images');
+		alert('Please select images');
+		return;
+	}
+	var proj = _currentProj;
+	console.log(proj);
+	for (var index in paths_global) {
+		var filename = path.basename(paths_global[index]).split(".")[0];
+		proj.addImage(filename, paths_global[index]);
+		proj.saveProject();
+	}
+
+	clearDetailsHtml();
+	loadDetail(proj.getName());
+	paths_global = null;
+
+	// var projectName = createProject();
+ //    if (projectName) {
+ //    	clearNew();
+ //      	loadDetail(projectName);
+	// 	refreshProjects();
+ //    } else {
+ //        console.log(projectName + ": project not created")
+ //    }
+
+});
+
+// function setuploadDetails() {
+// 	console.log('setting upload');
+// 	var holder = document.getElementById('upload2');
+// 	if (!holder) {
+// 		console.log('upload element does not exist');
+// 	  return false;
+// 	}
+
+// 	holder.ondragover = () => {
+// 	    return false;
+// 	};
+
+// 	holder.ondragleave = () => {
+// 	    return false;
+// 	};
+
+// 	holder.ondragend = () => {
+// 	    return false;
+// 	};
+
+// 	holder.onclick = () => {
+// 		console.log('clicked');
+// 	  	let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
+// 		if (!paths) {
+// 			return false;
+// 		}
+// 		paths_global = paths;
+// 		document.getElementById("file-label2").innerHTML = String(paths_global.length) + " files selected"
+// 	};
+
+// 	holder.ondrop = (e) => {
+// 	    e.preventDefault();
+// 			var paths = e.dataTransfer.files;
+// 			if (!paths) {
+// 				return false;
+// 			}
+// 			paths_global = paths;
+// 			document.getElementById("file-label2").innerHTML = String(paths_global.length) + " files selected"
+// 	    return false;
+// 	};
+// }
+
+// setuploadDetails();
 
 module.exports = {
 	loadDetail: loadDetail

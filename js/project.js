@@ -57,10 +57,6 @@ class Project {
     //this._images[name] = image.toDict();
     this.addImageAppData(image);
 
-    console.log('added image: ' + image);
-    console.log(this._images);
-
-
     this._lastModified = Date.now();
   }
 
@@ -71,7 +67,7 @@ class Project {
 
   // Add a copy of the image to project/image/ folder inside the AppData
   addImageAppData(image) {
-
+    return
   }
 
   // Remove an image/video from the project
@@ -114,7 +110,9 @@ class Project {
   saveProject() {
 
     // Create directory for this project
-    fs.mkdir(this._projectDirectory);
+    if (!fs.existsSync(this._projectDirectory)) {
+      fs.mkdir(this._projectDirectory);
+    }
     var projectFilePath = path.join(this._projectDirectory, this._projectName + '.json');
 
     // Save all images.
@@ -126,11 +124,8 @@ class Project {
         fs.mkdir(imageDirectory);
       }
       var imageFilePath = path.join(imageDirectory, image + '.json');
-      console.log("image file path");
-      console.log(imageFilePath);
       if (!fs.existsSync(imageFilePath)) {
         var dict_obj = this._images[image];
-        console.log(dict_obj);
         fs.writeFileSync(imageFilePath, JSON.stringify(dict_obj));
       }
       // console.log(this._images[image]);
@@ -174,10 +169,6 @@ class Project {
     var images = [];
 
     for (imagePath in this._images) {
-      console.log("imagePath");
-      console.log(imagePath);
-      console.log(this._images[imagePath]);
-
       //rawData = fs.readFileSync(imagePath);
       //info = JSON.parse(rawData);
 

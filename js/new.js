@@ -1,6 +1,7 @@
 const ProjectF = require('./js/project.js')
 const Project = ProjectF.Project
 const loadDetail = require('./js/detail.js').loadDetail
+const os = require('os')
 
 var paths_global = [];
 
@@ -23,16 +24,19 @@ function createProject(){
 		alert("Project name already in use");
     	return
 	} else {
-		console.log("creating project");
 		var proj = new Project(name, desc);
 		console.log(paths_global);
 		for (var index in paths_global) {
-			var split = paths_global[index].split("/");
-			var filename = split[split.length -1].split(".")[0];
+			// if (os.platform().includes("win")) {
+			// 	var split = paths_global[index].split("\\");
+			// } else {
+			// 	var split = paths_global[index].split("/");
+			// }
+			var filename = path.basename(paths_global[index]).split(".")[0];	
 			proj.addImage(filename, paths_global[index]);
 		}
 		proj.saveProject();
-    return name;
+    	return name;
 	}
 }
 
@@ -51,6 +55,8 @@ $("#new-project").submit(function(e) {
 function clearNew() {
 	document.getElementById("name-input").value = ""
 	document.getElementById("desc-input").value = ""
+	//document.getElementById("files-input").value = ""
+	document.getElementById("file-label").innerHTML = ""
 }
 
 function setupload() {

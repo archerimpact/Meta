@@ -7,7 +7,7 @@ function showProject(name, desc, imgsrc) {
   template = [
     "<div class='col-lg-4 col-sm-6 portfolio-item'>",
       "<div class='card h-100'>",
-        "<a href='#'><img class='card-img-top' src='{{imgsrc}}' alt=''></a>",
+        "<a id='photo-{{name}}' href='#'><img class='card-img-top' src='{{imgsrc}}' alt=''></a>",
         "<div class='card-body'>",
           "<h4 class='card-title'>",
             "<a id='link-{{name}}' href='#'>{{name}}</a>",
@@ -29,6 +29,9 @@ function showProject(name, desc, imgsrc) {
     loadDetail(name.toString());
   };
   document.getElementById('btn-' + name.toString()).onclick = function() {
+    loadDetail(name.toString());
+  };
+  document.getElementById('photo-' + name.toString()).onclick = function() {
     loadDetail(name.toString());
   };
 }
