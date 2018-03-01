@@ -134,15 +134,27 @@ function insertDetailTemplate(data, id) {
 	_data.push(dataForCsv);
 
 	var template = [
-			'<div id="detail-template" class="row">',
+			'<div id="detail-template{{name}}" class="row">',
 				'<div class="col-md-4">',
 					'<a href="#">',
 						'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">',
 					'</a>',
 				'</div>',
 				'<div class="col-md-8">',
-					'<h3>{{name}}</h3>',
+					'<h3 style="display: inline;">{{name}}</h3>',
+					'<div style="display: inline;" class="dropdown">',
+						'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
+							// '<span class="octicon octicon-gear"></span>',
+							'Options',
+						'</button>',
+						'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
+							'<a id="remove{{name}}" class="dropdown-item" href="#">Remove</a>',
+							'<a class="dropdown-item" href="#">Rename</a>',
+							'<a class="dropdown-item" href="#">Star</a>',
+						'</div>',
+					'</div>',
 					'<p>',
+					'<br>',
 					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#imagedata' + id + ' ">Image Info</button></span>',
 					'<div id="imagedata' + id +' " class="container collapse">',
 						'<table class="table table-bordered">',
@@ -170,6 +182,10 @@ function insertDetailTemplate(data, id) {
 
 	var filler = Mustache.render(template, data);
 	$("#image-wrapper").append(filler);
+
+	$("#remove" + data.name).click(function() {
+		console.log('photo remove not yet implemented');
+	});
 }
 
 function insertErrorTemplate(data, id) {
