@@ -137,6 +137,15 @@ function insertDetailTemplate(data, id) {
 			count = 0;
 		}
 	}
+	if (gpsdata === '') {
+		gpsdata = '<tr><td>No GPS information available for this image</td></tr>'
+	}
+	if (exifdata === '') {
+		exifdata = '<tr><td>No Exif information available for this image</td></tr>'
+	}
+	if (imgdata === '') {
+		imgdata = '<tr><td>No capture information available for this image</td></tr>'
+	}
 
 	_data.push(dataForCsv);
 
