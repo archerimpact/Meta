@@ -4,13 +4,14 @@ const remote = require('electron').remote;
 const fs = require('fs');
 
 function showProject(name, desc, imgsrc) {
+  var displayName = name.replace(/__/g, " ");
   template = [
     "<div class='col-lg-4 col-sm-6 portfolio-item'>",
       "<div class='card h-100'>",
         "<a id='photo-{{name}}' href='#'><img class='card-img-top' src='{{imgsrc}}' alt=''></a>",
         "<div class='card-body'>",
           "<h4 class='card-title'>",
-            "<a id='link-{{name}}' href='#'>{{name}}</a>",
+            "<a id='link-{{name}}' href='#'>{{displayName}}</a>",
           "</h4>",
           "<p class='card-text'>{{desc}}</p>",
           "<a class='btn btn-primary' id='btn-{{name}}' href='#'>View</a>",
@@ -19,6 +20,7 @@ function showProject(name, desc, imgsrc) {
     "</div>",
   ].join("\n");
   data = {
+    displayName: displayName,
     name: name.toString(),
     desc: desc,
     imgsrc: imgsrc,

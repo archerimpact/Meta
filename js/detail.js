@@ -11,6 +11,7 @@ const ExifImage = require('exif').ExifImage;
 var _data = [];
 var _currentProj;
 var paths_global;
+var storage = remote.getGlobal('sharedObj').store;
 
 function loadDetail(projectName){
 	clearDetailsHtml();
@@ -154,9 +155,9 @@ function insertDetailTemplate(data, id) {
 							'Options',
 						'</button>',
 						'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
-							'<a id="remove{{name}}" class="dropdown-item" href="#">Remove</a>',
-							'<a class="dropdown-item" href="#">Rename</a>',
-							'<a class="dropdown-item" href="#">Star</a>',
+							'<li id="remove{{name}}" class="dropdown-item">Remove</li>',
+							'<li class="dropdown-item">Rename</li>',
+							'<li class="dropdown-item">Star</li>',
 						'</div>',
 					'</div>',
 					'<br>',
@@ -190,21 +191,30 @@ function insertDetailTemplate(data, id) {
 	var filler = Mustache.render(template, data);
 	$("#image-wrapper").append(filler);
 
-	$("#remove" + data.name).click(function() {
-		console.log('photo remove not yet implemented');
-	});
+	setPhotoRemove(data.name);
 }
 
 function insertErrorTemplate(data, id) {
 	var template = [
-			'<div id="detail-template" class="row">',
+			'<div id="detail-template{{name}}" class="row">',
 				'<div class="col-md-4">',
 					'<a href="#">',
 						'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">',
 					'</a>',
 				'</div>',
 				'<div class="col-md-8">',
-					'<h3>{{name}}</h3>',
+					'<h3 style="display: inline;">{{name}}</h3>',
+					'<div style="display: inline;" class="dropdown">',
+						'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
+							// '<span class="octicon octicon-gear"></span>',
+							'Options',
+						'</button>',
+						'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
+							'<li id="remove{{name}}" class="dropdown-item" href="#">Remove</li>',
+							'<li class="dropdown-item" href="#">Rename</li>',
+							'<li class="dropdown-item" href="#">Star</li>',
+						'</div>',
+					'</div>',
 					'<p>',
 					'<div id="imagedata' + id +' ">',
 							'<br>',
@@ -218,12 +228,27 @@ function insertErrorTemplate(data, id) {
 
 	var filler = Mustache.render(template, data);
 	$("#image-wrapper").append(filler);
+
+	setPhotoRemove(data.name);
+}
+
+function setPhotoRemove(name) {
+	var projName = document.getElementById('project-name').innerHTML;
+	$("#remove" + name).click(function() {
+		var projectPath = storage.getProject(projName);
+		console.log(projectPath);
+		console.log(projName);
+		var proj = loadProject(path.join(projectPath, projName + '.json'));
+		proj.removeImage(name);
+		proj.saveProject();
+		$('#detail-template' + name).remove();
+	});
 }
 
 function loadHeader(project) {
   template = [
-    "<h1 id='name-header' class='my-4'>{{projName}}",
-      	"<small>{{projDesc}}</small>",
+    "<h1 id='name-header' class='my-4'>{{displayName}}",
+      	"<br><small>{{projDesc}}</small>",
 		"<button type='' class='btn btn-primary float-right mb-2' id='export{{projName}}'>",
 			"Export to CSV",
 		"</button>",
@@ -235,9 +260,11 @@ function loadHeader(project) {
 		"<button type='' id='upload{{projName}}' class='btn btn-primary float-right mb-2'>Add Image</button>",
     "</h1>",
 		"<br>",
+		"<div id='project-name' hidden=true>{{projName}}</div>"
   ].join("\n");
   data = {
     projName: project._projectName,
+		displayName: project._projectName.replace(/__/g, " "),
     projDesc: project._description,
   }
   var filler = Mustache.render(template, data);
@@ -281,8 +308,11 @@ function loadHeader(project) {
 	});
 
 	$("#delete" + project._projectName).click(function() {
-		project.eliminate();
-		redirect('projects');
+		var ans = confirm("Are you sure you want to delete this project?");
+		if (ans) {
+			project.eliminate();
+			redirect('projects');
+		}
 	});
 
 	$("#upload" + project._projectName).click(function() {

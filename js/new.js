@@ -10,6 +10,7 @@ function createProject(){
 	var store = remote.getGlobal('sharedObj').store;
 
 	var name = document.getElementById("name-input").value;
+	name = name.replace(/ /g, '__');
 	var desc = document.getElementById("desc-input").value;
 	// file paths stored in paths_global
 
@@ -32,7 +33,7 @@ function createProject(){
 			// } else {
 			// 	var split = paths_global[index].split("/");
 			// }
-			var filename = path.basename(paths_global[index]).split(".")[0];	
+			var filename = path.basename(paths_global[index]).split(".")[0];
 			proj.addImage(filename, paths_global[index]);
 		}
 		proj.saveProject();
