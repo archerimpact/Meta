@@ -128,7 +128,7 @@ function insertDetailTemplate(data, id) {
 	}
 	count = 0;
 	for (var key in data.exifData.gps) {
-		dataForCsv[key] = data.exifData.exif[key];
+		dataForCsv[key] = data.exifData.gps[key];
 		if (count == 0) {
 			gpsdata += '<tr><td>' + key + ': ' + data.exifData.gps[key] + '</td>';
 			count = 1;
@@ -295,6 +295,12 @@ function setPhotoRemove(name) {
 		proj.removeImage(name);
 		proj.saveProject();
 		$('#detail-template' + name).remove();
+		for (var row = 0; row < _data.length; row++) {
+			if (_data[row]['Image Name'] == name) {
+				_data.splice(row, 1);
+				break;
+			}
+		}
 	});
 }
 
@@ -338,10 +344,11 @@ function loadHeader(project) {
 			});
 			csvString += csvHeader.slice(0, csvHeader.length - 1);
 			csvString += "\n";
-			var rowString = "";
+			var rowString;
 			for (var row = 0; row < _data.length; row++) {
+				rowString = "";
 				keys.forEach(function(k) {
-					if (_data[row][k] != undefined) {
+					if (_data[row][k]) {
 						var value = _data[row][k].toString();
 						if (value.includes(',')) {
 							rowString += '"' + value + '",';
@@ -384,6 +391,7 @@ function loadHeader(project) {
 
 function clearDetailsHtml() {
 	// clear previous projects on the html
+	_data = [];
 	document.getElementById("detail-header").innerHTML = ""
 	document.getElementById("image-wrapper").innerHTML = ""
 	// document.getElementById("file-label2").innerHTML = ""
