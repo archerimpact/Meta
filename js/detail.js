@@ -190,6 +190,7 @@ function insertDetailTemplate(data, id) {
 						'<table class="table table-bordered">',
 							gpsdata,
 						'</table>',
+						'<div style="width:100%;" id="map{{name}}"></div>',
 					'</div>',
 				'</div>',
 			'</div>',
@@ -201,6 +202,16 @@ function insertDetailTemplate(data, id) {
 	$("#image-wrapper").append(filler);
 
 	setPhotoRemove(data.name);
+
+	if ('GPSLongitude' in data.exifData.gps && 'GPSLatitude' in data.exifData.gps) {
+		loadMap(
+			data.name,
+			data.exifData.gps.GPSLatitude,
+			data.exifData.gps.GPSLongitude,
+			data.exifData.gps.GPSLatitudeRef,
+			data.exifData.gps.GPSLongitudeRef,
+		);
+	}
 }
 
 function insertErrorTemplate(data, id) {
@@ -239,6 +250,39 @@ function insertErrorTemplate(data, id) {
 	$("#image-wrapper").append(filler);
 
 	setPhotoRemove(data.name);
+}
+
+function loadMap(name, lat, long, latref, longref) {
+	lat = tripleToDegree(lat);
+	long = tripleToDegree(long);
+	if (latref.toLowerCase().includes('s') && lat > 0) {
+		lat = -1 * lat;
+	}
+	if (longref.toLowerCase().includes('w') && long > 0) {
+		long = -1 * long;
+	}
+	console.log(lat, long);
+	_map = new google.maps.Map(document.getElementById('map' + name), {
+	  zoom: 15,
+	  center: {'lat': lat, 'lng': long},
+	});
+	var marker = new google.maps.Marker({
+    position: {'lat': lat, 'lng': long},
+    map: _map,
+  });
+	var div = document.getElementById('map' + name);
+	var width = div.offsetWidth
+	div.style.height = '500px';
+	if (width > 0) {
+		div.style.height = width.toString() + 'px';
+	}
+}
+
+function tripleToDegree(dms) {
+	if (typeof dms[Symbol.iterator] === 'function') {
+		return dms[0] + dms[1]/60 + dms[2]/3600;
+	}
+	return dms;
 }
 
 function setPhotoRemove(name) {
