@@ -56,6 +56,19 @@ header.masthead .intro-text .intro-heading {
   }
 }
 
+.container {
+  margin-top: 0px;
+  padding-top: 0px;
+}
+
+.jumbotron {
+  height: 100%;
+}
+
+#tool-description {
+  padding-bottom: 30px;
+}
+
 #landing {
   height:100%;
   margin-bottom: 0px;
