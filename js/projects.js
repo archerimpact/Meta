@@ -43,7 +43,7 @@ function showNewProject() {
   template = [
     "<div class='col-lg-4 col-sm-6 portfolio-item'>",
       "<div class='card h-100'>",
-        "<a id='new-project-photo' href='#'><img data-section='new' class='card-img-top' src='./assets/simple-plus.png' alt=''></a>",
+        "<a id='new-project-photo' href='#'><img data-section='new' class='card-img-top' src='./assets/add-proj.png' alt=''></a>",
         "<div class='card-body'>",
           "<h4 class='card-title'>",
             "<a id='new-photo-link' href='#'></a>",
