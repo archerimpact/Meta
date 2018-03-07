@@ -1,11 +1,11 @@
 body {
-  padding-top: 54px;
   height: 100vh;
 }
 
 @media (min-width: 992px) {
   body {
-    padding-top: 56px;
+    /* uncomment this if we would like to keep the navbar separate from the body */
+    /* padding-top: 56px; */
   }
 }
 
