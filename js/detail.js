@@ -128,7 +128,7 @@ function insertDetailTemplate(data, id) {
 	}
 	count = 0;
 	for (var key in data.exifData.gps) {
-		dataForCsv[key] = data.exifData.exif[key];
+		dataForCsv[key] = data.exifData.gps[key];
 		if (count == 0) {
 			gpsdata += '<tr><td>' + key + ': ' + data.exifData.gps[key] + '</td>';
 			count = 1;
@@ -157,20 +157,25 @@ function insertDetailTemplate(data, id) {
 					'</a>',
 				'</div>',
 				'<div class="col-md-8">',
-					'<h3 style="display: inline;">{{name}}</h3>',
-					'<div style="display: inline;" class="dropdown">',
-						'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
-							// '<span class="octicon octicon-gear"></span>',
-							'Options',
-						'</button>',
-						'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
-							'<li id="remove{{name}}" class="dropdown-item">Remove</li>',
-							'<li class="dropdown-item">Rename</li>',
-							'<li class="dropdown-item">Star</li>',
+					'<div class="row">',
+						'<div class="col-md-10">',
+							'<h3 style="word-wrap:break-word;">{{name}}</h3>',
+						'</div>',
+						'<div class="col-md-2">',
+							'<div class="dropdown">',
+								'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
+									// '<span class="octicon octicon-gear"></span>',
+									'Options',
+								'</button>',
+								'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
+									'<li id="remove{{name}}" class="dropdown-item">Remove</li>',
+									'<li class="dropdown-item">Rename</li>',
+									'<li class="dropdown-item">Star</li>',
+								'</div>',
+							'</div>',
 						'</div>',
 					'</div>',
-					'<br>',
-					'<br>',
+					// '<br>',
 					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#imagedata' + id + ' ">Image Info</button></span>',
 					'<div id="imagedata' + id +' " class="container collapse">',
 						'<table class="table table-bordered">',
@@ -190,6 +195,68 @@ function insertDetailTemplate(data, id) {
 						'<table class="table table-bordered">',
 							gpsdata,
 						'</table>',
+						'<div style="width:100%;" id="map{{name}}"></div>',
+					'</div>',
+				'</div>',
+			'</div>',
+			'<hr>'
+	].join("\n");
+	// template: '<div ...>\n<h1 ...>{{title}}<h1>\n</div>'
+
+	var filler = Mustache.render(template, data);
+	$("#image-wrapper").append(filler);
+
+	setPhotoRemove(data.name);
+
+	if ('GPSLongitude' in data.exifData.gps && 'GPSLatitude' in data.exifData.gps) {
+		loadMap(
+			data.name,
+			data.exifData.gps.GPSLatitude,
+			data.exifData.gps.GPSLongitude,
+			data.exifData.gps.GPSLatitudeRef,
+			data.exifData.gps.GPSLongitudeRef,
+		);
+	}
+}
+
+function insertErrorTemplate(data, id) {
+	if (data.error && data.error.includes('no such file')) {
+		data.error = 'This file could not be found. Is it possible ' +
+			'that it was moved? If so, either put it back, or delete ' +
+			'this entry and re-add it in its new location.'
+	}
+	var template = [
+			'<div id="detail-template{{name}}" class="row">',
+				'<div class="col-md-4">',
+					'<a href="#">',
+						'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">',
+					'</a>',
+				'</div>',
+				'<div class="col-md-8">',
+					'<div class="row">',
+						'<div class="col-md-10">',
+							'<h3 style="word-wrap:break-word;" style="display: inline;">{{name}}</h3>',
+						'</div>',
+						'<div class="col-md-2">',
+							'<div style="display: inline;" class="dropdown">',
+								'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
+									// '<span class="octicon octicon-gear"></span>',
+									'Options',
+								'</button>',
+								'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
+									'<li id="remove{{name}}" class="dropdown-item" href="#">Remove</li>',
+									'<li class="dropdown-item" href="#">Rename</li>',
+									'<li class="dropdown-item" href="#">Star</li>',
+								'</div>',
+							'</div>',
+						'</div>',
+					'</div>',
+					// '<p>',
+					'<div id="imagedata' + id +' ">',
+							'<br>',
+							'<div class="alert alert-warning">',
+								'<strong>Sorry! </strong>' + data.error,
+							'</div>',
 					'</div>',
 				'</div>',
 			'</div>',
@@ -203,42 +270,37 @@ function insertDetailTemplate(data, id) {
 	setPhotoRemove(data.name);
 }
 
-function insertErrorTemplate(data, id) {
-	var template = [
-			'<div id="detail-template{{name}}" class="row">',
-				'<div class="col-md-4">',
-					'<a href="#">',
-						'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">',
-					'</a>',
-				'</div>',
-				'<div class="col-md-8">',
-					'<h3 style="display: inline;">{{name}}</h3>',
-					'<div style="display: inline;" class="dropdown">',
-						'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
-							// '<span class="octicon octicon-gear"></span>',
-							'Options',
-						'</button>',
-						'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
-							'<li id="remove{{name}}" class="dropdown-item" href="#">Remove</li>',
-							'<li class="dropdown-item" href="#">Rename</li>',
-							'<li class="dropdown-item" href="#">Star</li>',
-						'</div>',
-					'</div>',
-					'<p>',
-					'<div id="imagedata' + id +' ">',
-							'<br>',
-							'<strong>Sorry! </strong>' + data.error,
-					'</div>',
-				'</div>',
-			'</div>',
-			'<hr>'
-	].join("\n");
-	// template: '<div ...>\n<h1 ...>{{title}}<h1>\n</div>'
+function loadMap(name, lat, long, latref, longref) {
+	lat = tripleToDegree(lat);
+	long = tripleToDegree(long);
+	if (latref.toLowerCase().includes('s') && lat > 0) {
+		lat = -1 * lat;
+	}
+	if (longref.toLowerCase().includes('w') && long > 0) {
+		long = -1 * long;
+	}
+	console.log(lat, long);
+	_map = new google.maps.Map(document.getElementById('map' + name), {
+	  zoom: 15,
+	  center: {'lat': lat, 'lng': long},
+	});
+	var marker = new google.maps.Marker({
+    position: {'lat': lat, 'lng': long},
+    map: _map,
+  });
+	var div = document.getElementById('map' + name);
+	var width = div.offsetWidth
+	div.style.height = '500px';
+	if (width > 0) {
+		div.style.height = width.toString() + 'px';
+	}
+}
 
-	var filler = Mustache.render(template, data);
-	$("#image-wrapper").append(filler);
-
-	setPhotoRemove(data.name);
+function tripleToDegree(dms) {
+	if (typeof dms[Symbol.iterator] === 'function') {
+		return dms[0] + dms[1]/60 + dms[2]/3600;
+	}
+	return dms;
 }
 
 function setPhotoRemove(name) {
@@ -251,25 +313,37 @@ function setPhotoRemove(name) {
 		proj.removeImage(name);
 		proj.saveProject();
 		$('#detail-template' + name).remove();
+		for (var row = 0; row < _data.length; row++) {
+			if (_data[row]['Image Name'] == name) {
+				_data.splice(row, 1);
+				break;
+			}
+		}
 	});
 }
 
 function loadHeader(project) {
   template = [
-    "<h1 id='name-header' class='my-4'>{{displayName}}",
-      	"<br><small>{{projDesc}}</small>",
-		"<button type='' class='btn btn-primary float-right mb-2' id='export{{projName}}'>",
-			"Export to CSV",
-		"</button>",
-		'<br>',
-		"<button type='' class='btn btn-danger float-right mb-2' id='delete{{projName}}'>",
-			"Delete Project",
-		"</button>",
-		"<br>",
-		"<button type='' id='upload{{projName}}' class='btn btn-primary float-right mb-2'>Add Image</button>",
-    "</h1>",
-	"<br>",
-	"<div id='project-name' hidden=true>{{projName}}</div>"
+		"<div class='row'>",
+			"<div class='col-md-10'>",
+		    "<h1 id='name-header' class='my-4'>{{displayName}}</h1>",
+				"<h4>{{projDesc}}</h4>",
+			"</div>",
+			"<div class='col-md-2'>",
+				"<br><br><br>",
+				"<button type='' class='btn btn-primary float-right mb-2' id='export{{projName}}'>",
+					"Export to CSV",
+				"</button>",
+				'<br>',
+				"<button type='' class='btn btn-danger float-right mb-2' id='delete{{projName}}'>",
+					"Delete Project",
+				"</button>",
+				"<br>",
+				"<button type='' id='upload{{projName}}' class='btn btn-primary float-right mb-2'>Add Image</button>",
+				"<br>",
+			"</div>",
+			"<div id='project-name' hidden=true>{{projName}}</div>",
+		"</div>"
   ].join("\n");
   data = {
     projName: project._projectName,
@@ -294,10 +368,11 @@ function loadHeader(project) {
 			});
 			csvString += csvHeader.slice(0, csvHeader.length - 1);
 			csvString += "\n";
-			var rowString = "";
+			var rowString;
 			for (var row = 0; row < _data.length; row++) {
+				rowString = "";
 				keys.forEach(function(k) {
-					if (_data[row][k] != undefined) {
+					if (_data[row][k]) {
 						var value = _data[row][k].toString();
 						if (value.includes(',')) {
 							rowString += '"' + value + '",';
@@ -340,6 +415,7 @@ function loadHeader(project) {
 
 function clearDetailsHtml() {
 	// clear previous projects on the html
+	_data = [];
 	document.getElementById("detail-header").innerHTML = ""
 	document.getElementById("image-wrapper").innerHTML = ""
 	// document.getElementById("file-label2").innerHTML = ""
