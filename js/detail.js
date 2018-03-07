@@ -18,13 +18,9 @@ function loadDetail(projectName){
 	var projectPath = getProjectJsonPath(projectName);
 	var project = loadProject(projectPath);
 	_currentProj = project;
-	// Should we drop the Detail class??
-	// var detail = new Detail(project);
 
 	redirect('detail');
-  	//document.getElementById('name-header').innerHTML = document.getElementById('name-header').innerHTML.replace("name-pc", projectName).replace("description-pc", "description here");
-  	loadHeader(project);
-  	//loadImages(project);
+	loadHeader(project);
 	var images = project.loadImages();
 	images.sort(compareTimestamp);
 	console.log(images);
@@ -44,68 +40,6 @@ function compareTimestamp(image1, image2){
 	else
 		return 1;
 }
-
-// function loadImages(project){
-// 	// Add each image in project into details.html
-// 	var images = project.getImages();
-// 	images.sort();
-// 	console.log(images)
-// 	var id = image.len - 1;
-// 	for (var image in images) {
-// 		id--;
-// 		// var data = {
-// 		//     name: "Image #" + id,
-// 		//     path: "image._path",
-// 		//     phone: "image._phone",
-// 		// 	exifData: null
-// 		// }
-//
-// 		insertImage(image, id);
-// 	}
-
-// }
-
-// function insertImage(image, id) {
-// 	var mdata = '';
-// 	var count = 0;
-// 	console.log('starting add metadata')
-// 	for (var key in image['meta']) {
-// 		console.log('metadata')
-// 		if (count == 0) {
-// 			mdata += '<tr><td>' + key + ': ' + image[key] + '</td>';
-// 			count = 1;
-// 		} else {
-// 			mdata += '<td>' + key + ': ' + image[key] + '</td></tr>';
-// 			count = 0;
-// 		}
-//
-// 	}
-//
-// 	var template = [
-// 	    '<div id="detail-template" class="row">',
-// 	      '<div class="col-md-4">',
-// 	        '<a href="#">',
-// 	          '<img class="img-fluid rounded mb-3 mb-md-0" src="http://placehold.it/700x300" alt="">',
-// 	        '</a>',
-// 	      '</div>',
-// 	      '<div class="col-md-8">',
-// 	        '<h3>{{name}}</h3>',
-// 	        '<p>',
-// 	        '<div id="metadata' + image['name'] + id +' " class="container collapse">',
-// 			  '<table class="table table-bordered">',
-// 			  	mdata,
-// 			  '</table>',
-// 			'</div>',
-// 	        '<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#metadata' + id + ' ">Metadata</button></span>',
-// 	      '</div>',
-// 	    '</div>',
-// 	    '<hr>'
-// 	].join("\n");
-// 	// template: '<div ...>\n<h1 ...>{{title}}<h1>\n</div>'
-//
-// 	var filler = Mustache.render(template, data);
-// 	$("#image-wrapper").append(filler);
-// }
 
 function insertDetailTemplate(data, id) {
 	imgdata = '';
