@@ -12,6 +12,7 @@ class Image {
       this._path = path;
       this._project = project;
       this._metadata = {};
+      this._timestamp = Date.now();
 
       // var helper = this._path.toString().split(".");
       // if (helper[helper.length - 1] == "jpg" || helper[helper.length - 1] == "jpeg") {
@@ -30,7 +31,7 @@ class Image {
       //   console.log('metadata: ' + this._metadata);
       // }
       this._project = project.getProjectName();
-      console.log(this._metadata);
+      // console.log(this._metadata);
 
   }
 
@@ -70,6 +71,11 @@ class Image {
 
   getMetadata() {
     return this._metadata;
+  }
+
+  // get time created
+  getTimestamp() {
+    return this._timestamp;
   }
 
   getMovMetadata(path) {
@@ -115,6 +121,7 @@ class Image {
     console.log('SAVING');
     console.log(this._metadata);
     dict['meta'] = this._metadata;
+    dict['timestamp'] = this._timestamp;
     return dict;
   }
 }

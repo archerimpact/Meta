@@ -181,6 +181,8 @@ class Project {
       images.push(image);
     }
 
+    console.log("in proj");
+    console.log(images);
     return images;
   }
 

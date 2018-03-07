@@ -24,6 +24,9 @@ function createProject(){
     	console.log("Project name already used");
 		alert("Project name already in use");
     	return
+	} else if (unacceptableFormat(name)) {
+		console.log("Please provide a valid project name. Commas, slashes, and periods cannot be used.");
+		alert("Please provide a valid project name. Commas, slashes, and periods cannot be used.");
 	} else {
 		var proj = new Project(name, desc);
 		console.log(paths_global);
@@ -39,6 +42,11 @@ function createProject(){
 		proj.saveProject();
     	return name;
 	}
+}
+
+function unacceptableFormat(name) {
+	return name.includes(".") || name.includes("/") || name.includes(",") ||
+				 name.includes("\\");
 }
 
 $("#new-project").submit(function(e) {
