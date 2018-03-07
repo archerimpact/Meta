@@ -162,61 +162,58 @@ function insertDetailTemplate(data, id) {
 	_data.push(dataForCsv);
 
 	var template = [
-			'<div id="detail-template{{name}}" class="row">',
-				'<div class="col-md-4">',
-					'<a href="#">',
-						'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">',
-					'</a>',
-				'</div>',
-				'<div class="col-md-8">',
-					'<div class="row">',
-						'<div class="col-md-10">',
-							'<h3 style="word-wrap:break-word;">{{name}}</h3>',
-						'</div>',
-						'<div class="col-md-2">',
-							'<div class="dropdown">',
-								'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
-									// '<span class="octicon octicon-gear"></span>',
-									'Options',
-								'</button>',
-								'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
-									'<li id="remove{{name}}" class="dropdown-item">Remove</li>',
-									'<li class="dropdown-item">Rename</li>',
-									'<li class="dropdown-item">Star</li>',
-								'</div>',
+			'<div class="col-md-4">',
+				'<a href="#">',
+					'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">',
+				'</a>',
+			'</div>',
+			'<div class="col-md-8">',
+				'<div class="row">',
+					'<div class="col-md-10">',
+						'<h3 style="word-wrap:break-word;">{{name}}</h3>',
+					'</div>',
+					'<div class="col-md-2">',
+						'<div class="dropdown">',
+							'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
+								// '<span class="octicon octicon-gear"></span>',
+								'Options',
+							'</button>',
+							'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
+								'<li id="remove{{name}}" class="dropdown-item">Remove</li>',
+								'<li class="dropdown-item">Rename</li>',
+								'<li class="dropdown-item">Star</li>',
 							'</div>',
 						'</div>',
 					'</div>',
-					// '<br>',
-					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#imagedata' + id + ' ">Image Info</button></span>',
-					'<div id="imagedata' + id +' " class="container collapse">',
-						'<table class="table table-bordered">',
-							imgdata,
-						'</table>',
-					'</div>',
-					'<br>',
-					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#exifdata' + id + ' ">Exif Data</button></span>',
-					'<div id="exifdata' + id +' " class="container collapse">',
-						'<table class="table table-bordered">',
-							exifdata,
-						'</table>',
-					'</div>',
-					'<br>',
-					'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#gpsdata' + id + ' ">GPS Data</button></span>',
-					'<div id="gpsdata' + id +' " class="container collapse">',
-						'<table class="table table-bordered">',
-							gpsdata,
-						'</table>',
-						'<div style="width:100%;" id="map{{name}}"></div>',
-					'</div>',
+				'</div>',
+				// '<br>',
+				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#imagedata' + id + ' ">Image Info</button></span>',
+				'<div id="imagedata' + id +' " class="container collapse">',
+					'<table class="table table-bordered">',
+						imgdata,
+					'</table>',
+				'</div>',
+				'<br>',
+				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#exifdata' + id + ' ">Exif Data</button></span>',
+				'<div id="exifdata' + id +' " class="container collapse">',
+					'<table class="table table-bordered">',
+						exifdata,
+					'</table>',
+				'</div>',
+				'<br>',
+				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#gpsdata' + id + ' ">GPS Data</button></span>',
+				'<div id="gpsdata' + id +' " class="container collapse">',
+					'<table class="table table-bordered">',
+						gpsdata,
+					'</table>',
+					'<div style="width:100%;" id="map{{name}}"></div>',
 				'</div>',
 			'</div>',
-			'<hr>'
 	].join("\n");
 	// template: '<div ...>\n<h1 ...>{{title}}<h1>\n</div>'
 
 	var filler = Mustache.render(template, data);
-	$("#image-wrapper").append(filler);
+	$("#detail-template" + data.name).append(filler);
 
 	setPhotoRemove(data.name);
 
@@ -238,46 +235,43 @@ function insertErrorTemplate(data, id) {
 			'this entry and re-add it in its new location.'
 	}
 	var template = [
-			'<div id="detail-template{{name}}" class="row">',
-				'<div class="col-md-4">',
-					'<a href="#">',
-						'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">',
-					'</a>',
+			'<div class="col-md-4">',
+				'<a href="#">',
+					'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">',
+				'</a>',
+			'</div>',
+			'<div class="col-md-8">',
+				'<div class="row">',
+					'<div class="col-md-10">',
+						'<h3 style="word-wrap:break-word;" style="display: inline;">{{name}}</h3>',
+					'</div>',
+					'<div class="col-md-2">',
+						'<div style="display: inline;" class="dropdown">',
+							'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
+								// '<span class="octicon octicon-gear"></span>',
+								'Options',
+							'</button>',
+							'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
+								'<li id="remove{{name}}" class="dropdown-item" href="#">Remove</li>',
+								'<li class="dropdown-item" href="#">Rename</li>',
+								'<li class="dropdown-item" href="#">Star</li>',
+							'</div>',
+						'</div>',
+					'</div>',
 				'</div>',
-				'<div class="col-md-8">',
-					'<div class="row">',
-						'<div class="col-md-10">',
-							'<h3 style="word-wrap:break-word;" style="display: inline;">{{name}}</h3>',
+				// '<p>',
+				'<div id="imagedata' + id +' ">',
+						'<br>',
+						'<div class="alert alert-warning">',
+							'<strong>Sorry! </strong>' + data.error,
 						'</div>',
-						'<div class="col-md-2">',
-							'<div style="display: inline;" class="dropdown">',
-								'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
-									// '<span class="octicon octicon-gear"></span>',
-									'Options',
-								'</button>',
-								'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
-									'<li id="remove{{name}}" class="dropdown-item" href="#">Remove</li>',
-									'<li class="dropdown-item" href="#">Rename</li>',
-									'<li class="dropdown-item" href="#">Star</li>',
-								'</div>',
-							'</div>',
-						'</div>',
-					'</div>',
-					// '<p>',
-					'<div id="imagedata' + id +' ">',
-							'<br>',
-							'<div class="alert alert-warning">',
-								'<strong>Sorry! </strong>' + data.error,
-							'</div>',
-					'</div>',
 				'</div>',
 			'</div>',
-			'<hr>'
 	].join("\n");
 	// template: '<div ...>\n<h1 ...>{{title}}<h1>\n</div>'
 
 	var filler = Mustache.render(template, data);
-	$("#image-wrapper").append(filler);
+	$("#detail-template" + data.name).append(filler);
 
 	setPhotoRemove(data.name);
 }
@@ -435,6 +429,15 @@ function clearDetailsHtml() {
 }
 
 function detailExifDisplay(imgpath, name) {
+	// Set default template.
+	var template = [
+		'<div id="detail-template{{name}}" class="row">',
+		'</div>',
+		'<hr>'
+	].join("\n")
+	var filler = Mustache.render(template, {name: name});
+	$("#image-wrapper").append(filler);
+
 	try {
 		new ExifImage({ image : imgpath }, function (error, exifData) {
 				var data = {
