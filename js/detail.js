@@ -268,8 +268,8 @@ function loadHeader(project) {
 		"<br>",
 		"<button type='' id='upload{{projName}}' class='btn btn-primary float-right mb-2'>Add Image</button>",
     "</h1>",
-		"<br>",
-		"<div id='project-name' hidden=true>{{projName}}</div>"
+	"<br>",
+	"<div id='project-name' hidden=true>{{projName}}</div>"
   ].join("\n");
   data = {
     projName: project._projectName,

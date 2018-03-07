@@ -13,7 +13,7 @@ function showProject(name, desc, imgsrc) {
           "<h4 class='card-title'>",
             "<a id='link-{{name}}' href='#'>{{displayName}}</a>",
           "</h4>",
-          "<p class='card-text'>{{desc}}</p>",
+          "<p class='card-text text-truncate'>{{desc}}</p>",
           "<a class='btn btn-primary' id='btn-{{name}}' href='#'>View</a>",
         "</div>",
       "</div>",
