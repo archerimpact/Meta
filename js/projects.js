@@ -13,7 +13,7 @@ function showProject(name, desc, imgsrc) {
           "<h4 class='card-title'>",
             "<a id='link-{{name}}' href='#'>{{displayName}}</a>",
           "</h4>",
-          "<p class='card-text'>{{desc}}</p>",
+          "<p class='card-text text-truncate'>{{desc}}</p>",
           "<a class='btn btn-primary' id='btn-{{name}}' href='#'>View</a>",
         "</div>",
       "</div>",
@@ -38,11 +38,31 @@ function showProject(name, desc, imgsrc) {
   };
 }
 
-// use this sort of thing
+function showNewProject() {
+  data = {};
+  template = [
+    "<div class='col-lg-4 col-sm-6 portfolio-item'>",
+      "<div class='card h-100'>",
+        "<a id='new-project-photo' href='#'><img data-section='new' class='card-img-top' src='./assets/add-proj.png' alt=''></a>",
+        "<div class='card-body'>",
+          "<h4 class='card-title'>",
+            "<a id='new-photo-link' href='#'></a>",
+          "</h4>",
+          "<p class='card-text'></p>",
+          "<a data-section='new' class='btn btn-primary js-scroll-trigger' id='new-photo-btn' href='#'>Add New Project</a>",
+        "</div>",
+      "</div>",
+    "</div>",
+  ].join("\n");
+
+  var filler = Mustache.render(template, data);
+  $("#projects-body").append(filler);
+}
 
 function populateProjectsScreen() {
   var storage = remote.getGlobal('sharedObj').store;
   var lib = storage.getAllProjects();
+  showNewProject();
   for (var proj in lib) {
     var projectPath = lib[proj] + '/' + proj + '.json';
   	var project = loadProject(projectPath);
