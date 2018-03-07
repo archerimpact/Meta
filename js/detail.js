@@ -305,21 +305,22 @@ function tripleToDegree(dms) {
 
 function setPhotoRemove(name) {
 	var projName = document.getElementById('project-name').innerHTML;
-	$("#remove" + name).click(function() {
+	document.getElementById("remove" + name).onclick = function() {
 		var projectPath = storage.getProject(projName);
 		console.log(projectPath);
 		console.log(projName);
 		var proj = loadProject(path.join(projectPath, projName + '.json'));
 		proj.removeImage(name);
 		proj.saveProject();
-		$('#detail-template' + name).remove();
+		var elem = document.getElementById('detail-template' + name);
+		elem.parentNode.removeChild(elem);
 		for (var row = 0; row < _data.length; row++) {
 			if (_data[row]['Image Name'] == name) {
 				_data.splice(row, 1);
 				break;
 			}
 		}
-	});
+	};
 }
 
 function loadHeader(project) {
@@ -346,14 +347,14 @@ function loadHeader(project) {
 		"</div>"
   ].join("\n");
   data = {
-    projName: project._projectName,
-		displayName: project._projectName.replace(/__/g, " "),
-    projDesc: project._description,
+    projName: project.getName(),
+		displayName: project.getName().replace(/__/g, " "),
+    projDesc: project.getDescription(),
   }
   var filler = Mustache.render(template, data);
   $("#detail-header").append(filler);
 
-	$("#export" + project._projectName).click(function() {
+	$("#export" + project.getName()).click(function() {
 		electron.remote.dialog.showSaveDialog(function(filename, bookmark) {
 			var csvString = "";
 			var keys = new Set();
@@ -391,7 +392,7 @@ function loadHeader(project) {
 		});
 	});
 
-	$("#delete" + project._projectName).click(function() {
+	$("#delete" + project.getName()).click(function() {
 		var ans = confirm("Are you sure you want to delete this project?");
 		if (ans) {
 			project.eliminate();
@@ -399,7 +400,7 @@ function loadHeader(project) {
 		}
 	});
 
-	$("#upload" + project._projectName).click(function() {
+	$("#upload" + project.getName()).click(function() {
 		console.log('hello');
 		let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
 		for (var index in paths) {
