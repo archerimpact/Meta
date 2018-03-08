@@ -24,7 +24,7 @@ function loadDetail(projectName){
 	var images = project.loadImages();
 	images.sort(compareTimestamp);
 	console.log(images);
-	images.forEach(function(image) {
+	images.forEach(function (image) {
 		var img_path = image['path'];
 		var name = image['name'];
 		detailExifDisplay(img_path, name);

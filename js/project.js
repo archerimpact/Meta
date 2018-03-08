@@ -106,6 +106,10 @@ class Project {
     this._lastModified = timestamp;
   }
 
+  getLastModified() {
+    return this._lastModified;
+  }
+
   // TODO(varsha): Eventually update the saving process, so that it is more efficient.
   saveProject() {
 
