@@ -22,13 +22,8 @@ function loadDetail(projectName){
 	loadHeader(project);
 	var images = project.getImages();
 	images.sort(compareTimestamp);
-<<<<<<< HEAD
 	console.log("images: " + images);
 	images.forEach(function(image) {
-=======
-	console.log(images);
-	images.forEach(function (image) {
->>>>>>> 5e2824dca7525ca738beaf4b99ed9d5a2cea4722
 		var img_path = image['path'];
 		var name = image['name'];
 		var metadata = image['metadata'];
