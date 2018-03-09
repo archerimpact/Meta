@@ -46,7 +46,7 @@ function createProject(){
 
 function unacceptableFormat(name) {
 	return name.includes(".") || name.includes("/") || name.includes(",") ||
-				 name.includes("\\");
+				 name.includes("\\") || name.includes(">") || name.includes("<");
 }
 
 $("#new-project").submit(function(e) {
