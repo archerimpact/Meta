@@ -35,6 +35,10 @@ function(n, dest) {
 
    showSection: function(event) {
      const sectionId = event.target.dataset.section
+     console.log(sectionId)
+     if (sectionId == "projects") {
+      refreshProjects();
+     }
      $('#' + sectionId).show()
      $('#' + sectionId + ' section').show()
    },

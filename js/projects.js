@@ -3,6 +3,8 @@ const loadProject = require('./js/project.js').loadProject
 const remote = require('electron').remote;
 const fs = require('fs');
 
+var lib = storage.getAllProjects();
+
 function showProject(name, desc, imgsrc) {
   var displayName = name.replace(/__/g, " ");
   template = [
@@ -61,11 +63,17 @@ function showNewProject() {
 
 function populateProjectsScreen() {
   var storage = remote.getGlobal('sharedObj').store;
-  var lib = storage.getAllProjects();
+  lib = storage.getAllProjects();
   showNewProject();
+  var proj_list = [];
   for (var proj in lib) {
-    var projectPath = lib[proj] + '/' + proj + '.json';
-  	var project = loadProject(projectPath);
+    proj_list.push(proj);
+  }
+
+  proj_list.sort(compareTimestamp);
+
+  proj_list.forEach(function (proj) {
+    var project = getProject(proj);
     if (!project) {
       storage.deleteProject(proj);
     } else {
@@ -76,11 +84,28 @@ function populateProjectsScreen() {
       }
       showProject(project.getName(), project.getDescription(), imgsrc);// "https://upload.wikimedia.org/wikipedia/commons/d/d1/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg");
     }
-  }
+  })
 }
 populateProjectsScreen()
+
+function getProject(projName) {
+  var projectPath = lib[projName] + '/' + projName + '.json';
+  var project = loadProject(projectPath);
+  return project;
+}
+
+// Comparator that puts newer projects before older ones.
+function compareTimestamp(proj1, proj2){
+  if (getProject(proj1).getLastModified() > getProject(proj2).getLastModified())
+    return -1;
+  else if (getProject(proj1).getLastModified() == getProject(proj2).getLastModified())
+    return 0;
+  else
+    return 1;
+}
 
 function refreshProjects() {
   document.getElementById("projects-body").innerHTML = "";
   populateProjectsScreen()
+  console.log('refresh')
 }
