@@ -10,7 +10,15 @@ function createProject(){
 	var store = remote.getGlobal('sharedObj').store;
 
 	var name = document.getElementById("name-input").value;
+	console.log("logging name");
+	console.log(name);
 	name = name.replace(/ /g, '__');
+	name = name.replace(/'/g, '__');
+	name = name.replace(/"/g, '__');
+	name = name.replace(/;/g, '__');
+	console.log("updated");
+	console.log(name);
+
 	var desc = document.getElementById("desc-input").value;
 	// file paths stored in paths_global
 
