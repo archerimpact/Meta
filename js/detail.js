@@ -22,12 +22,12 @@ function loadDetail(projectName){
 	loadHeader(project);
 	var images = project.getImages();
 	images.sort(compareTimestamp);
-	console.log("images: " + images);
+	// console.log("images: " + images);
 	images.forEach(function(image) {
 		var img_path = image['path'];
 		var name = image['name'];
 		var metadata = image['metadata'];
-		console.log(metadata);
+		// console.log(metadata);
 		detailExifDisplay(img_path, name, metadata);
 	});
 }
@@ -220,7 +220,7 @@ function loadMap(name, lat, long, latref, longref) {
 	if (longref.toLowerCase().includes('w') && long > 0) {
 		long = -1 * long;
 	}
-	console.log(lat, long);
+	// console.log(lat, long);
 	_map = new google.maps.Map(document.getElementById('map' + name), {
 	  zoom: 15,
 	  center: {'lat': lat, 'lng': long},
@@ -248,8 +248,8 @@ function setPhotoRemove(name) {
 	var projName = document.getElementById('project-name').innerHTML;
 	document.getElementById("remove" + name).onclick = function() {
 		var projectPath = storage.getProject(projName);
-		console.log(projectPath);
-		console.log(projName);
+		// console.log(projectPath);
+		// console.log(projName);
 		var proj = loadProject(path.join(projectPath, projName + '.json'));
 		proj.removeImage(name);
 		proj.saveProject();
@@ -342,7 +342,6 @@ function loadHeader(project) {
 	});
 
 	$("#upload" + project.getName()).click(function() {
-		console.log('hello');
 		let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
 		for (var index in paths) {
 			var filename = path.basename(paths[index]).split(".")[0];
@@ -421,7 +420,6 @@ $("#add-image").submit(function(e) {
 		return;
 	}
 	var proj = _currentProj;
-	console.log(proj);
 	for (var index in paths_global) {
 		var filename = path.basename(paths_global[index]).split(".")[0];
 		proj.addImage(filename, paths_global[index]);

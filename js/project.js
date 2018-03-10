@@ -120,7 +120,6 @@ class Project {
     return this._lastModified;
   }
 
-  // TODO(varsha): Eventually update the saving process, so that it is more efficient.
   saveProject() {
 
     // Create directory for this project
@@ -133,7 +132,11 @@ class Project {
 
     // Call storage class
     var storage = remote.getGlobal('sharedObj').store;
-    storage.saveProject(this._projectName, this._projectDirectory);
+    storage.saveProject(this._projectName, this._projectDirectory); //currently this line is not working, so we do it manually
+
+    //TODO: fix this hack
+    storage._projects[this._projectName] = this._projectDirectory;
+    fs.writeFileSync(storage._path, JSON.stringify(storage._projects));
   }
 
   eliminate() {

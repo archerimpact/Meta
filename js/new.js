@@ -10,14 +10,11 @@ function createProject(){
 	var store = remote.getGlobal('sharedObj').store;
 
 	var name = document.getElementById("name-input").value;
-	console.log("logging name");
-	console.log(name);
 	name = name.replace(/ /g, '__');
 	name = name.replace(/'/g, '__');
 	name = name.replace(/"/g, '__');
 	name = name.replace(/;/g, '__');
-	console.log("updated");
-	console.log(name);
+
 
 	var desc = document.getElementById("desc-input").value;
 	// file paths stored in paths_global
@@ -37,13 +34,7 @@ function createProject(){
 		alert("Please provide a valid project name. Commas, slashes, and periods cannot be used.");
 	} else {
 		var proj = new Project(name, desc);
-		console.log(paths_global);
 		for (var index in paths_global) {
-			// if (os.platform().includes("win")) {
-			// 	var split = paths_global[index].split("\\");
-			// } else {
-			// 	var split = paths_global[index].split("/");
-			// }
 			var filename = path.basename(paths_global[index]).split(".")[0];
 			proj.addImage(filename, paths_global[index]);
 		}
@@ -72,7 +63,6 @@ $("#new-project").submit(function(e) {
 function clearNew() {
 	document.getElementById("name-input").value = ""
 	document.getElementById("desc-input").value = ""
-	//document.getElementById("files-input").value = ""
 	document.getElementById("file-label").innerHTML = ""
 }
 
@@ -97,7 +87,6 @@ function setupload() {
 	};
 
 	holder.onclick = () => {
-		console.log('clicked');
 	  let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
 		if (!paths) {
 			return false;
