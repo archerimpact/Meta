@@ -110,6 +110,7 @@ function insertDetailTemplate(data, id) {
 					'<div class="col-md-3">',
 						'<div class="dropdown">',
 							'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
+							  // octicons uninstalled for now
 								// '<span class="octicon octicon-gear"></span>',
 								'Options',
 							'</button>',
@@ -121,7 +122,6 @@ function insertDetailTemplate(data, id) {
 						'</div>',
 					'</div>',
 				'</div>',
-				// '<br>',
 				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#imagedata' + id + ' ">Image Info</button></span>',
 				'<div id="imagedata' + id +' " class="container collapse">',
 					'<table class="table table-bordered">',
@@ -193,7 +193,6 @@ function insertErrorTemplate(data, id) {
 						'</div>',
 					'</div>',
 				'</div>',
-				// '<p>',
 				'<div id="imagedata' + id +' ">',
 						'<br>',
 						'<div class="alert alert-warning">',
