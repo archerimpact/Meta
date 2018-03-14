@@ -2,7 +2,6 @@ const electron = require('electron')
 const path = require('path')
 const fs = require('fs')
 const remote = require('electron').remote
-const Image = require('./image.js')
 const getProjectJsonPath = require('./project.js').getProjectJsonPath
 const loadProject = require('./project.js').loadProject
 const Mustache = require('Mustache')
@@ -21,13 +20,15 @@ function loadDetail(projectName){
 
 	redirect('detail');
 	loadHeader(project);
-	var images = project.loadImages();
+	var images = project.getImages();
 	images.sort(compareTimestamp);
-	console.log(images);
-	images.forEach(function (image) {
+	// console.log("images: " + images);
+	images.forEach(function(image) {
 		var img_path = image['path'];
 		var name = image['name'];
-		detailExifDisplay(img_path, name);
+		var metadata = image['metadata'];
+		// console.log(metadata);
+		detailExifDisplay(img_path, name, metadata);
 	});
 }
 
@@ -226,7 +227,7 @@ function loadMap(name, lat, long, latref, longref) {
 	if (longref.toLowerCase().includes('w') && long > 0) {
 		long = -1 * long;
 	}
-	console.log(lat, long);
+	// console.log(lat, long);
 	_map = new google.maps.Map(document.getElementById('map' + name), {
 	  zoom: 15,
 	  center: {'lat': lat, 'lng': long},
@@ -254,8 +255,8 @@ function setPhotoRemove(name) {
 	var projName = document.getElementById('project-name').innerHTML;
 	document.getElementById("remove" + name).onclick = function() {
 		var projectPath = storage.getProject(projName);
-		console.log(projectPath);
-		console.log(projName);
+		// console.log(projectPath);
+		// console.log(projName);
 		var proj = loadProject(path.join(projectPath, projName + '.json'));
 		proj.removeImage(name);
 		proj.saveProject();
@@ -368,7 +369,6 @@ function loadHeader(project) {
 	});
 
 	$("#upload" + project.getName()).click(function() {
-		console.log('hello');
 		let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
 		for (var index in paths) {
 			var filename = path.basename(paths[index]).split(".")[0];
@@ -389,7 +389,7 @@ function clearDetailsHtml() {
 	// document.getElementById("file-label2").innerHTML = ""
 }
 
-function detailExifDisplay(imgpath, name) {
+function detailExifDisplay(imgpath, name, metadata) {
 	// Set default template.
 	var template = [
 		'<div id="detail-template{{name}}" class="row">',
@@ -399,42 +399,43 @@ function detailExifDisplay(imgpath, name) {
 	var filler = Mustache.render(template, {name: name});
 	$("#image-wrapper").append(filler);
 
-	try {
-		new ExifImage({ image : imgpath }, function (error, exifData) {
-				var data = {
-					'name': name,
-					'path': imgpath,
-					'exifData': {},
-					'error': "",
-				};
-				if (error) {
-						console.log('Error: ' + error.message);
-						data.error = error.message;
-				} else {
-						var types = ['exif', 'image', 'gps'];
-						for (var ind in types) {
-							var type = types[ind];
-							data.exifData[type] = exifData[type];
-							if (!data.exifData[type]) {
-								data.exifData[type] = {};
+	if (Object.keys(metadata).length == 0) {
+		try {
+			console.log("generating metadata for " + name);
+			new ExifImage({ image : imgpath }, function (error, exifData) {
+					var data = {
+						'name': name,
+						'path': imgpath,
+						'exifData': {},
+						'error': "",
+					};
+					if (error) {
+							console.log('Error: ' + error.message);
+							data.error = error.message;
+					} else {
+							var types = ['exif', 'image', 'gps'];
+							for (var ind in types) {
+								var type = types[ind];
+								data.exifData[type] = exifData[type];
+								if (!data.exifData[type]) {
+									data.exifData[type] = {};
+								}
+								// these are not web-formatted and look like random symbols
+								// consider looking into formatting these
+								delete data.exifData.exif['MakerNote'];
+								delete data.exifData.exif['UserComment'];
 							}
-							// these are not web-formatted and look like random symbols
-							// consider looking into formatting these
-							delete data.exifData.exif['MakerNote'];
-							delete data.exifData.exif['UserComment'];
-
-							// for (var key in exifData[type]) {
-							// 	var val = exifData[type][key];
-							// 	if (val.constructor.name === 'Number' || val.constructor.name ==='String') {
-							// 		data['exifData'][key] = val;
-							// 	}
-							// }
-						}
-				}
-				insertDetailTemplate(data, name);
-		});
-	} catch (error) {
-			console.log('Exif Error: ' + error.message);
+					}
+					_currentProj.setImageMetadata(name, data);
+					_currentProj.saveProject();
+					insertDetailTemplate(data, name);
+			});
+		} catch (error) {
+				console.log('Exif Error: ' + error.message);
+		}
+	} else {
+		console.log("using existing metadata for " + name);
+		insertDetailTemplate(metadata, name);
 	}
 }
 
@@ -446,7 +447,6 @@ $("#add-image").submit(function(e) {
 		return;
 	}
 	var proj = _currentProj;
-	console.log(proj);
 	for (var index in paths_global) {
 		var filename = path.basename(paths_global[index]).split(".")[0];
 		proj.addImage(filename, paths_global[index]);
@@ -456,61 +456,7 @@ $("#add-image").submit(function(e) {
 	clearDetailsHtml();
 	loadDetail(proj.getName());
 	paths_global = null;
-
-	// var projectName = createProject();
- //    if (projectName) {
- //    	clearNew();
- //      	loadDetail(projectName);
-	// 	refreshProjects();
- //    } else {
- //        console.log(projectName + ": project not created")
- //    }
-
 });
-
-// function setuploadDetails() {
-// 	console.log('setting upload');
-// 	var holder = document.getElementById('upload2');
-// 	if (!holder) {
-// 		console.log('upload element does not exist');
-// 	  return false;
-// 	}
-
-// 	holder.ondragover = () => {
-// 	    return false;
-// 	};
-
-// 	holder.ondragleave = () => {
-// 	    return false;
-// 	};
-
-// 	holder.ondragend = () => {
-// 	    return false;
-// 	};
-
-// 	holder.onclick = () => {
-// 		console.log('clicked');
-// 	  	let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
-// 		if (!paths) {
-// 			return false;
-// 		}
-// 		paths_global = paths;
-// 		document.getElementById("file-label2").innerHTML = String(paths_global.length) + " files selected"
-// 	};
-
-// 	holder.ondrop = (e) => {
-// 	    e.preventDefault();
-// 			var paths = e.dataTransfer.files;
-// 			if (!paths) {
-// 				return false;
-// 			}
-// 			paths_global = paths;
-// 			document.getElementById("file-label2").innerHTML = String(paths_global.length) + " files selected"
-// 	    return false;
-// 	};
-// }
-
-// setuploadDetails();
 
 module.exports = {
 	loadDetail: loadDetail

@@ -2,9 +2,6 @@ const electron = require('electron');
 const path = require('path');
 const fs = require('fs');
 const remote = require('electron').remote;
-const Images = require('./image.js');
-const Image = Images.Image;
-const { creatCsvFile, downloadFile, detectionClientType } = require('download-csv');
 const rimraf = require('rimraf');
 
 class Project {
@@ -37,7 +34,7 @@ class Project {
 
   getImages() {
     return Object.values(this._images).map(function(v) {
-      return v['path'];
+      return v;
     });
   }
 
@@ -50,12 +47,24 @@ class Project {
 
   // Add an image/video to the project
   addImage(name, path) {
-    var image = new Image(name, path, this);
+    this._images[name] = this.getImageData(name, path);
 
-    this._images[name] = image.getInfo();
+    // this.addImageAppData(image);
 
-    //this._images[name] = image.toDict();
-    this.addImageAppData(image);
+    this._lastModified = Date.now();
+  }
+
+  getImageData(name, path) {
+    var dict = new Object();
+    dict['name'] = name;
+    dict['path'] = path;
+    dict['timestamp'] = Date.now();
+    dict['metadata'] = {};
+    return dict;
+  }
+
+  setImageMetadata(image, metadata) {
+    this._images[image]['metadata'] = metadata;
 
     this._lastModified = Date.now();
   }
@@ -75,6 +84,7 @@ class Project {
     delete this._images[name];
 
     this._lastModified = Date.now();
+    this.saveProject();
   }
 
   // Update the project name
@@ -110,7 +120,6 @@ class Project {
     return this._lastModified;
   }
 
-  // TODO(varsha): Eventually update the saving process, so that it is more efficient.
   saveProject() {
 
     // Create directory for this project
@@ -119,28 +128,15 @@ class Project {
     }
     var projectFilePath = path.join(this._projectDirectory, this._projectName + '.json');
 
-    // Save all images.
-    var imageDirectory = path.join(this._projectDirectory, 'images');
-    var imageDict = new Object();
-
-    for (var image in this._images) {
-      if (!fs.existsSync(imageDirectory)) {
-        fs.mkdir(imageDirectory);
-      }
-      var imageFilePath = path.join(imageDirectory, image + '.json');
-      if (!fs.existsSync(imageFilePath)) {
-        var dict_obj = this._images[image];
-        fs.writeFileSync(imageFilePath, JSON.stringify(dict_obj));
-      }
-      // console.log(this._images[image]);
-      imageDict[image] = this._images[image]['name'];
-    }
-
     fs.writeFileSync(projectFilePath, JSON.stringify(this.toDict()));
 
     // Call storage class
     var storage = remote.getGlobal('sharedObj').store;
-    storage.saveProject(this._projectName, this._projectDirectory);
+    storage.saveProject(this._projectName, this._projectDirectory); //currently this line is not working, so we do it manually
+
+    //TODO: fix this hack
+    storage._projects[this._projectName] = this._projectDirectory;
+    fs.writeFileSync(storage._path, JSON.stringify(storage._projects));
   }
 
   eliminate() {
@@ -220,6 +216,7 @@ function loadProject(jsonFile) {
 
   // Load images.
   project.setImages(info['images']);
+  console.log(info['images']);
 
   // Set creation timestamp.
   project.setCreation(info['creation']);
