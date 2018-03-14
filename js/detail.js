@@ -114,7 +114,7 @@ function insertDetailTemplate(data, id) {
 							'</button>',
 							'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
 								'<li id="remove{{name}}" class="dropdown-item">Remove</li>',
-								'<li class="dropdown-item">Rename</li>',
+								'<li id="rename{{name}}" class="dropdown-item">Rename</li>',
 								'<li class="dropdown-item">Star</li>',
 							'</div>',
 						'</div>',
@@ -177,7 +177,13 @@ function insertErrorTemplate(data, id) {
 			'<div class="col-md-8">',
 				'<div class="row">',
 					'<div class="col-md-10">',
-						'<h3 style="word-wrap:break-word;" style="display: inline;">{{name}}</h3>',
+						'<h3 style="word-wrap:break-word;" style="display: inline;">{{name}}',
+							'<form id="input-new{{name}}">',
+								'<input type="text" name="new-name{{name}}" value="New Name">',
+								'<br>',
+								'<input type="submit" value="Submit">',
+							'</form>',
+							'</h3>',
 					'</div>',
 					'<div class="col-md-2">',
 						'<div style="display: inline;" class="dropdown">',
@@ -187,7 +193,7 @@ function insertErrorTemplate(data, id) {
 							'</button>',
 							'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
 								'<li id="remove{{name}}" class="dropdown-item" href="#">Remove</li>',
-								'<li class="dropdown-item" href="#">Rename</li>',
+								'<li id="rename{{name}}" class="dropdown-item" href="#">Rename</li>',
 								'<li class="dropdown-item" href="#">Star</li>',
 							'</div>',
 						'</div>',
@@ -208,6 +214,7 @@ function insertErrorTemplate(data, id) {
 	$("#detail-template" + data.name).append(filler);
 
 	setPhotoRemove(data.name);
+	setPhotoRename(data.name);
 }
 
 function loadMap(name, lat, long, latref, longref) {
@@ -261,6 +268,26 @@ function setPhotoRemove(name) {
 			}
 		}
 	};
+}
+
+function setPhotoRename(name) {
+	var projName = document.getElementById('project-name').innerHTML;
+	document.getElementById("rename" + name).onclick = function() {
+		var projectPath = storage.getProject(projName);
+		console.log(projectPath);
+		console.log(projName);
+		var proj = loadProject(path.join(projectPath, projName + '.json'));
+		var image = proj.loadImage(name);
+		if (!image) {
+			console.log('image not found');
+			return;
+		}
+		var oldName = name;
+		var input = document.getElementById("input-new" + name);
+		input.style.display = "none";
+		//var newName = document.get
+		//image.rename()
+	}
 }
 
 function loadHeader(project) {

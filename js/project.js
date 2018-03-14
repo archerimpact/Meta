@@ -190,6 +190,10 @@ class Project {
     return images;
   }
 
+  loadImage(name) {
+    return this._images[name];
+  }
+
   // Return project directory path.
   getProjectDirectory() {
     return this._projectDirectory;
