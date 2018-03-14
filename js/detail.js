@@ -10,7 +10,7 @@ const ExifImage = require('exif').ExifImage;
 var _data = [];
 var _currentProj;
 var paths_global;
-var storage = remote.getGlobal('sharedObj').store;
+//var storage = remote.getGlobal('sharedObj').store;
 
 function loadDetail(projectName){
 	clearDetailsHtml();
@@ -104,10 +104,10 @@ function insertDetailTemplate(data, id) {
 			'</div>',
 			'<div class="col-md-8">',
 				'<div class="row">',
-					'<div class="col-md-10">',
+					'<div class="col-md-9">',
 						'<h3 style="word-wrap:break-word;">{{name}}</h3>',
 					'</div>',
-					'<div class="col-md-2">',
+					'<div class="col-md-3">',
 						'<div class="dropdown">',
 							'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
 								// '<span class="octicon octicon-gear"></span>',
@@ -145,7 +145,6 @@ function insertDetailTemplate(data, id) {
 				'</div>',
 			'</div>',
 	].join("\n");
-	// template: '<div ...>\n<h1 ...>{{title}}<h1>\n</div>'
 
 	var filler = Mustache.render(template, data);
 	$("#detail-template" + data.name).append(filler);
@@ -177,16 +176,10 @@ function insertErrorTemplate(data, id) {
 			'</div>',
 			'<div class="col-md-8">',
 				'<div class="row">',
-					'<div class="col-md-10">',
-						'<h3 style="word-wrap:break-word;" style="display: inline;">{{name}}',
-							'<form id="input-new{{name}}">',
-								'<input type="text" name="new-name{{name}}" value="New Name">',
-								'<br>',
-								'<input type="submit" value="Submit">',
-							'</form>',
-							'</h3>',
+					'<div class="col-md-9">',
+						'<h3 style="word-wrap:break-word;" style="display: inline;">{{name}}</h3>',
 					'</div>',
-					'<div class="col-md-2">',
+					'<div class="col-md-3">',
 						'<div style="display: inline;" class="dropdown">',
 							'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
 								// '<span class="octicon octicon-gear"></span>',
@@ -194,8 +187,8 @@ function insertErrorTemplate(data, id) {
 							'</button>',
 							'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
 								'<li id="remove{{name}}" class="dropdown-item" href="#">Remove</li>',
-								'<li id="rename{{name}}" class="dropdown-item" href="#">Rename</li>',
-								'<li class="dropdown-item" href="#">Star</li>',
+								// '<li class="dropdown-item" href="#">Rename</li>',
+								// '<li class="dropdown-item" href="#">Star</li>',
 							'</div>',
 						'</div>',
 					'</div>',
@@ -209,13 +202,12 @@ function insertErrorTemplate(data, id) {
 				'</div>',
 			'</div>',
 	].join("\n");
-	// template: '<div ...>\n<h1 ...>{{title}}<h1>\n</div>'
 
 	var filler = Mustache.render(template, data);
-	$("#detail-template" + data.name).append(filler);
+	document.getElementById("detail-template" + data.name).innerHTML += filler;
 
 	setPhotoRemove(data.name);
-	setPhotoRename(data.name);
+	// setPhotoRename(data.name);
 }
 
 function loadMap(name, lat, long, latref, longref) {
@@ -253,15 +245,23 @@ function tripleToDegree(dms) {
 
 function setPhotoRemove(name) {
 	var projName = document.getElementById('project-name').innerHTML;
-	document.getElementById("remove" + name).onclick = function() {
+	console.log(name)
+	var elem = document.getElementById("remove" + name)
+	if (!elem) {
+		return;
+	}
+	elem.onclick = function() {
 		var projectPath = storage.getProject(projName);
-		// console.log(projectPath);
-		// console.log(projName);
+		console.log(projectPath);
+		console.log(projName);
+		console.log(storage)
 		var proj = loadProject(path.join(projectPath, projName + '.json'));
 		proj.removeImage(name);
 		proj.saveProject();
-		var elem = document.getElementById('detail-template' + name);
-		elem.parentNode.removeChild(elem);
+		var content = document.getElementById('detail-template' + name);
+		content.parentNode.removeChild(content);
+		var line = document.getElementById('hr' + name);
+		line.parentNode.removeChild(line);
 		for (var row = 0; row < _data.length; row++) {
 			if (_data[row]['Image Name'] == name) {
 				_data.splice(row, 1);
@@ -271,32 +271,32 @@ function setPhotoRemove(name) {
 	};
 }
 
-function setPhotoRename(name) {
-	var projName = document.getElementById('project-name').innerHTML;
-	document.getElementById("rename" + name).onclick = function() {
-		var projectPath = storage.getProject(projName);
-		console.log(projectPath);
-		console.log(projName);
-		var proj = loadProject(path.join(projectPath, projName + '.json'));
-		var image = proj.loadImage(name);
-		if (!image) {
-			console.log('image not found');
-			return;
-		}
-		var oldName = name;
-		var input = document.getElementById("input-new" + name);
-		input.style.display = "none";
-		//var newName = document.get
-		//image.rename()
-	}
-}
+// function setPhotoRename(name) {
+// 	var projName = document.getElementById('project-name').innerHTML;
+// 	document.getElementById("rename" + name).onclick = function() {
+// 		var projectPath = storage.getProject(projName);
+// 		console.log(projectPath);
+// 		console.log(projName);
+// 		var proj = loadProject(path.join(projectPath, projName + '.json'));
+// 		var image = proj.loadImage(name);
+// 		if (!image) {
+// 			console.log('image not found');
+// 			return;
+// 		}
+// 		var oldName = name;
+// 		var input = document.getElementById("input-new" + name);
+// 		input.style.display = "none";
+// 		//var newName = document.get
+// 		//image.rename()
+// 	}
+// }
 
 function loadHeader(project) {
   template = [
 		"<div class='row'>",
 			"<div class='col-md-10'>",
-		    "<h1 id='name-header' class='my-4'>{{displayName}}</h1>",
-				"<h4>{{projDesc}}</h4>",
+		    "<h1 id='name-header' class='my-4' style='word-wrap:break-word;'>{{displayName}}</h1>",
+				"<h4 style='word-wrap:break-word;'>{{projDesc}}</h4>",
 			"</div>",
 			"<div class='col-md-2'>",
 				"<br><br><br>",
@@ -322,7 +322,7 @@ function loadHeader(project) {
   var filler = Mustache.render(template, data);
   $("#detail-header").append(filler);
 
-	$("#export" + project.getName()).click(function() {
+	document.getElementById("export" + project.getName()).onclick = function() {
 		electron.remote.dialog.showSaveDialog(function(filename, bookmark) {
 			var csvString = "";
 			var keys = new Set();
@@ -358,17 +358,18 @@ function loadHeader(project) {
 			}
 			fs.writeFileSync(filename+".csv", csvString);
 		});
-	});
+	};
 
-	$("#delete" + project.getName()).click(function() {
+	document.getElementById("delete" + project.getName()).onclick = function() {
 		var ans = confirm("Are you sure you want to delete this project?");
 		if (ans) {
 			project.eliminate();
 			redirect('projects');
 		}
-	});
+	};
 
-	$("#upload" + project.getName()).click(function() {
+	document.getElementById("upload" + project.getName()).onclick = function() {
+		console.log('hello');
 		let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
 		for (var index in paths) {
 			var filename = path.basename(paths[index]).split(".")[0];
@@ -378,7 +379,7 @@ function loadHeader(project) {
 
 		clearDetailsHtml();
 		loadDetail(project.getName());
-	});
+	};
 }
 
 function clearDetailsHtml() {
@@ -394,10 +395,13 @@ function detailExifDisplay(imgpath, name, metadata) {
 	var template = [
 		'<div id="detail-template{{name}}" class="row">',
 		'</div>',
-		'<hr>'
+		'<hr id="hr{{name}}">'
 	].join("\n")
 	var filler = Mustache.render(template, {name: name});
 	$("#image-wrapper").append(filler);
+	if (!metadata) {
+		metadata = {};
+	}
 
 	if (Object.keys(metadata).length == 0) {
 		try {

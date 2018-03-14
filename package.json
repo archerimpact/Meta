@@ -1,15 +1,18 @@
 {
-  "name": "archer-hrc-metadata",
+  "name": "ArcherMeta",
   "version": "1.0.0",
+  "author": "Anne Zepecki, Franklin Rice, Varsha Venkat, and Jordan Flores",
   "description": "A desktop tool for Mac, Windows, and Linux made with Electron for viewing and exporting photo and video metadata online.",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
+  "productName": "Archer Meta",
   "repository": "https://github.com/venkatvarsha/archer-hrc-metadata",
   "author": "Archer HRC Team",
   "devDependencies": {
-    "electron": "~1.7.8"
+    "electron": "~1.7.8",
+    "electron-packager": "^11.1.0"
   },
   "dependencies": {
     "audio-metadata": "^0.3.0",
@@ -24,5 +27,11 @@
     "node-iptc": "^1.0.5",
     "octicons": "^7.1.0",
     "rimraf": "^2.6.2"
+  },
+  "build": {
+    "appId": "com.archer.meta",
+    "mac": {
+      "category": "public.app-category.photography"
+    }
   }
 }

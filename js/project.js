@@ -131,12 +131,8 @@ class Project {
     fs.writeFileSync(projectFilePath, JSON.stringify(this.toDict()));
 
     // Call storage class
-    var storage = remote.getGlobal('sharedObj').store;
-    storage.saveProject(this._projectName, this._projectDirectory); //currently this line is not working, so we do it manually
-
-    //TODO: fix this hack
-    storage._projects[this._projectName] = this._projectDirectory;
-    fs.writeFileSync(storage._path, JSON.stringify(storage._projects));
+    //var storage = remote.getGlobal('sharedObj').store;
+    storage.saveProject(this._projectName, this._projectDirectory);
   }
 
   eliminate() {
@@ -145,7 +141,7 @@ class Project {
       console.log('Project ' + name + ' eliminated');
     });
 
-    var storage = remote.getGlobal('sharedObj').store;
+    //var storage = remote.getGlobal('sharedObj').store;
     storage.deleteProject(this._projectName);
   }
 

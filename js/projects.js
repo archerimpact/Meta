@@ -62,13 +62,15 @@ function showNewProject() {
 }
 
 function populateProjectsScreen() {
-  var storage = remote.getGlobal('sharedObj').store;
+  // var storage = remote.getGlobal('sharedObj').store;
   lib = storage.getAllProjects();
   showNewProject();
   var proj_list = [];
   for (var proj in lib) {
     proj_list.push(proj);
   }
+
+  console.log(proj_list)
 
   proj_list.sort(compareTimestamp);
 
@@ -82,6 +84,7 @@ function populateProjectsScreen() {
       if (!fs.existsSync(imgsrc)) {
         imgsrc = "https://static1.squarespace.com/static/5a6557ae692ebe609770a2a7/t/5a67a1be0852291d033bb08b/1518849801599/?format=1500w";
       }
+      console.log("showing " + project.getName())
       showProject(project.getName(), project.getDescription(), imgsrc);// "https://upload.wikimedia.org/wikipedia/commons/d/d1/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg");
     }
   })
@@ -89,6 +92,9 @@ function populateProjectsScreen() {
 populateProjectsScreen()
 
 function getProject(projName) {
+  if (!(projName in lib)) {
+    return null;
+  }
   var projectPath = lib[projName] + '/' + projName + '.json';
   var project = loadProject(projectPath);
   return project;
@@ -96,9 +102,19 @@ function getProject(projName) {
 
 // Comparator that puts newer projects before older ones.
 function compareTimestamp(proj1, proj2){
-  if (getProject(proj1).getLastModified() > getProject(proj2).getLastModified())
+  console.log(proj1);
+  console.log(proj2);
+  var p1 = getProject(proj1);
+  var p2 = getProject(proj2);
+  if (!p2) {
     return -1;
-  else if (getProject(proj1).getLastModified() == getProject(proj2).getLastModified())
+  }
+  if (!p1) {
+    return 1;
+  }
+  if (p1.getLastModified() > p2.getLastModified())
+    return -1;
+  else if (p1.getLastModified() == p2.getLastModified())
     return 0;
   else
     return 1;
