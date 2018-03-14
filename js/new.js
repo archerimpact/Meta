@@ -7,7 +7,7 @@ var paths_global = [];
 
 function createProject(){
 	var remote = electron.remote;
-	var store = remote.getGlobal('sharedObj').store;
+	// var store = remote.getGlobal('sharedObj').store;
 
 	var name = document.getElementById("name-input").value;
 	console.log("logging name");
@@ -27,7 +27,7 @@ function createProject(){
 		console.log("Please give a project name");
 		alert("Please provide a project name");
 		return
-	} else if (store.getProject(name) != null) {
+	} else if (storage.getProject(name) != null) {
 		// display: "Project name already used. Please input new name"
     	console.log("Project name already used");
 		alert("Project name already in use");
@@ -70,6 +70,7 @@ $("#new-project").submit(function(e) {
 });
 
 function clearNew() {
+	paths_global = [];
 	document.getElementById("name-input").value = ""
 	document.getElementById("desc-input").value = ""
 	//document.getElementById("files-input").value = ""

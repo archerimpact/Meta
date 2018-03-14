@@ -132,7 +132,7 @@ class Project {
     fs.writeFileSync(projectFilePath, JSON.stringify(this.toDict()));
 
     // Call storage class
-    var storage = remote.getGlobal('sharedObj').store;
+    //var storage = remote.getGlobal('sharedObj').store;
     storage.saveProject(this._projectName, this._projectDirectory);
   }
 
@@ -142,7 +142,7 @@ class Project {
       console.log('Project ' + name + ' eliminated');
     });
 
-    var storage = remote.getGlobal('sharedObj').store;
+    //var storage = remote.getGlobal('sharedObj').store;
     storage.deleteProject(this._projectName);
   }
 
