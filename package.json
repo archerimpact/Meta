@@ -5,18 +5,21 @@
   "description": "A desktop tool for Mac, Windows, and Linux made with Electron for viewing and exporting photo and video metadata online.",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "postinstall": "install-app-deps"
   },
   "productName": "Archer Meta",
   "repository": "https://github.com/venkatvarsha/archer-hrc-metadata",
   "devDependencies": {
     "electron": "~1.7.8",
+    "electron-builder": "^20.8.1",
     "electron-packager": "^11.1.0"
   },
   "dependencies": {
     "exif": "^0.6.0",
     "mustache": "^2.3.0",
-    "rimraf": "^2.6.2"
+    "rimraf": "^2.6.2",
+    "sqlite3": "^4.0.0"
   },
   "build": {
     "appId": "com.archer.meta",
