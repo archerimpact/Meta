@@ -14,13 +14,17 @@ const storage = new Storage({
   defaults: {}
 });
 
+// Import database file.
+const Database = require('.js/database.js');
+const db = init_database();
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
 // Set storage instance to be used across js files. All constants that should
 // be accessible to other scripts must go here.
-global.sharedObj = {store: storage};
+global.sharedObj = {store: storage, database: db};
 
 function createWindow () {
   // Create the browser window.
