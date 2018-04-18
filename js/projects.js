@@ -80,8 +80,12 @@ function populateProjectsScreen() {
       storage.deleteProject(proj);
     } else {
       // uncomment this when images working
-      var imgsrc = project.getImages()[0]['path'];
-      if (!fs.existsSync(imgsrc)) {
+      if (project.getImages()[0]) {
+        var imgsrc = project.getImages()[0]['path'];
+      } else {
+        imgsrc = ""
+      }
+      if (imgsrc == "" || !fs.existsSync(imgsrc)) {
         imgsrc = "https://static1.squarespace.com/static/5a6557ae692ebe609770a2a7/t/5a67a1be0852291d033bb08b/1518849801599/?format=1500w";
       }
       console.log("showing " + project.getName())

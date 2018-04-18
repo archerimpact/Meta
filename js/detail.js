@@ -6,6 +6,8 @@ const getProjectJsonPath = require('./project.js').getProjectJsonPath
 const loadProject = require('./project.js').loadProject
 const Mustache = require('Mustache')
 const ExifImage = require('exif').ExifImage;
+const { ExifTool } = require("exiftool-vendored");
+const exiftool = new ExifTool();
 
 var _data = [];
 var _currentProj;
@@ -28,7 +30,8 @@ function loadDetail(projectName){
 		var name = image['name'];
 		var metadata = image['metadata'];
 		// console.log(metadata);
-		detailExifDisplay(img_path, name, metadata);
+		//detailExifDisplay(img_path, name, metadata);
+		detailExifDisplay__NEW(img_path, name, metadata)
 	});
 }
 
@@ -464,3 +467,315 @@ $("#add-image").submit(function(e) {
 module.exports = {
 	loadDetail: loadDetail
 };
+
+/*
+** Need to look into resource conservation here, by creating a new exiftool
+** only when needed, then calling .end() after it is done batch processing
+** (it does also have a batch mode)
+*/
+function detailExifDisplay__NEW(imgpath, name, metadata) {
+	var data = {
+		'name': name,
+		'path': imgpath,
+		'exifData': {},
+		'gpsData': {},
+		'fileData': {},
+		'error': "",
+	};
+	var template = [
+		'<div id="detail-template{{name}}" class="row">',
+		'</div>',
+		'<hr id="hr{{name}}">'
+	].join("\n")
+	var filler = Mustache.render(template, {name: name});
+	$("#image-wrapper").append(filler);
+	// if (Object.keys(metadata).length > 0) {
+	// 	data.exifData = metadata;
+	// 	insertDetailTemplate__NEW(data, name);
+	// 	return;
+	// }
+	exiftool
+		.read(imgpath)
+		.then(function(tags) {
+			console.log(tags);
+			data.exifData = {};
+			for (var key in tags) {
+				data.exifData[key] = tags[key];
+				processData(data);
+			}
+			insertDetailTemplate__NEW(data, name);
+		})
+		.catch(function(error) {
+			console.error(error);
+			data.error = error;
+			insertDetailTemplate__NEW(data, name);
+		});
+}
+
+function insertDetailTemplate__NEW(data, id) {
+	if (data.error) {
+		insertErrorTemplate(data, id);
+		return;
+	}
+	var contents = {};
+	var disableds = {};
+	var types = ['exif', 'gps', 'file', 'fav'];
+	for (var ind in types) {
+		var name = types[ind]
+		var category = data[name + 'Data'];
+		var content = '';
+		count = 0;
+		for (var key in category) {
+			if (count == 0) {
+				content += '<tr>';
+			}
+			content += '<td style="padding:1.0rem"><strong>' + key + '</strong>: ' + category[key] + '</td>';
+			if (count == 2) {
+				content += '</tr>'
+			}
+			count = (count + 1) % 3;
+		}
+		if (content == '') {
+			disableds[name] = 'disabled';
+		} else {
+			disableds[name] = '';
+		}
+		if (!content.endsWith('</tr>')) {
+			content += '</tr>';
+		}
+	}
+
+	// _data.push(dataForCsv);
+
+	var flag_string = 'Flagged as modified';
+	// TODO implement flag trigger
+	var is_modified = false;
+	var flag_trigger = '';
+	if (is_modified) {
+		flag_trigger = 'hidden';
+	}
+
+	var template = [
+		'<div class="row">',
+			'<div class="col-md-4">',
+				'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">', // add image features here
+			'</div>',
+			'<div class="col-md-8">',
+				'<div class="row">',
+					'<div class="col-md-8">',
+						'<h3 style="word-wrap:break-word;">{{name}}</h3>',
+						// tags
+						'<div>',
+							'<input type="text" placeholder="Add tag" name="tag">',
+							// one new label per tag, with appropriate color
+							'<h3 style="display:inline">',
+								'<span class="badge badge-pill badge-primary">', //style="background-color:#00ffff">',
+									'Fun',
+								'</span> ',
+								'<span class="badge badge-pill badge-primary" style="background-color:#00ffff">',
+									'Party',
+								'</span> ',
+							'</h2>',
+						'</div>',
+						'<br>',
+						'<textarea class="form-control" rows="3" placeholder="Notes" />',
+					'</div>',
+					'<div class="col-md-4">',
+
+						'<div class="row">',
+							'<img src="./assets/alert.svg" style="height:40px" data-toggle="tooltip" data-placement="auto" ' + flag_trigger + ' title="' + flag_string + '"/>',
+							'<div class="dropdown">',
+								'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
+									'Options',
+								'</button>',
+								'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
+									'<li id="remove{{name}}" class="dropdown-item">Remove</li>',
+									'<li id="rename{{name}}" class="dropdown-item">Rename</li>',
+								'</div>',
+							'</div>',
+						'</div>',
+						// search bar
+						'<br>',
+						'<input type="text" placeholder="Exif search">',
+						'<tr><th> Search results </th></tr>',
+
+					'</div>',
+				'</div>',
+			'</div>',
+		'</div>',
+
+		'<div class="row container-fluid" style="height:20px"></div>',
+
+		'<div class="container-fluid row">',
+			'<div class="col-md-3 text-center">',
+				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#favdata' + id + ' "' + disableds.fav + '>Favorite fields</button></span>',
+			'</div>',
+			'<div class="col-md-3 text-center">',
+				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#filedata' + id + ' "' + disableds.file + '>File Info</button></span>',
+			'</div>',
+			'<div class="col-md-3 text-center">',
+				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#exifdata' + id + ' "' + disableds.exif + '>Exif Data</button></span>',
+			'</div>',
+			'<div class="col-md-3 text-center">',
+				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#gpsdata' + id + ' "' + disableds.gps + '>GPS Data</button></span>',
+			'</div>',
+		'</div>',
+
+		'<div class="container-fluid row">',
+			'<div class="col-md-12 center-block">',
+				// favorites
+				'<div id="favdata' + id +' " class="container collapse">',
+					'<table class="table table-bordered">',
+						contents.fav,
+					'</table>',
+				'</div>',
+				'<br>',
+				//file info
+				'<div id="filedata' + id +' " class="container collapse">',
+					'<table class="table table-bordered">',
+						contents.file,
+					'</table>',
+				'</div>',
+				'<br>',
+				// general Exif
+				'<div id="exifdata' + id +' " class="container collapse">',
+					'<table class="table table-bordered">',
+						contents.exif,
+					'</table>',
+				'</div>',
+				'<br>',
+				// GPS
+				'<div id="gpsdata' + id +' " class="container collapse">',
+					'<table class="table table-bordered">',
+						contents.gps,
+					'</table>',
+				'</div>',
+			'</div>',
+		'</div>',
+	].join("\n");
+
+	var filler = Mustache.render(template, data);
+	$("#detail-template" + data.name).append(filler);
+
+	$('[data-toggle="tooltip"]').tooltip();
+
+	// console.log(data);
+	setPhotoRemove(data.name);
+
+	// if ('GPSLongitude' in data.exifData.gps && 'GPSLatitude' in data.exifData.gps) {
+	// 	loadMap(
+	// 		data.name,
+	// 		data.exifData.gps.GPSLatitude,
+	// 		data.exifData.gps.GPSLongitude,
+	// 		data.exifData.gps.GPSLatitudeRef,
+	// 		data.exifData.gps.GPSLongitudeRef,
+	// 	);
+	// }
+}
+function isStr(maybeString) {
+	return maybeString && !(maybeString == "");
+}
+
+function processData(data) {
+	var remove= ["FileName", "Directory", "FileTypeExtension"]
+	var files = ["SourceFile", ]
+	for (var key in data.exifData) {
+		if (key == "errors" && !isStr(data.exifData[key])) {
+			delete data.exifData[key];
+		}
+		if (key in remove) {
+			console.log("deleting " + key);
+			delete data.exifData[key];
+		}
+		if (key.toLowerCase().includes("gps")) {
+			data.gpsData[key] = data.exifData[key];
+			delete data.exifData['key']
+		}
+
+
+	}
+}
+
+function newTemplate(data, id) {
+	var template = [
+		'<div class="row">',
+			'<div class="col-md-4">',
+				'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">', // add image features here
+			'</div>',
+			'<div class="col-md-8">',
+				'<div class="row">',
+					'<div class="col-md-8">',
+						'<h3 style="word-wrap:break-word;">{{name}}</h3>',
+						// tags
+						'<div>',
+							'<input type="text" placeholder="Add tag" name="tag">',
+							// one new label per tag, with appropriate color
+							'<span class="label label-success" style="background-color:#00ffff">',
+								'Fun',
+							'</span>',
+							'<span class="label label-warning" style="background-color:#00ffff">',
+								'Party',
+							'</span>',
+						'</div>',
+						'<textarea class="form-control" id="exampleTextarea" rows="3" placeholder="Notes">',
+					'</div>',
+					'<div class="col-md-4">',
+
+						'<div class="row">',
+							'<img src="./assets/alert.svg"/>',
+							'<div class="dropdown">',
+								'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
+									'Options',
+								'</button>',
+								'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
+									'<li id="remove{{name}}" class="dropdown-item">Remove</li>',
+									'<li id="rename{{name}}" class="dropdown-item">Rename</li>',
+								'</div>',
+							'</div>',
+						'</div>',
+						// search bar
+						'<input type="text" placeholder="Exif search">',
+						'<tr><th> Search results </th></tr>',
+
+					'</div>',
+				'</div>',
+			'</div>',
+		'</div>',
+		'<div class="row">',
+			'<div class="col-lg-6">',
+				// favorites
+				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#favdata' + id + ' ">Favorite fields</button></span>',
+				'<div id="favdata' + id +' " class="container collapse">',
+					'<table class="table table-bordered">',
+						exifdata,
+					'</table>',
+				'</div>',
+				'<br>',
+				//file info
+				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#filedata' + id + ' ">File Info</button></span>',
+				'<div id="filedata' + id +' " class="container collapse">',
+					'<table class="table table-bordered">',
+						exifdata,
+					'</table>',
+				'</div>',
+			'</div>',
+			'<div class="col-lg-6">',
+				// general Exif
+				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#exifdata' + id + ' ">Exif Data</button></span>',
+				'<div id="exifdata' + id +' " class="container collapse">',
+					'<table class="table table-bordered">',
+						exifdata,
+					'</table>',
+				'</div>',
+				'<br>',
+				// GPS
+				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#gpsdata' + id + ' ">GPS Data</button></span>',
+				'<div id="gpsdata' + id +' " class="container collapse">',
+					'<table class="table table-bordered">',
+						exifdata,
+					'</table>',
+				'</div>',
+			'</div>',
+	].join("\n");
+	return template;
+}
