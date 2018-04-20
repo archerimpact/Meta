@@ -5,6 +5,19 @@ const loadDetail = require('./js/detail.js').loadDetail
 var paths_global = [];
 
 function createProject(){
+	var sqlite3 = require('sqlite3').verbose();
+	var db_filename = './db/meta.db'
+
+	var db = new sqlite3.Database(':memory:', (err) => {
+	if (err) {
+	  console.error(err.message);
+	}
+
+	// if meta.db was just created, create Images and Projects tables.
+
+
+	console.log('Connected to the meta database.');
+	});
 	db.serialize(function() {
 	  db.run("CREATE TABLE lorem (info TEXT)");
 
