@@ -15,7 +15,7 @@ const storage = new Storage({
 });
 
 // Import database file.
-const Database = require('.js/database.js');
+const Database = require('./js/database.js');
 const db = init_database();
 
 // Keep a global reference of the window object, if you don't, the window will

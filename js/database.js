@@ -13,13 +13,14 @@ function init_database() {
 
     console.log('Connected to the meta database.');
   });
+  return db
 }
 
 function table_exists(table_name) {
-  var query = 'SELECT name FROM sqlite_master WHERE type="table" AND name="{0}"'.format(table_name);
-  db.get(query, (err, row) {
-    if (!err) {
-      return true;
-    }
-  });
+  // var query = 'SELECT name FROM sqlite_master WHERE type="table" AND name="{0}"'.format(table_name);
+  // db.get(query, (err, row) {
+  //   if (!err) {
+  //     return true;
+  //   }
+  // });
 }

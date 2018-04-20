@@ -6,14 +6,16 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "postinstall": "install-app-deps"
+    "postinstall": "install-app-deps",
+    "rebuild": "electron-rebuild -f -w sqlite3"
   },
   "productName": "Archer Meta",
   "repository": "https://github.com/venkatvarsha/archer-hrc-metadata",
   "devDependencies": {
     "electron": "~1.7.8",
-    "electron-builder": "^20.8.1",
-    "electron-packager": "^11.1.0"
+    "electron-builder": "^20.9.0",
+    "electron-packager": "^11.1.0",
+    "electron-rebuild": "^1.7.3"
   },
   "dependencies": {
     "exif": "^0.6.0",
