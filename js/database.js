@@ -1,5 +1,5 @@
 const os = require('os')
-var sqlite3 = require('sqlite3').verbose();
+var sqlite3 = require('sqlite3');
 var db_filename = './db/meta.db'
 
 function init_database() {
@@ -16,11 +16,19 @@ function init_database() {
   return db
 }
 
-function table_exists(table_name) {
-  // var query = 'SELECT name FROM sqlite_master WHERE type="table" AND name="{0}"'.format(table_name);
-  // db.get(query, (err, row) {
-  //   if (!err) {
-  //     return true;
-  //   }
-  // });
+function create_tables_if_new_db() {
+  var query_template = "SELECT name FROM sqlite_master WHERE type='table' AND name='{0}'";
+  var image_query = query_template.format("Images");
+  var project_query = query_template.format("Projects");
+  var setting_query = query_template.format("Settings");
+
+  // check if Images table exists, and create if it does not
+  db.get(image_query, (err, row) {
+    if (row == undefined) {
+      var create_table = "CREATE TABLE Images (name TEXT, id NUM, creation DATE)";
+      return true;
+    }
+  });
+
+  // check if Projects table exists, and create if it does not
 }

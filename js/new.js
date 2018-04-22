@@ -1,11 +1,11 @@
 const ProjectF = require('./js/project.js')
 const Project = ProjectF.Project
 const loadDetail = require('./js/detail.js').loadDetail
+var sqlite3 = require('sqlite3').verbose();
 
 var paths_global = [];
 
 function createProject(){
-	var sqlite3 = require('sqlite3').verbose();
 	var db_filename = './db/meta.db'
 
 	var db = new sqlite3.Database(':memory:', (err) => {
