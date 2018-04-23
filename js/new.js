@@ -6,35 +6,22 @@ var sqlite3 = require('sqlite3').verbose();
 var paths_global = [];
 
 function createProject(){
-	var db_filename = './db/meta.db'
+	var db = electron.remote.getGlobal('sharedObj').db.get_database();
 
-	var db = new sqlite3.Database(':memory:', (err) => {
-	if (err) {
-	  console.error(err.message);
-	}
-
-	// if meta.db was just created, create Images and Projects tables.
-
-
-	console.log('Connected to the meta database.');
-	});
 	db.serialize(function() {
-	  db.run("CREATE TABLE lorem (info TEXT)");
-
-	  var stmt = db.prepare("INSERT INTO lorem VALUES (?)");
+	  var stmt = db.prepare("INSERT INTO Projects VALUES (?, ?, ?)");
 	  for (var i = 0; i < 10; i++) {
-	      stmt.run("Ipsum " + i);
+	      stmt.run("Ipsum " + i, i, "default description");
 	  }
 	  stmt.finalize();
 
-	  db.each("SELECT rowid AS id, info FROM lorem", function(err, row) {
-	      console.log(row.id + ": " + row.info);
+	  db.each("SELECT name, id, description FROM Projects", function(err, row) {
+	      console.log(row.name + " " + row.id + ": " + row.description);
 	  });
 	});
 
-	db.close();
+	// db.close();
 
-	var remote = electron.remote;
 	// var store = remote.getGlobal('sharedObj').store;
 
 	var name = document.getElementById("name-input").value;

@@ -27,7 +27,7 @@ let mainWindow
 
 // Set storage instance to be used across js files. All constants that should
 // be accessible to other scripts must go here.
-global.sharedObj = {store: storage};
+global.sharedObj = {db: db};
 
 function createWindow () {
   // Create the browser window.
@@ -61,6 +61,8 @@ if (app) {
 
   // Quit when all windows are closed.
   app.on('window-all-closed', function () {
+    db.close();
+
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform !== 'darwin') {
