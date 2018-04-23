@@ -1,6 +1,8 @@
 const os = require('os')
 var sqlite3 = require('sqlite3')
-var db_filename = './meta.db'
+// Get the user data path, the directory in which the information will be stored.
+const userDataPath = (electron.app || electron.remote.app).getPath('userData');
+var db_filename = path.join(userDataPath, 'meta.db');
 
 class Database {
   constructor(opts) {
