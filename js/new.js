@@ -1,45 +1,26 @@
-const ProjectF = require('./js/project.js')
-const Project = ProjectF.Project
 const loadDetail = require('./js/detail.js').loadDetail
 var sqlite3 = require('sqlite3').verbose();
 
 var paths_global = [];
 
 function createProject(){
-	var db = electron.remote.getGlobal('sharedObj').db.get_database();
-
-	db.serialize(function() {
-	  var stmt = db.prepare("INSERT INTO Projects VALUES (?, ?, ?)");
-	  for (var i = 0; i < 10; i++) {
-	      stmt.run("Ipsum " + i, i, "default description");
-	  }
-	  stmt.finalize();
-
-	  db.each("SELECT name, id, description FROM Projects", function(err, row) {
-	      console.log(row.name + " " + row.id + ": " + row.description);
-	  });
-	});
-
-	// db.close();
-
-	// var store = remote.getGlobal('sharedObj').store;
-
 	var name = document.getElementById("name-input").value;
 	name = name.replace(/ /g, '__');
 	name = name.replace(/'/g, '__');
 	name = name.replace(/"/g, '__');
 	name = name.replace(/;/g, '__');
 
-
 	var desc = document.getElementById("desc-input").value;
 	// file paths stored in paths_global
+
+	var database = electron.remote.getGlobal('sharedObj').db;
 
 	if (!name) {
 		// display: "Please give a project name"
 		console.log("Please give a project name");
 		alert("Please provide a project name");
 		return
-	} else if (storage.getProject(name) != null) {
+	} else if (database.has_project(name) != null) {
 		// display: "Project name already used. Please input new name"
     	console.log("Project name already used");
 		alert("Project name already in use");
@@ -48,13 +29,14 @@ function createProject(){
 		console.log("Please provide a valid project name. Commas, slashes, and periods cannot be used.");
 		alert("Please provide a valid project name. Commas, slashes, and periods cannot be used.");
 	} else {
-		var proj = new Project(name, desc);
+		database.create_project(name, desc);
+
 		for (var index in paths_global) {
 			var filename = path.basename(paths_global[index]).split(".")[0];
-			proj.addImage(filename, paths_global[index]);
+			database.add_image(filename, paths_global[index]);
 		}
-		proj.saveProject();
-    	return name;
+
+  	return name;
 	}
 }
 

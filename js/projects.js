@@ -89,6 +89,7 @@ function populateProjectsScreen() {
     }
   })
 }
+
 populateProjectsScreen()
 
 function getProject(projName) {

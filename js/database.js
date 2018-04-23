@@ -9,9 +9,47 @@ const db_filename = path.join(userDataPath, 'meta.db');
 class Database {
   constructor(opts) {
     this.db = this.init_database();
+    this.last_image_id = 0;
   }
 
-  update_image(name, proj_name, data_dict_questionmark) {
+  create_project(name, description) {
+	  var stmt = db.prepare("INSERT INTO Projects VALUES (?, ?, ?, ?)");
+    // this.last_project_id += 1;
+    var created = Date.now();
+    stmt.run(name, description, created, created);
+	  stmt.finalize();
+  }
+
+  has_project(name) {
+    // return whether project already exists in database
+  }
+
+  update_project_name(old_name, new_name) {
+    if this.has_project(new_name) {
+      // alert that can't use this name
+      return false;
+    }
+    // update name
+  }
+
+  update_project_description(project_name, description) {
+    // update project description
+  }
+
+  // TODO: add support for only showing images that satisfy a certain condition
+  get_all_images_by_project(project_name) {
+    // return list of tuples: (image_path, project_name) — this is the PRIMARY KEY into the Images table
+  }
+
+  get_images_with_metadata() {
+    // return all images that have non-empty metadata fields
+  }
+
+  has_image(path) {
+    // return whether image with given path already exists
+  }
+
+  add_image(image_name, image_path) {
     // Check if image has been made yet, if not create it
 
     // Update each column for row, create column if it didn't exist before
@@ -19,10 +57,11 @@ class Database {
     // Update last_modified field
   }
 
-  create_image(name, proj_name) {
-    
+  add_image_meta(img_path, proj_name, meta_key, meta_value) {
+    // set metadata for image
+    // if column doesn't exist, add column
   }
-  
+
   init_database() {
     var db = new sqlite3.Database(db_filename, (err) => {
       if (err) {
@@ -43,15 +82,15 @@ class Database {
     var project_query = "SELECT name FROM sqlite_master WHERE type='table' AND name='Projects'";
     var setting_query = "SELECT name FROM sqlite_master WHERE type='table' AND name='Settings'";
 
-
     var db = this.db;
 
     db.serialize(function() {
       // check if Images table exists, and create if it does not
       db.get(image_query, (err, row) => {
         if (row == undefined) {
-          var create_image_table = "CREATE TABLE Images (name TEXT, proj_name TEXT, creation NUMERIC," +
-                                   "last_modified NUMERIC, tags TEXT, starred TEXT, notes TEXT)";
+          var create_image_table = "CREATE TABLE Images (img_name TEXT, path TEXT, proj_name TEXT, " +
+                                   "creation NUMERIC, last_modified NUMERIC, tags TEXT, starred TEXT, " +
+                                   "notes TEXT)";
           db.run(create_image_table);
           console.log("create Images");
         } else {
