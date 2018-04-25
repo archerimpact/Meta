@@ -29,6 +29,12 @@ let mainWindow
 // be accessible to other scripts must go here.
 global.sharedObj = {db: db};
 
+// for testing
+db.create_project('testproj_name', 'testdesc')
+db.add_image('testname', 'testpath/testname', 'testproj_name')
+db.add_image('testname', 'testpath/testname', 'testproj_name')
+console.log(db.get_all_images_by_project('testproj_name'))
+
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 1000, height: 800})

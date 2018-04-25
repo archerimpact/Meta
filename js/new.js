@@ -14,6 +14,7 @@ function createProject(){
 	// file paths stored in paths_global
 
 	var database = electron.remote.getGlobal('sharedObj').db;
+	console.log("database: " + database)
 
 	if (!name) {
 		// display: "Please give a project name"
@@ -36,6 +37,7 @@ function createProject(){
 			database.add_image(filename, paths_global[index]);
 		}
 
+	console.log('Create project finished: ' + name)
   	return name;
 	}
 }

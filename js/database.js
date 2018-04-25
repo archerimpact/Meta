@@ -13,8 +13,8 @@ class Database {
   }
 
   create_project(name, description) {
-	  var stmt = db.prepare("INSERT INTO Projects VALUES (?, ?, ?, ?)");
-    // this.last_project_id += 1;
+    console.log('create_project: ' + name + " " + description)
+	  var stmt = this.db.prepare("INSERT INTO Projects (name, description, creation, last_modified) VALUES (?, ?, ?, ?)");
     var created = Date.now();
     stmt.run(name, description, created, created);
 	  stmt.finalize();
@@ -25,7 +25,7 @@ class Database {
   }
 
   update_project_name(old_name, new_name) {
-    if this.has_project(new_name) {
+    if(this.has_project(new_name)) {
       // alert that can't use this name
       return false;
     }
@@ -39,6 +39,23 @@ class Database {
   // TODO: add support for only showing images that satisfy a certain condition
   get_all_images_by_project(project_name) {
     // return list of tuples: (image_path, project_name) — this is the PRIMARY KEY into the Images table
+    var images;
+    // var stmt = this.db.prepare("SELECT img_name, path FROM Images WHERE proj_name = ?");
+    // stmt.all(project_name, function(err, row) {
+    //   console.log('row: ' + row);
+      
+    // });
+    var sql = "SELECT img_name, path FROM Images WHERE proj_name = ?";
+    this.db.all(sql, project_name, (err, rows) {
+      if (err) {
+        throw error;
+      }
+      rows.forEach((rows) => {
+        console.log(row);
+      });
+    });
+    console.log("get_all_images_by_project: " + images);
+    stmt.finalize();
   }
 
   get_images_with_metadata() {
@@ -49,12 +66,14 @@ class Database {
     // return whether image with given path already exists
   }
 
-  add_image(image_name, image_path) {
+  add_image(image_name, image_path, proj_name) {
     // Check if image has been made yet, if not create it
-
-    // Update each column for row, create column if it didn't exist before
-
-    // Update last_modified field
+    console.log('add_image: ' + image_name + " " + image_path + " " + proj_name)
+    var stmt = this.db.prepare("INSERT OR REPLACE INTO Images (img_name, path, proj_name, " +
+                               "creation, last_modified) VALUES (?, ?, ?, ?, ?)");
+    var created = Date.now();
+    stmt.run(image_name, image_path, proj_name, created, created);
+    stmt.finalize();
   }
 
   add_image_meta(img_path, proj_name, meta_key, meta_value) {
