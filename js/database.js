@@ -48,26 +48,29 @@ class Database {
         callback(projects);
       });
       stmt.finalize();
-      return true;
     });
   }
 
   /*** Returns true if Projects table contains 'name'. ***/
-  has_project(name) {
+  has_project(name, callback) {
     // return whether project already exists in database
-    return false;
+    var bool = true;
+    callback(bool, name);
   }
 
-  update_project_name(old_name, new_name) {
+  update_project_name(old_name, new_name, callback) {
     if(this.has_project(new_name)) {
       // alert that can't use this name
-      return false;
+      callback(false);
     }
     // update name
+    callback(true);
   }
 
-  update_project_description(proj_name, description) {
+  update_project_description(proj_name, description, callback) {
     // update project description
+    var bool = true;
+    callback(bool);
   }
 
   // TODO: add support for only showing images that satisfy a certain condition
@@ -78,33 +81,35 @@ class Database {
     db.serialize(function() {
       if (!_this.has_project(proj_name)) {
         console.error('Project', proj_name, "does not exist")
-        return false;
+        callback([]);
+      } else {
+        var images = [];
+        var stmt = db.prepare("SELECT img_name, path FROM Images WHERE proj_name = ?");
+        stmt.each([proj_name], function(err, row) {
+          if (err) {
+            throw error;
+          }
+          images.push(row);
+        }, function() {
+          console.log('images inside: ', images);
+          callback(images);
+        });
+        stmt.finalize();
       }
-      var images = [];
-      var stmt = db.prepare("SELECT img_name, path FROM Images WHERE proj_name = ?");
-      stmt.each([proj_name], function(err, row) {
-        if (err) {
-          throw error;
-        }
-        images.push(row);
-      }, function() {
-        console.log('images inside: ', images)
-        callback(images)
-      });
-      stmt.finalize();
-      return true;
     });
   }
 
-  get_images_with_metadata() {
+  get_images_with_metadata(callback) {
     // return all images that have non-empty metadata fields
+    var bool = true;
+    callback(bool);
   }
 
-  has_image(path, proj_name) {
+  has_image(img_path, proj_name, callback) {
     // return whether image with given path already exists for a given project
     var bool = true;
     var stmt = this.db.prepare("SELECT * FROM Images WHERE path = ? AND proj_name = ?");
-    stmt.get([path, proj_name], function(err, row) {
+    stmt.get([img_path, proj_name], function(err, row) {
       if (err) {
         throw error;
       }
@@ -112,11 +117,12 @@ class Database {
       if (row == undefined) {
         bool = false
       }
+      callback(bool);
     });
     return bool;
   }
 
-  add_image(image_name, image_path, proj_name) {
+  add_image(image_name, image_path, proj_name, callback) {
     // Check if image has been made yet, if not create it
     var _this = this;
     var db = this.db;
@@ -134,13 +140,16 @@ class Database {
         stmt.run(image_name, image_path, proj_name, created, created);
         stmt.finalize();
       }
-      return bool;
+
+      callback(bool);
     });
   }
 
-  add_image_meta(img_path, proj_name, meta_key, meta_value) {
+  add_image_meta(img_path, proj_name, meta_key, meta_value, callback) {
     // set metadata for image
     // if column doesn't exist, add column
+    var bool = true;
+    callback(bool);
   }
 
   init_database() {
