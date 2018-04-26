@@ -12,15 +12,10 @@ class Storage {
 
     // Load all prior saved projects.
     this._projects = populateProjects(this._path, opts.defaults);
-
-    console.log(this._projects);
-    console.log(this)
-
   }
 
   // Return the value associated with a saved project (specified by string key).
   getProject(projectName) {
-    console.log(this._projects)
     return this._projects[projectName];
   }
 
@@ -31,7 +26,6 @@ class Storage {
   getAllProjects() {
     // var path = this.getPath();
     // this._projects = populateProjects(path, {});
-    console.log(this)
     return this._projects;
   }
 
@@ -80,8 +74,6 @@ function populateProjects(filePath, defaults) {
   try {
     return JSON.parse(fs.readFileSync(filePath));
   } catch (error) {
-    console.log(filePath);
-    console.log("\n\nERROR:\n" + error + "\n\n");
     return defaults;
   }
 }
