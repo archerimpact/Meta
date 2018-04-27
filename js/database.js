@@ -52,7 +52,7 @@ class Database {
     });
   }
 
-  /*** Returns true if Projects table contains 'name'. ***/
+  /* Returns true if Projects table contains 'name'. */
   has_project(name) {
     // return whether project already exists in database
     return false;
@@ -76,10 +76,10 @@ class Database {
     var _this = this;
     var db = this.db;
     db.serialize(function() {
-      if (!_this.has_project(proj_name)) {
-        console.error('Project', proj_name, "does not exist")
-        return false;
-      }
+      // if (!_this.has_project(proj_name)) {
+      //   console.error('Project', proj_name, "does not exist")
+      //   return false;
+      // }
       var images = [];
       var stmt = db.prepare("SELECT img_name, path FROM Images WHERE proj_name = ?");
       stmt.each([proj_name], function(err, row) {
@@ -100,7 +100,7 @@ class Database {
     // return all images that have non-empty metadata fields
   }
 
-  has_image(path, proj_name) {
+  has_image(path, proj_name, callback) {
     // return whether image with given path already exists for a given project
     var bool = true;
     var stmt = this.db.prepare("SELECT * FROM Images WHERE path = ? AND proj_name = ?");
@@ -110,10 +110,10 @@ class Database {
       }
       console.log('has_image row: ', row);
       if (row == undefined) {
-        bool = false
+        bool = false;
       }
+      callback(bool);
     });
-    return bool;
   }
 
   add_image(image_name, image_path, proj_name) {
@@ -122,19 +122,20 @@ class Database {
     var db = this.db;
     var bool = false;
     db.serialize(function() {
-      if (_this.has_image(image_path, proj_name)) {
-        console.log('image ', image_name, ' already in ', proj_name);
-        bool = false;
-      } else {
+      _this.has_image(image_path, proj_name, function(bool) {
+        if(bool) {
+          console.log('image ', image_name, ' already in ', proj_name);
+          bool = false;
+        } else {
 
-        console.log('add_image: ' + image_name + " " + image_path + " " + proj_name)
-        var stmt = db.prepare("INSERT OR REPLACE INTO Images (img_name, path, proj_name, " +
-                                   "creation, last_modified) VALUES (?, ?, ?, ?, ?)");
-        var created = Date.now();
-        stmt.run(image_name, image_path, proj_name, created, created);
-        stmt.finalize();
-      }
-      return bool;
+          console.log('add_image: ' + image_name + " " + image_path + " " + proj_name)
+          var stmt = db.prepare("INSERT OR REPLACE INTO Images (img_name, path, proj_name, " +
+                                     "creation, last_modified) VALUES (?, ?, ?, ?, ?)");
+          var created = Date.now();
+          stmt.run(image_name, image_path, proj_name, created, created);
+          stmt.finalize();
+        }
+      });
     });
   }
 
