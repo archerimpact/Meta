@@ -21,15 +21,14 @@ function createProject(){
 		console.log("Please give a project name");
 		alert("Please provide a project name");
 		return
-	} else if (database.has_project(name) != null) {
-		// display: "Project name already used. Please input new name"
-    	console.log("Project name already used");
-		alert("Project name already in use");
-    	return
 	} else if (unacceptableFormat(name)) {
 		console.log("Please provide a valid project name. Commas, slashes, and periods cannot be used.");
 		alert("Please provide a valid project name. Commas, slashes, and periods cannot be used.");
-	} else {
+	}
+
+	database.has_project(name, create_project_if_doesnt_exist);
+
+	 else {
 		database.create_project(name, desc);
 
 		for (var index in paths_global) {
@@ -37,8 +36,32 @@ function createProject(){
 			database.add_image(filename, paths_global[index]);
 		}
 
-	console.log('Create project finished: ' + name)
+		console.log('Create project finished: ' + name)
   	return name;
+	}
+}
+
+/**
+ *
+ * Callback function used for has_project(). Decides whether to invoke the
+ * asynchronous create_project() function.
+ *
+ **/
+function create_project_if_doesnt_exist(bool, name) {
+	if (!bool) {
+		// project already exists
+		console.log("Project name already used");
+		alert("Project name already in use");
+  	return
+	}
+
+	// project doesn't exist
+	database.create_project(name, desc, populate_project_with_images);
+}
+
+function populate_project_with_images(bool, project_name, paths_global) {
+	if (!bool) {
+		console.log("unable to create project")
 	}
 }
 

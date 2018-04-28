@@ -31,17 +31,17 @@ global.sharedObj = {db: db};
 
 // for testing
 db.db.serialize(function() {
-  db.create_project('testproj_name', 'testdesc');
-  db.add_image('testname2', 'testpath/testname2', 'testproj_name');
-  db.add_image('testname2', 'testpath/testname2', 'testproj_name');
-  console.log('call db.get_all_images: ', db.get_all_images_by_project('testproj_name', function(images) {
-    console.log('images: ', images);
-    return images;
-  }));
-  console.log('call db.get_projects: ', db.get_projects(function(projects) {
-    console.log('projects: ', projects);
-    return projects;
-  }));
+  db.create_project('testproj_name', 'testdesc', function() {});
+  // db.add_image('testname2', 'testpath/testname2', 'testproj_name');
+  // db.add_image('testname2', 'testpath/testname2', 'testproj_name');
+  // console.log('call db.get_all_images: ', db.get_all_images_by_project('testproj_name', function(images) {
+  //   console.log('images: ', images);
+  //   return images;
+  // }));
+  // console.log('call db.get_projects: ', db.get_projects(function(projects) {
+  //   console.log('projects: ', projects);
+  //   return projects;
+  // }));
 });
 
 function createWindow () {
