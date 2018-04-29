@@ -30,6 +30,9 @@ class Database {
       }
       callback(bool);
     });
+
+    // /* Pass creation status, project name, and list of images to add to callback. */
+    // callback(bool, name, image_paths);
   }
 
   /* Uses callback(boolean) to return whether or not proj_name has img_path. */
@@ -57,7 +60,7 @@ class Database {
   }
 
   /* Use callback(boolean) to return if project was successfully created. */
-  add_project(name, description, callback) {
+  add_project(name, description, img_paths, callback) {
     var _this = this;
     var db = this.db;
     var success = false;
@@ -73,7 +76,7 @@ class Database {
         } else {
           console.log('add_project: project', name, description, 'could not be created');
         }
-        callback(success);
+        callback(success, name, img_paths);
       });
     });
   }
@@ -84,6 +87,7 @@ class Database {
     var _this = this;
     var db = this.db;
     var success = false;
+    console.log("adding image");
     db.serialize(function() {
       _this.has_image(img_path, proj_name, function(bool) {
         if (bool) {
@@ -97,7 +101,7 @@ class Database {
           console.log('add_image: successfully added image', img_name, img_path, proj_name)
           success = true;
         }
-        callback(success);
+        callback(success, proj_name, image_path, image_index);
       });
     });
   }
@@ -143,7 +147,7 @@ class Database {
   }
 
   update_project_name(old_name, new_name, callback) {
-    this.has_project(old_name, function() {
+    this.has_project(old_name, function(bool) {
       callback(true);
     });
   }
@@ -193,12 +197,12 @@ class Database {
             images.push(row);
           }, function() {
             console.log('get_images_in_project:', images, 'in', proj_name);
-            callback(images);
+            callback(proj_name, images);
           });
           stmt.finalize();
         } else {
           console.error('get_images_in_project:', proj_name, "does not exist");
-          callback([]);
+          callback(proj_name, []);
         }
       });
     });
