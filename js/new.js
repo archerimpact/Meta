@@ -1,7 +1,33 @@
-const loadDetail = require('./js/detail.js').loadDetail
+const load_detail = require('./js/detail.js').loadDetail
 var sqlite3 = require('sqlite3').verbose();
 
 var paths_global = [];
+var database = electron.remote.getGlobal('sharedObj').db;
+
+function populate_project_with_images(bool, project_name, img_paths) {
+	if (!bool) {
+		alert("Unable to create project");
+		return
+	}
+
+	/* Populate newly created project with provided images. */
+	for (var index in img_paths) {
+		var filename = path.basename(img_paths[index]).split(".")[0];
+		database.add_image(filename, img_paths[index], project_name, index == img_paths.length() - 1, alert_image_upload);
+	}
+
+	console.log("added all images");
+
+	/* Load project view. */
+	database.get_images_in_project(project_name, load_detail);
+}
+
+function alert_image_upload(bool, project_name, img_path, is_last_image) {
+	if (!bool) {
+		alert("Unable to add image");
+		return
+	}
+}
 
 function createProject(){
 	var name = document.getElementById("name-input").value;
@@ -13,9 +39,6 @@ function createProject(){
 	var desc = document.getElementById("desc-input").value;
 	// file paths stored in paths_global
 
-	var database = electron.remote.getGlobal('sharedObj').db;
-	console.log("database: " + database)
-
 	if (!name) {
 		// display: "Please give a project name"
 		console.log("Please give a project name");
@@ -26,42 +49,9 @@ function createProject(){
 		alert("Please provide a valid project name. Commas, slashes, and periods cannot be used.");
 	}
 
-	database.has_project(name, create_project_if_doesnt_exist);
+	database.add_project(name, desc, paths_global, populate_project_with_images);
 
-	database.create_project(name, desc);
-
-	for (var index in paths_global) {
-		var filename = path.basename(paths_global[index]).split(".")[0];
-		database.add_image(filename, paths_global[index]);
-	}
-
-	console.log('Create project finished: ' + name)
-  	return name;
-	
-}
-
-/**
- *
- * Callback function used for has_project(). Decides whether to invoke the
- * asynchronous create_project() function.
- *
- **/
-function create_project_if_doesnt_exist(bool, name) {
-	if (!bool) {
-		// project already exists
-		console.log("Project name already used");
-		alert("Project name already in use");
-  	return
-	}
-
-	// project doesn't exist
-	database.create_project(name, desc, populate_project_with_images);
-}
-
-function populate_project_with_images(bool, project_name, paths_global) {
-	if (!bool) {
-		console.log("unable to create project")
-	}
+	return name;
 }
 
 function unacceptableFormat(name) {
