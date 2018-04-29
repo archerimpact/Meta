@@ -49,6 +49,11 @@ class Database {
       }
       callback(bool);
     });
+    stmt.finalize();
+  }
+
+  has_metadata(img_path, proj_name, callback) {
+
   }
 
   /* Use callback(boolean) to return if project was successfully created. */
@@ -74,22 +79,22 @@ class Database {
   }
 
   /* Uses callback(boolean) to return if image was added successfully or not. */
-  add_image(image_name, image_path, proj_name, callback) {
+  add_image(img_name, img_path, proj_name, callback) {
     // Check if image has been made yet, if not create it
     var _this = this;
     var db = this.db;
     var success = false;
     db.serialize(function() {
-      _this.has_image(image_path, proj_name, function(bool) {
+      _this.has_image(img_path, proj_name, function(bool) {
         if (bool) {
-          console.log('add_image:', image_name, 'already in', proj_name);
+          console.log('add_image:', img_name, 'already in', proj_name);
         } else {
           var stmt = db.prepare("INSERT INTO Images (img_name, path, proj_name, " +
                                 "creation, last_modified) VALUES (?, ?, ?, ?, ?)");
           var created = Date.now();
-          stmt.run(image_name, image_path, proj_name, created, created);
+          stmt.run(img_name, img_path, proj_name, created, created);
           stmt.finalize();
-          console.log('add_image: successfully added image', image_name, image_path, proj_name)
+          console.log('add_image: successfully added image', img_name, img_path, proj_name)
           success = true;
         }
         callback(success);
@@ -100,8 +105,41 @@ class Database {
   add_image_meta(img_path, proj_name, meta_key, meta_value, callback) {
     // set metadata for image
     // if column doesn't exist, add column
-    var bool = true;
-    callback(bool);
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      var columns = [];
+      db.each("PRAGMA table_info(Images)", function(err, col) {
+        if (err) {
+          throw error;
+        }
+        columns.push(col.name);
+      }, function(){
+        console.log('add_project: columns', columns);
+        var col_exists = (columns.indexOf(meta_key) >= 0);
+
+        if (!col_exists) {
+          var meta_type = typeof meta_value;
+          db.run("ALTER TABLE Images ADD " + meta_key + " " + meta_type + ";");
+          console.log('add_project: col added', meta_key, meta_type);
+        }
+      });
+
+      var success = false;
+      _this.has_image(img_path, proj_name, function(bool) {
+        if (bool) {
+          var query = "UPDATE Images SET " + meta_key + "=? WHERE path=? AND proj_name=?"
+          var stmt = db.prepare(query);
+          stmt.run([meta_value, img_path, proj_name]);
+          stmt.finalize();
+          success = true;
+          console.log('add_image_meta: image', img_path, 'metadata', meta_key, meta_value)
+        } else {
+          console.error('add_image_meta: image', img_path, 'does not exist in', proj_name);
+        }
+        callback(success);
+      });
+    });
   }
 
   update_project_name(old_name, new_name, callback) {
@@ -140,7 +178,7 @@ class Database {
   // TODO: add support for only showing images that satisfy a certain condition
   /* Uses callback(list) to return a list of images in a project. */
   get_images_in_project(proj_name, callback) {
-    // return list of tuples: (image_path, proj_name) — this is the PRIMARY KEY into the Images table
+    // return list of tuples: (img_path, proj_name) — this is the PRIMARY KEY into the Images table
     var _this = this;
     var db = this.db;
     db.serialize(function() {

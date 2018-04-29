@@ -38,6 +38,13 @@ db.db.serialize(function() {
   //     console.log('testproj_name is NOT in db');
   //   }
   // });
+  db.has_image('testpath/testname2', 'testproj_name', function(bool) {
+    
+  });
+  db.add_image_meta('testpath/testname2', 'testproj_name', 'Exif_int', 12314, function(bool) {
+    console.log('adding add_image_meta Exif_int')
+
+  });
   db.add_project('testproj_name', 'testdesc', function(bool) {
     if (bool) {
       console.log('testproj_name was successfully created');
@@ -65,6 +72,20 @@ db.db.serialize(function() {
         db.get_images_in_project('testproj_name', function(images) {
           console.log('images returned:', images);
         });
+
+
+
+        // db.add_image_meta('testpath/testname2', 'testproj_name', 'Exif_int', 12314, function(bool) {
+        //   console.log('adding add_image_meta Exif_int')
+        //   db.add_image_meta('testpath/testname2', 'testproj_name', 'Exif_int', 12314, function(bool) {
+        //     console.log('adding add_image_meta Exif_int')
+
+        //   });
+        // });
+        // db.add_image_meta('testpath/testname2', 'testproj_name', 'Exif_int', 12314, function(bool) {
+        //   console.log('adding add_image_meta Exif_int')
+
+        // });
       });
     });
   });
