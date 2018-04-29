@@ -28,17 +28,16 @@ function createProject(){
 
 	database.has_project(name, create_project_if_doesnt_exist);
 
-	 else {
-		database.create_project(name, desc);
+	database.create_project(name, desc);
 
-		for (var index in paths_global) {
-			var filename = path.basename(paths_global[index]).split(".")[0];
-			database.add_image(filename, paths_global[index]);
-		}
-
-		console.log('Create project finished: ' + name)
-  	return name;
+	for (var index in paths_global) {
+		var filename = path.basename(paths_global[index]).split(".")[0];
+		database.add_image(filename, paths_global[index]);
 	}
+
+	console.log('Create project finished: ' + name)
+  	return name;
+	
 }
 
 /**

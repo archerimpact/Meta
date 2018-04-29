@@ -31,17 +31,43 @@ global.sharedObj = {db: db};
 
 // for testing
 db.db.serialize(function() {
-  db.create_project('testproj_name', 'testdesc', function() {});
-  // db.add_image('testname2', 'testpath/testname2', 'testproj_name');
-  // db.add_image('testname2', 'testpath/testname2', 'testproj_name');
-  // console.log('call db.get_all_images: ', db.get_all_images_by_project('testproj_name', function(images) {
-  //   console.log('images: ', images);
-  //   return images;
-  // }));
-  // console.log('call db.get_projects: ', db.get_projects(function(projects) {
-  //   console.log('projects: ', projects);
-  //   return projects;
-  // }));
+  // db.has_project('testproj_name', function(bool) {
+  //   if (bool) {
+  //     console.log('testproj_name is already in db');
+  //   } else {
+  //     console.log('testproj_name is NOT in db');
+  //   }
+  // });
+  db.add_project('testproj_name', 'testdesc', function(bool) {
+    if (bool) {
+      console.log('testproj_name was successfully created');
+    } else {
+      console.log('testproj_name was NOT successfully created');
+    }
+
+    db.get_projects(function(projects) {
+      console.log('list of projects in db:', projects);
+    });
+
+    db.add_image('testname2', 'testpath/testname2', 'testproj_name', function(bool) {
+      if (bool) {
+        console.log('testpath/testname2 was successfully created');
+      } else {
+        console.log('testpath/testname2 was NOT successfully created');
+      }
+
+      db.add_image('testname2', 'testpath/testname2', 'testproj_name', function(bool) {
+        if (bool) {
+          console.log('testpath/testname2 was successfully created');
+        } else {
+          console.log('testpath/testname2 was NOT successfully created');
+        }
+        db.get_images_in_project('testproj_name', function(images) {
+          console.log('images returned:', images);
+        });
+      });
+    });
+  });
 });
 
 function createWindow () {
