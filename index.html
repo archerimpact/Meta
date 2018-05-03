@@ -27,49 +27,73 @@
     <link rel="import" href="sections/settings.html">
 
   </head>
-    <div id="wrapper">
+
   <body>
 
-    <!-- Navigation -->
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container">
-      <img src="archer_meta.png" height="44.8px" width ="200px" id="landing-menu" data-section="landing" class="navbar-brand" href="#">
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="collapse navbar-collapse" id="navbarColor02">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a id="new-menu" data-section="new" class="nav-link" href="#">New Project</a>
-      </li>
-      <li class="nav-item">
-          <a id="projects-menu" data-section="projects" class="nav-link" href="#">My Projects</a>
-      </li>
-      <li class="nav-item">
-          <a id="about-menu" data-section="about" class="nav-link" href="#">About Us</a>
-      </li>
-      <li class="nav-item">
-          <a id="settings-menu" data-section="settings" class="nav-link" href="#">Settings</a>
-      </li>
-    </ul>
-  </div>
-</nav>
+          <!-- Navigation -->
+          <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+              <div class="navbar-header">
+                  <a class="navbar-brand" href="index.html">Archer Meta</a>
+                  <a class="btn btn-outline btn-default" href="overall-images.html" style="margin-top: 10px; margin-left: 20px;">Images </a>
+                  <a class="btn btn-outline btn-default" href="overall-images.html" style="margin-top: 10px; margin-left: 20px;">Trends </a>
+                  <a class="btn btn-outline btn-default" href="overall-images.html" style="margin-top: 10px; margin-left: 20px;">Compare </a>
+                  <!-- <button type="button" class="btn btn-outline btn-default" style="margin-top: 10px; margin-left: 20px;" href="overall-images.html"><a href="overall-images.html"> Images </a></button> -->
+              </div>
 
 
-    </div>
+              <div class="navbar-default sidebar" role="navigation" style="color: #0d77e2">
+                  <div class="sidebar-nav navbar-collapse">
+                      <ul class="nav" id="side-menu">
+                        <!--TODO: Right now, commenting this out until we decide whether or not we want to have a search in the side bar -->
+                          <!-- <li class="sidebar-search">
+                              <div class="input-group custom-search-form">
+                                  <input type="text" class="form-control" placeholder="Search...">
+                                  <span class="input-group-btn">
+                                  <button class="btn btn-default" type="button">
+                                      <i class="fa fa-search"></i>
+                                  </button>
+                              </span>
+                              </div>
+                              <! /input-group -->
+                          <!-- </li> -->
+                          <li>
+                              <a data-section="landing"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                          </li>
+                          <li>
+                              <a data-section="new"><i class="fa fa-plus fa-fw"></i> New Project</a>
+                          </li>
+                          <li>
+                              <a data-section="projects"><i class="fa fa-folder fa-fw"></i> Projects</a>
+                              <!--TODO: eventually, we'll want to put this together so that it has a listed projects underneath it, but for now we'll just redirect to the existing project page like we had beofre -->
+                          </li>
+                          <li>
+                              <a data-section="settings"><i class="fa fa-gear fa-fw"></i> Settings</a>
+                          </li>
 
-    <!-- Scripts -->
-    <script>
-      window.$ = window.jQuery = require('./vendor/jquery/jquery.min.js');
-    </script>
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="main.js"></script>
-    <script src="./js/nav.js"></script>
 
-    <script src="https://maps.googleapis.com/maps/api/js" async defer></script>
 
+                      </ul>
+                  </div>
+                  <!-- /.sidebar-collapse -->
+              </div>
+              <!-- /.navbar-static-side -->
+          </nav>
+          <div id="wrapper" style="background-color: #0d77e2">
+
+
+
+      </div>
+      <!-- /#wrapper -->
+
+      <script>
+        window.$ = window.jQuery = require('./vendor/jquery/jquery.min.js');
+      </script>
+      <script src="vendor/jquery/jquery.min.js"></script>
+      <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+      <script src="main.js"></script>
+      <script src="./js/nav.js"></script>
+
+      <script src="https://maps.googleapis.com/maps/api/js" async defer></script>
   </body>
+
 </html>
