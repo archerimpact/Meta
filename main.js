@@ -31,64 +31,22 @@ global.sharedObj = {db: db};
 
 // for testing
 db.db.serialize(function() {
-  // db.has_project('testproj_name', function(bool) {
-  //   if (bool) {
-  //     console.log('testproj_name is already in db');
-  //   } else {
-  //     console.log('testproj_name is NOT in db');
-  //   }
-  // });
-  // db.has_image('testpath/testname2', 'testproj_name', function(bool) {
-    
-  // });
-  // db.add_image_meta('testpath/testname2', 'testproj_name', 'Exif_int', 12314, function(bool) {
-  //   console.log('adding add_image_meta Exif_int')
-
-  // });
-  // db.add_project('testproj_name', 'testdesc', function(bool) {
-  //   if (bool) {
-  //     console.log('testproj_name was successfully created');
-  //   } else {
-  //     console.log('testproj_name was NOT successfully created');
-  //   }
-
-  //   db.get_projects(function(projects) {
-  //     console.log('list of projects in db:', projects);
-  //   });
-
-  //   db.add_image('testname2', 'testpath/testname2', 'testproj_name', function(bool) {
-  //     if (bool) {
-  //       console.log('testpath/testname2 was successfully created');
-  //     } else {
-  //       console.log('testpath/testname2 was NOT successfully created');
-  //     }
-
-  //     db.add_image('testname2', 'testpath/testname2', 'testproj_name', function(bool) {
-  //       if (bool) {
-  //         console.log('testpath/testname2 was successfully created');
-  //       } else {
-  //         console.log('testpath/testname2 was NOT successfully created');
-  //       }
-  //       db.get_images_in_project('testproj_name', function(images) {
-  //         console.log('images returned:', images);
-  //       });
-
-
-
-  //       // db.add_image_meta('testpath/testname2', 'testproj_name', 'Exif_int', 12314, function(bool) {
-  //       //   console.log('adding add_image_meta Exif_int')
-  //       //   db.add_image_meta('testpath/testname2', 'testproj_name', 'Exif_int', 12314, function(bool) {
-  //       //     console.log('adding add_image_meta Exif_int')
-
-  //       //   });
-  //       // });
-  //       // db.add_image_meta('testpath/testname2', 'testproj_name', 'Exif_int', 12314, function(bool) {
-  //       //   console.log('adding add_image_meta Exif_int')
-
-  //       // });
-  //     });
-  //   });
-  // });
+  db.has_project('testproj_name', function(bool) {
+    if (bool) {
+      console.log('testproj_name is already in db');
+    } else {
+      console.log('testproj_name is NOT in db');
+    }
+  });
+  db.has_image('testpath/testname2', 'testproj_name', function(bool) {
+    db.get_image_metadata('testpath/testname2', 'testproj_name', function() {});
+  });
+  db.add_image_meta('testpath/testname2', 'testproj_name', 'fuckyou', true, function(bool) {
+    console.log('adding add_image_meta Exif_int')
+    db.get_metadata_fields(function(fields) {
+      console.log('recieved', fields);
+    });
+  });
 });
 
 function createWindow () {

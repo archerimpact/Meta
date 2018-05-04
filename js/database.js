@@ -30,6 +30,7 @@ class Database {
       }
       callback(bool);
     });
+    stmt.finalize();
 
     // /* Pass creation status, project name, and list of images to add to callback. */
     // callback(bool, name, image_paths);
@@ -106,6 +107,7 @@ class Database {
     });
   }
 
+  // TODO: handle spaces in metafields(?)
   add_image_meta(img_path, proj_name, meta_key, meta_value, callback) {
     // set metadata for image
     // if column doesn't exist, add column
@@ -118,7 +120,7 @@ class Database {
           throw error;
         }
         columns.push(col.name);
-      }, function(){
+      }, function() {
         console.log('add_project: columns', columns);
         var col_exists = (columns.indexOf(meta_key) >= 0);
 
@@ -127,21 +129,21 @@ class Database {
           db.run("ALTER TABLE Images ADD " + meta_key + " " + meta_type + ";");
           console.log('add_project: col added', meta_key, meta_type);
         }
-      });
 
-      var success = false;
-      _this.has_image(img_path, proj_name, function(bool) {
-        if (bool) {
-          var query = "UPDATE Images SET " + meta_key + "=? WHERE path=? AND proj_name=?"
-          var stmt = db.prepare(query);
-          stmt.run([meta_value, img_path, proj_name]);
-          stmt.finalize();
-          success = true;
-          console.log('add_image_meta: image', img_path, 'metadata', meta_key, meta_value)
-        } else {
-          console.error('add_image_meta: image', img_path, 'does not exist in', proj_name);
-        }
-        callback(success);
+        var success = false;
+        _this.has_image(img_path, proj_name, function(bool) {
+          if (bool) {
+            var query = "UPDATE Images SET " + meta_key + "=? WHERE path=? AND proj_name=?"
+            var stmt = db.prepare(query);
+            stmt.run([meta_value, img_path, proj_name]);
+            stmt.finalize();
+            success = true;
+            console.log('add_image_meta: image', img_path, 'metadata', meta_key, meta_value)
+          } else {
+            console.error('add_image_meta: image', img_path, 'does not exist in', proj_name);
+          }
+          callback(success);
+        });
       });
     });
   }
@@ -208,10 +210,52 @@ class Database {
     });
   }
 
-  get_images_with_metadata(callback) {
-    // return all images that have non-empty metadata fields
-    var bool = true;
-    callback(bool);
+  /* Uses callback(list) to return list of metadata fields. */
+  get_metadata_fields(callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      var fields = [];
+      var not_metadata = ["img_name", "path", "proj_name", "creation",
+                          "last_modified", "tags", "starred", "notes"];
+      db.each("PRAGMA table_info(Images)", function(err, col) {
+        if (err) {
+          throw error;
+        }
+        var name = col.name;
+        if (not_metadata.indexOf(name) < 0) {
+          fields.push(name);
+        }
+      }, function() {
+        console.log('get_metadata_fields: fields', fields);
+        callback(fields);
+      });
+    });
+  }
+
+  /* Uses callback(dictionary) to return dict of metafields to metadata.
+   * Ignores any fields that are not filled in. */
+  get_image_metadata(img_path, proj_name, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      // _this.db.has_project(proj_name, function() {
+        
+      // })
+      var not_metadata = ["img_name", "path", "proj_name", "creation",
+                          "last_modified", "tags", "starred", "notes"];
+      var stmt = db.prepare("SELECT * FROM Images WHERE path=? AND proj_name=?");
+      stmt.get([img_path, proj_name], function(err, row) {
+        for (var key in row) {
+          if (row[key] == null || not_metadata.indexOf(key) >= 0) {
+            delete row[key];
+          }
+        }
+        console.log('get_image_metadata: row', row);
+        stmt.finalize();
+        callback(row);
+      });
+    });
   }
 
   init_database() {
@@ -293,6 +337,12 @@ class Database {
 
   close() {
     this.db.close();
+  }
+
+  /* Never use this in code, only use for testing. */
+  clear_database(callback) {
+    this.db.run("DROP TABLE Projects; DROP TABLE Images; DROP TABLE Settings;");
+    callback();
   }
 }
 
