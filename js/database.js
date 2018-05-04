@@ -39,12 +39,13 @@ class Database {
   /* Uses callback(boolean) to return whether or not proj_name has img_path. */
   has_image(img_path, proj_name, callback) {
     // return whether image with given path already exists for a given project
+    var _this = this;
     this.has_project(proj_name, function(bool) {
       if (!bool) {
         console.log("has_image: Project not found", proj_name);
         callback(false);
       } else {
-        var stmt = this.db.prepare("SELECT * FROM Images WHERE path = ? AND proj_name = ?");
+        var stmt = _this.db.prepare("SELECT * FROM Images WHERE path = ? AND proj_name = ?");
         stmt.get([img_path, proj_name], function(err, row) {
           var bool = true;
           if (err) {
@@ -68,7 +69,7 @@ class Database {
 
   }
 
-  /* Use callback(boolean) to return if project was successfully created. */
+  /* Use callback(success, name, img_paths) to return if project was successfully created. */
   add_project(name, description, img_paths, callback) {
     var _this = this;
     var db = this.db;
@@ -249,7 +250,7 @@ class Database {
     db.serialize(function() {
       _this.has_image(img_path, proj_name, function(bool) {
         if (!bool) {
-          console.log("get_selected_image_metadata: Image not found", img_path);
+          console.log("get_image_metadata: Image not found", img_path);
           callback({});
         } else {
           var not_metadata = ["img_name", "path", "proj_name", "creation",
@@ -271,7 +272,7 @@ class Database {
   }
 
   /* Uses callback(dictionary) to return dict of metafields to metadata.
-   * Ignores any fields that are not filled in. */
+   * Ignores any fields that are not filled in or not selected. */
   get_selected_image_metadata(img_path, proj_name, selected, callback) {
     var _this = this;
     var db = this.db;
@@ -291,7 +292,7 @@ class Database {
                 delete row[key];
               }
             }
-            console.log('get_image_metadata: row', row);
+            console.log('get_selected_image_metadata: row', row);
             stmt.finalize();
             callback(row);
           });

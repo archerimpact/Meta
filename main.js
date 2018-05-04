@@ -39,17 +39,20 @@ db.db.serialize(function() {
     }
   });
 
-  db.add_image_meta('testpath/testname2', 'testproj_name', 'fuckyou', true, function(bool) {
-    console.log('adding add_image_meta Exif_int')
-    db.get_metadata_fields(function(fields) {
-      console.log('recieved', fields);
-    });
-    db.has_image('testpath/testname2', 'testproj_name', function(bool) {
-      db.get_image_metadata('testpath/testname2', 'testproj_name', function(fields) {});
-      db.get_selected_image_metadata('testpath/testname2', 'testproj_name', ["fuckyou"], function(fields) {});
-    });
+  db.add_project('testproj_name', 'desc', ['path1'], function(success, name, img_paths) {
+    db.add_image_meta('testpath/testname2', 'testproj_name', 'aspdokpas', true, function(bool) {
+      console.log('adding add_image_meta Exif_int')
+      db.get_metadata_fields(function(fields) {
+        console.log('recieved', fields);
+      });
+      db.has_image('testpath/testname2', 'testproj_name', function(bool) {
+        db.get_image_metadata('testpath/testname2', 'testproj_name', function(fields) {});
+        db.get_selected_image_metadata('testpath/testname2', 'testproj_name', ["fuckyou"], function(fields) {});
+      });
 
+    });
   });
+  
 });
 
 function createWindow () {
