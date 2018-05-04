@@ -29,12 +29,10 @@ function loadDetail(projectName){
 	selectPrep();
 	var images = project.getImages();
 	images.sort(compareTimestamp);
-	// console.log("images: " + images);
 	images.forEach(function(image) {
 		var img_path = image['path'];
 		var name = image['name'];
 		var metadata = image['metadata'];
-		// console.log(metadata);
 		//detailExifDisplay(img_path, name, metadata);
 		detailExifDisplay__NEW(img_path, name, metadata)
 	});
@@ -106,7 +104,6 @@ function loadMap(name, lat, long, latref, longref) {
 	if (longref.toLowerCase().includes('w') && long > 0) {
 		long = -1 * long;
 	}
-	// console.log(lat, long);
 	_map = new google.maps.Map(document.getElementById('map' + name), {
 	  zoom: 15,
 	  center: {'lat': lat, 'lng': long},
@@ -132,16 +129,12 @@ function tripleToDegree(dms) {
 
 function setPhotoRemove(name) {
 	var projName = document.getElementById('project-name').innerHTML;
-	console.log(name)
 	var elem = document.getElementById("remove" + name)
 	if (!elem) {
 		return;
 	}
 	elem.onclick = function() {
 		var projectPath = storage.getProject(projName);
-		console.log(projectPath);
-		console.log(projName);
-		console.log(storage)
 		var proj = loadProject(path.join(projectPath, projName + '.json'));
 		proj.removeImage(name);
 		proj.saveProject();
@@ -256,7 +249,6 @@ function loadHeader(project) {
 	};
 
 	document.getElementById("upload" + project.getName()).onclick = function() {
-		console.log('hello');
 		let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
 		for (var index in paths) {
 			var filename = path.basename(paths[index]).split(".")[0];
@@ -276,59 +268,6 @@ function clearDetailsHtml() {
 	document.getElementById("image-wrapper").innerHTML = ""
 	document.getElementById("detail-charts").innerHTML = ""
 	// document.getElementById("file-label2").innerHTML = ""
-}
-
-function detailExifDisplay(imgpath, name, metadata) {
-	// Set default template.
-	var template = [
-		'<div id="detail-template{{name}}" class="row">',
-		'</div>',
-		'<hr id="hr{{name}}">'
-	].join("\n")
-	var filler = Mustache.render(template, {name: name});
-	$("#image-wrapper").append(filler);
-	if (!metadata) {
-		metadata = {};
-	}
-
-	if (Object.keys(metadata).length == 0) {
-		try {
-			console.log("generating metadata for " + name);
-			new ExifImage({ image : imgpath }, function (error, exifData) {
-					var data = {
-						'name': name,
-						'path': imgpath,
-						'exifData': {},
-						'error': "",
-					};
-					if (error) {
-							console.log('Error: ' + error.message);
-							data.error = error.message;
-					} else {
-							var types = ['exif', 'image', 'gps'];
-							for (var ind in types) {
-								var type = types[ind];
-								data.exifData[type] = exifData[type];
-								if (!data.exifData[type]) {
-									data.exifData[type] = {};
-								}
-								// these are not web-formatted and look like random symbols
-								// consider looking into formatting these
-								delete data.exifData.exif['MakerNote'];
-								delete data.exifData.exif['UserComment'];
-							}
-					}
-					_currentProj.setImageMetadata(name, data);
-					_currentProj.saveProject();
-					insertDetailTemplate(data, name);
-			});
-		} catch (error) {
-				console.log('Exif Error: ' + error.message);
-		}
-	} else {
-		console.log("using existing metadata for " + name);
-		insertDetailTemplate(metadata, name);
-	}
 }
 
 $("#add-image").submit(function(e) {
@@ -383,13 +322,11 @@ function detailExifDisplay__NEW(imgpath, name, metadata) {
 	exiftool
 		.read(imgpath)
 		.then(function(tags) {
-			console.log(tags);
 			data.exifData = {};
 			for (var key in tags) {
 				data.exifData[key] = tags[key];
 				data = processData(data);
 			}
-			console.log(data)
 			insertDetailTemplate__NEW(data, name);
 		})
 		.catch(function(error) {
@@ -410,7 +347,6 @@ function detailExifDisplay__NEW(imgpath, name, metadata) {
 //  fileData: {...}
 // }
 function insertDetailTemplate__NEW(data, id) {
-	console.log(data)
 	if (data.error) {
 		insertErrorTemplate(data, id);
 		return;
@@ -458,8 +394,6 @@ function insertDetailTemplate__NEW(data, id) {
 	if (is_modified) {
 		flag_trigger = '';
 	}
-
-	console.log(contents)
 
 	var template = [
 		'<div class="row">',
@@ -575,12 +509,8 @@ function insertDetailTemplate__NEW(data, id) {
 		[{'lat':latitude, 'lng':longitude}],
 	)
 
-	// TODO why isn't this working
-	console.log($)
-	console.log($.fn)
 	$('[data-toggle="tooltip"]').tooltip();
 
-	// console.log(data);
 	setPhotoRemove(data.name);
 
 }
@@ -697,9 +627,7 @@ function loadCharts() {
 	var ref = document.getElementById('lineChart');
 	var div = document.getElementById('trendsmap')
 	var width = ref.offsetWidth / 2
-	console.log(width)
 	if (width > 0) {
-		console.log("taking ref height")
 		div.style.height = width.toString() + 'px';
 	} else {
 		div.style.height = '400px';
@@ -710,7 +638,6 @@ function loadCharts() {
 // THIS IS NOT WORKING
 function selectPrep() {
 	var ts = $(".tag-selector");
-	console.log(ts)
 	// ts.select2({
   // 	tags: true
 	// });

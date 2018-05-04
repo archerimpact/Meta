@@ -91,7 +91,6 @@ function addMap(id, markers) {
 		});
     bounds  = new google.maps.LatLngBounds();
     for (var ind in markers) {
-      console.log(markers[ind])
   		var marker = new google.maps.Marker({
   	    position: markers[ind],
   	    map: _map,
