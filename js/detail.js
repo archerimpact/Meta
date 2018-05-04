@@ -638,7 +638,10 @@ function loadCharts() {
 // THIS IS NOT WORKING
 function selectPrep() {
 	var ts = $(".tag-selector");
-	// ts.select2({
-  // 	tags: true
-	// });
+	console.log(ts)
+	console.log($)
+	console.log($.fn)
+	ts.select2({
+  	tags: true
+	});
 }

@@ -1,5 +1,4 @@
 function loadSettings() {
-  console.log("inside")
   var allTags = queryAllExifTags()
   var favwrapper = $("#fav-settings-wrapper")
   var csvwrapper = $("#csv-settings-wrapper")
@@ -30,4 +29,3 @@ function queryAllExifTags() {
 }
 
 loadSettings()
-console.log("called")
