@@ -29,7 +29,15 @@ header.masthead {
 #wrapper {
   height: 100%;
 }
+.absolute-center {
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
 
-.search {
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+
+    align-items: center;
 
 }
