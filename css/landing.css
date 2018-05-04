@@ -18,6 +18,9 @@ header.masthead {
   height:100%;
   margin-bottom: 0px;
   padding-bottom: 0px;
+  margin:0px;
+  padding: 0px;
+  width: 100%
 }
 
 .section_template {
@@ -28,6 +31,7 @@ header.masthead {
 
 #wrapper {
   height: 100%;
+  padding: 0
 }
 .absolute-center {
     display: -ms-flexbox;
