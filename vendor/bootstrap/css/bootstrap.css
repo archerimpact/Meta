@@ -4172,7 +4172,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 @media (min-width: 430px) {
   .navbar {
     border-radius: 0px;
-    /*not sure if this is doing what i want?? to get rid of weird white border btwn top & side */ 
+    /*not sure if this is doing what i want?? to get rid of weird white border btwn top & side */
   }
 }
 @media (min-width: 430px) {
@@ -4944,7 +4944,7 @@ a.badge:focus {
 }
 .list-group-item.active > .badge,
 .nav-pills > .active > a > .badge {
-  color: #337ab7;
+  color: #192d42;
   background-color: #fff;
 }
 .list-group-item > .badge {
