@@ -30,27 +30,27 @@ let mainWindow
 global.sharedObj = {db: db};
 
 // for testing
-db.db.serialize(function() {
-  db.has_project('testproj_name', function(bool) {
-    if (bool) {
-      console.log('testproj_name is already in db');
-    } else {
-      console.log('testproj_name is NOT in db');
-    }
-  });
-
-  db.add_image_meta('testpath/testname2', 'testproj_name', 'fuckyou', true, function(bool) {
-    console.log('adding add_image_meta Exif_int')
-    db.get_metadata_fields(function(fields) {
-      console.log('recieved', fields);
-    });
-    db.has_image('testpath/testname2', 'testproj_name', function(bool) {
-      db.get_image_metadata('testpath/testname2', 'testproj_name', function(fields) {});
-      db.get_selected_image_metadata('testpath/testname2', 'testproj_name', ["fuckyou"], function(fields) {});
-    });
-
-  });
-});
+// db.db.serialize(function() {
+//   db.has_project('testproj_name', function(bool) {
+//     if (bool) {
+//       console.log('testproj_name is already in db');
+//     } else {
+//       console.log('testproj_name is NOT in db');
+//     }
+//   });
+//
+//   db.add_image_meta('testpath/testname2', 'testproj_name', 'fuckyou', true, function(bool) {
+//     console.log('adding add_image_meta Exif_int')
+//     db.get_metadata_fields(function(fields) {
+//       console.log('recieved', fields);
+//     });
+//     db.has_image('testpath/testname2', 'testproj_name', function(bool) {
+//       db.get_image_metadata('testpath/testname2', 'testproj_name', function(fields) {});
+//       db.get_selected_image_metadata('testpath/testname2', 'testproj_name', ["fuckyou"], function(fields) {});
+//     });
+//
+//   });
+// });
 
 function createWindow () {
   // Create the browser window.

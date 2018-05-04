@@ -4,6 +4,13 @@ var sqlite3 = require('sqlite3').verbose();
 var paths_global = [];
 var database = electron.remote.getGlobal('sharedObj').db;
 
+function alert_image_upload(bool, project_name, img_path) {
+	if (!bool) {
+		alert("Unable to add image");
+		return
+	}
+}
+
 function populate_project_with_images(bool, project_name, img_paths) {
 	if (!bool) {
 		alert("Unable to create project");
@@ -13,20 +20,13 @@ function populate_project_with_images(bool, project_name, img_paths) {
 	/* Populate newly created project with provided images. */
 	for (var index in img_paths) {
 		var filename = path.basename(img_paths[index]).split(".")[0];
-		database.add_image(filename, img_paths[index], project_name, index == img_paths.length() - 1, alert_image_upload);
+		database.add_image(filename, img_paths[index], project_name, alert_image_upload);
 	}
 
 	console.log("added all images");
 
 	/* Load project view. */
-	database.get_images_in_project(project_name, load_detail);
-}
-
-function alert_image_upload(bool, project_name, img_path, is_last_image) {
-	if (!bool) {
-		alert("Unable to add image");
-		return
-	}
+	load_detail(project_name);
 }
 
 function createProject(){
@@ -62,13 +62,13 @@ function unacceptableFormat(name) {
 $("#new-project").submit(function(e) {
 	e.preventDefault();
 	var projectName = createProject();
-    if (projectName) {
-    	clearNew();
-      	loadDetail(projectName);
-		refreshProjects();
-    } else {
-        console.log(projectName + ": project not created")
-    }
+    // if (projectName) {
+    // 	clearNew();
+    //   	load_detail(projectName);
+		// refreshProjects();
+    // } else {
+    //     console.log(projectName + ": project not created")
+    // }
 });
 
 function clearNew() {
