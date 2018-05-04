@@ -16,6 +16,7 @@
   "dependencies": {
     "exif": "^0.6.0",
     "exiftool-vendored": "^4.20.0",
+    "material-design-icons": "^3.0.1",
     "mustache": "^2.3.0",
     "rimraf": "^2.6.2"
   },

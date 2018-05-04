@@ -14,6 +14,9 @@
     <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
     <link href="css/columns.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
     <!-- <link href="css/font-awesome.min.css" rel="stylesheet"> -->
 
     <!-- reinstall octicons and uncomment this if we want github octicons -->
@@ -28,6 +31,35 @@
     <link rel="import" href="sections/overall-images.html">
     <link rel="import" href="sections/overall-compare.html">
 
+    <style>
+
+      .material-icons {
+        font-family: 'Material Icons';
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px;  /* Preferred icon size */
+        vertical-align: bottom;
+        display: inline-block;
+        line-height: 1;
+        text-transform: none;
+        letter-spacing: normal;
+        word-wrap: normal;
+        white-space: nowrap;
+        direction: ltr;
+
+        /* Support for all WebKit browsers. */
+        -webkit-font-smoothing: antialiased;
+        /* Support for Safari and Chrome. */
+        text-rendering: optimizeLegibility;
+
+        /* Support for Firefox. */
+        -moz-osx-font-smoothing: grayscale;
+
+        /* Support for IE. */
+        font-feature-settings: 'liga';
+      }
+  </style>
+
 
   </head>
 
@@ -35,45 +67,45 @@
 
 
           <!-- Navigation -->
-          <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+          <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin: 0; padding: 0; background-color: #192d42; color: white">
               <div class="navbar-header">
-                  <a class="navbar-brand" href="index.html">Archer Meta</a>
-                  <a class="btn btn-outline btn-default" data-section="overall-images.html" style="margin-top: 10px; margin-left: 20px;">Images </a>
-                  <a class="btn btn-outline btn-default" data-section="landing.html" style="margin-top: 10px; margin-left: 20px;">Trends </a>
-                  <a class="btn btn-outline btn-default" data-section="overall-compare.html" style="margin-top: 10px; margin-left: 20px;">Compare </a>
+                  <a class="navbar-brand" style="color:white" href="index.html">Archer Meta</a>
+
+                            <ul class="nav nav-pills" style="display: inline-block; margin-top:5px">
+                                <li><a data-section="overall-images">Images</a>
+                                </li>
+                                <li class="active"><a data-section="landing">Trends</a>
+                                </li>
+                                <li><a data-section="overall-compare">Compare</a>
+                                </li>
+                            </ul>
+
+
+
+                  <!-- <a class="btn btn-default" data-section="overall-images.html" style="margin-top: 10px; margin-left: 20px; background-color: #192d42; color:white">Images </a>
+                  <a class="btn btn-default" data-section="landing.html" style="margin-top: 10px; margin-left: 20px; background-color: #192d42; color:white">Trends </a>
+                  <a class="btn btn-default" data-section="overall-compare.html" style="margin-top: 10px; margin-left: 20px; background-color: #192d42; color:white">Compare </a> -->
                   <!-- <button type="button" class="btn btn-outline btn-default" style="margin-top: 10px; margin-left: 20px;" href="overall-images.html"><a href="overall-images.html"> Images </a></button> -->
               </div>
           </nav>
               <div class="row" style="height:100%">
                 <div class="col-sm-3" style="padding: 0px; margin: 0px; height: 100%">
 
-               <div class="navbar-default sidebar" role="navigation" style="color: #0d77e2; height:100%">
-                  <div class="sidebar-nav navbar-collapse">
-                      <ul class="nav" id="side-menu">
-                        <!--TODO: Right now, commenting this out until we decide whether or not we want to have a search in the side bar -->
-                          <!-- <li class="sidebar-search">
-                              <div class="input-group custom-search-form">
-                                  <input type="text" class="form-control" placeholder="Search...">
-                                  <span class="input-group-btn">
-                                  <button class="btn btn-default" type="button">
-                                      <i class="fa fa-search"></i>
-                                  </button>
-                              </span>
-                              </div>
-                              <!-- /input-group -->
-                           <!--</li> -->
+               <div class="navbar-default sidebar" role="navigation" style="color: white; background-color: #192d42; height:100%">
+                  <div class="sidebar-nav">
+                      <ul class="nav" id="side-menu" style="padding-left: 15px; color: white; padding-top: 0;">
                           <li>
-                              <a data-section="landing"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                              <a data-section="landing" style="color: white"><i class="material-icons">dashboard</i> Dashboard</a>
                           </li>
                           <li>
-                              <a data-section="new"><i class="fa fa-plus fa-fw"></i> New Project</a>
+                              <a data-section="new" style="color: white"><i class="material-icons">add</i> New Project</a>
                           </li>
                           <li>
-                              <a data-section="projects"><i class="fa fa-folder fa-fw"></i> Projects</a>
+                              <a data-section="projects" style="color: white"><i class="material-icons">folder</i> Projects</a>
                               <!--TODO: eventually, we'll want to put this together so that it has a listed projects underneath it, but for now we'll just redirect to the existing project page like we had beofre -->
                           </li>
                           <li>
-                              <a data-section="settings"><i class="fa fa-gear fa-fw"></i> Settings</a>
+                              <a data-section="settings" style="color: white"><i class="material-icons">settings</i> Settings</a>
                           </li>
 
 
