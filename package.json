@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "chart.js": "^2.7.2",
+    "choices.js": "^3.0.4",
     "echarts": "^4.0.4",
     "exif": "^0.6.0",
     "exiftool-vendored": "^4.20.0",
