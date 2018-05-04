@@ -39,21 +39,29 @@ class Database {
   /* Uses callback(boolean) to return whether or not proj_name has img_path. */
   has_image(img_path, proj_name, callback) {
     // return whether image with given path already exists for a given project
-    var stmt = this.db.prepare("SELECT * FROM Images WHERE path = ? AND proj_name = ?");
-    stmt.get([img_path, proj_name], function(err, row) {
-      var bool = true;
-      if (err) {
-        throw error;
-      }
-      if (row == undefined) {
-        bool = false;
-        console.log('has_image: image', img_path, 'is NOT in Images');
+    this.has_project(proj_name, function(bool) {
+      if (!bool) {
+        console.log("has_image: Project not found", proj_name);
+        callback(false);
       } else {
-        console.log('has_image: image', img_path, 'is in Images');
+        var stmt = this.db.prepare("SELECT * FROM Images WHERE path = ? AND proj_name = ?");
+        stmt.get([img_path, proj_name], function(err, row) {
+          var bool = true;
+          if (err) {
+            throw error;
+          }
+          if (row == undefined) {
+            bool = false;
+            console.log('has_image: image', img_path, 'is NOT in Images');
+          } else {
+            console.log('has_image: image', img_path, 'is in Images');
+          }
+          callback(bool);
+        });
+        stmt.finalize();
       }
-      callback(bool);
     });
-    stmt.finalize();
+    
   }
 
   has_metadata(img_path, proj_name, callback) {
@@ -140,7 +148,7 @@ class Database {
             success = true;
             console.log('add_image_meta: image', img_path, 'metadata', meta_key, meta_value)
           } else {
-            console.error('add_image_meta: image', img_path, 'does not exist in', proj_name);
+            console.log('add_image_meta: image', img_path, 'does not exist in', proj_name);
           }
           callback(success);
         });
@@ -239,21 +247,55 @@ class Database {
     var _this = this;
     var db = this.db;
     db.serialize(function() {
-      // _this.db.has_project(proj_name, function() {
-        
-      // })
-      var not_metadata = ["img_name", "path", "proj_name", "creation",
-                          "last_modified", "tags", "starred", "notes"];
-      var stmt = db.prepare("SELECT * FROM Images WHERE path=? AND proj_name=?");
-      stmt.get([img_path, proj_name], function(err, row) {
-        for (var key in row) {
-          if (row[key] == null || not_metadata.indexOf(key) >= 0) {
-            delete row[key];
-          }
+      _this.has_image(img_path, proj_name, function(bool) {
+        if (!bool) {
+          console.log("get_selected_image_metadata: Image not found", img_path);
+          callback({});
+        } else {
+          var not_metadata = ["img_name", "path", "proj_name", "creation",
+                      "last_modified", "tags", "starred", "notes"];
+          var stmt = db.prepare("SELECT * FROM Images WHERE path=? AND proj_name=?");
+          stmt.get([img_path, proj_name], function(err, row) {
+            for (var key in row) {
+              if (row[key] == null || not_metadata.indexOf(key) >= 0) {
+                delete row[key];
+              }
+            }
+            console.log('get_image_metadata: row', row);
+            stmt.finalize();
+            callback(row);
+          });
         }
-        console.log('get_image_metadata: row', row);
-        stmt.finalize();
-        callback(row);
+      });
+    });
+  }
+
+  /* Uses callback(dictionary) to return dict of metafields to metadata.
+   * Ignores any fields that are not filled in. */
+  get_selected_image_metadata(img_path, proj_name, selected, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      _this.has_image(img_path, proj_name, function(bool) {
+        if (!bool) {
+          console.log("get_selected_image_metadata: Image not found", img_path);
+          callback({});
+        } else {
+          var not_metadata = ["img_name", "path", "proj_name", "creation",
+                      "last_modified", "tags", "starred", "notes"];
+          var stmt = db.prepare("SELECT * FROM Images WHERE path=? AND proj_name=?");
+          stmt.get([img_path, proj_name], function(err, row) {
+            for (var key in row) {
+              if (row[key] == null || not_metadata.indexOf(key) >= 0
+                  || selected.indexOf(key) < 0) {
+                delete row[key];
+              }
+            }
+            console.log('get_image_metadata: row', row);
+            stmt.finalize();
+            callback(row);
+          });
+        }
       });
     });
   }
