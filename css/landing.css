@@ -41,3 +41,22 @@ header.masthead {
     align-items: center;
 
 }
+
+#home {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+#side-nav {
+  position: fixed;
+  overflow: hidden;
+  margin: 50px 0px 0px 0px;
+}
+
+#top-nav {
+  position: fixed;
+}
+
+#body {
+  margin: 0px 0px 0px 16.66%;
+}
