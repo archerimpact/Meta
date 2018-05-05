@@ -93,7 +93,7 @@ class Database {
   }
 
   /* Uses callback(boolean) to return if image was added successfully or not. */
-  add_image(img_name, img_path, proj_name, callback) {
+  add_image(img_name, img_path, proj_name, index, num_images, callback) {
     // Check if image has been made yet, if not create it
     var _this = this;
     var db = this.db;
@@ -112,7 +112,7 @@ class Database {
           console.log('add_image: successfully added image', img_name, img_path, proj_name)
           success = true;
         }
-        callback(success, proj_name, img_path);
+        callback(success, proj_name, img_path, index, num_images);
       });
     });
   }
@@ -216,16 +216,13 @@ class Database {
     db.serialize(function() {
       _this.has_project(proj_name, function(bool) {
         if (bool) {
-          var images = [];
           var stmt = db.prepare("SELECT * FROM Images WHERE proj_name = ?");
-          stmt.get([proj_name], function(err, row) {
+          stmt.all([proj_name], function(err, rows) {
             if (err) {
               throw error;
             }
-            console.log("pushed row to images list: " + row);
-            images.push(row);
-            console.log('get_images_in_project:', images, 'in', proj_name);
-            callback(proj_name, images);
+            console.log('get_images_in_project:', rows, 'in', proj_name);
+            callback(proj_name, rows);
           });
           stmt.finalize();
         } else {
@@ -268,7 +265,7 @@ class Database {
       _this.has_image(img_path, proj_name, function(bool) {
         if (!bool) {
           console.log("get_selected_image_metadata: Image not found", img_path);
-          callback(false, img_name, proj_name, {});
+          callback(false, img_name, img_path, proj_name, {});
         } else {
           var not_metadata = ["img_name", "path", "proj_name", "creation",
                       "last_modified", "tags", "starred", "notes"];
@@ -280,7 +277,7 @@ class Database {
               }
             }
             console.log('get_image_metadata: row', row);
-            callback(true, img_name, proj_name, row);
+            callback(true, img_name, img_path, proj_name, row);
           });
           stmt.finalize();
         }

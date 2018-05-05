@@ -4,10 +4,15 @@ var sqlite3 = require('sqlite3').verbose();
 var paths_global = [];
 var database = electron.remote.getGlobal('sharedObj').db;
 
-function alert_image_upload(bool, project_name, img_path) {
+function alert_image_upload(bool, project_name, img_path, index, num_images) {
 	if (!bool) {
 		alert("Unable to add image");
 		return
+	} else if (index == num_images - 1) {
+		console.log("added all images");
+
+		/* Load project view. */
+		load_detail(project_name);
 	}
 }
 
@@ -20,13 +25,8 @@ function populate_project_with_images(bool, project_name, img_paths) {
 	/* Populate newly created project with provided images. */
 	for (var index in img_paths) {
 		var filename = path.basename(img_paths[index]).split(".")[0];
-		database.add_image(filename, img_paths[index], project_name, alert_image_upload);
+		database.add_image(filename, img_paths[index], project_name, index, img_paths.length, alert_image_upload);
 	}
-
-	console.log("added all images");
-
-	/* Load project view. */
-	load_detail(project_name);
 }
 
 function createProject(){
