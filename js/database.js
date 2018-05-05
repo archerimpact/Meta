@@ -62,9 +62,9 @@ class Database {
         stmt.finalize();
       }
     });
-    
   }
 
+  /* Uses callback(boolean) to return whether or not an image has metadata. */
   has_metadata(img_path, proj_name, callback) {
 
   }
@@ -77,7 +77,8 @@ class Database {
     db.serialize(function() {
       _this.has_project(name, function(bool) {
         if (!bool) {
-          var stmt = db.prepare("INSERT INTO Projects (name, description, creation, last_modified) VALUES (?, ?, ?, ?)");
+          var stmt = db.prepare("INSERT INTO Projects (name, description, creation, " +
+                                "last_modified) VALUES (?, ?, ?, ?)");
           var created = Date.now();
           stmt.run(name, description, created, created);
           stmt.finalize();
