@@ -40,7 +40,7 @@ function loadDetail(projectName) {
 
 	/* Display images in this project. */
 	database.get_images_in_project(projectName, function(projectName, image_list) {
-		// TODO(varsha): make sure images are sorted
+		image_list.sort(compareTimestamp);
 		console.log("got images: " + image_list.length + ", " + JSON.stringify(image_list));
 
 		image_list.forEach(function(image) {
@@ -53,7 +53,7 @@ function loadDetail(projectName) {
 	});
 }
 
-// Comparator that puts newer images before older ones.
+/* Comparator that puts newer images before older ones. */
 function compareTimestamp(image1, image2){
 	if (image1['last_modified'] > image2['last_modified'])
 		return -1;
