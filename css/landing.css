@@ -52,13 +52,13 @@ header.masthead {
 }
 
 #side-nav {
-  position: fixed;
-  overflow: hidden;
-  margin: 50px 0px 0px 0px;
+  /* position: fixed; */
+  /* overflow: hidden; */
+  margin: 0px 0px 0px 0px;
 }
 
 #top-nav {
-  position: fixed;
+  /* position: fixed; */
 }
 
 #body {
