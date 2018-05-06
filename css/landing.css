@@ -90,3 +90,7 @@ header.masthead .intro-text .intro-heading {
 #wrapper {
   height: 100%;
 }
+
+.choices__list--dropdown .choices__item--selectable {
+    padding-right: 10px !important;
+}

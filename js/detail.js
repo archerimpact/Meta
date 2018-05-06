@@ -5,12 +5,13 @@ const remote = require('electron').remote
 const getProjectJsonPath = require('./project.js').getProjectJsonPath
 const loadProject = require('./project.js').loadProject
 const Mustache = require('Mustache')
-const ExifImage = require('exif').ExifImage;
+// const ExifImage = require('exif').ExifImage;
 const { ExifTool } = require("exiftool-vendored");
 const exiftool = new ExifTool();
 const Chart = require('chart.js');
-const echarts = require('echarts');
-const select2 = require('select2');
+// const echarts = require('echarts');
+// const select2 = require('select2');
+const Choices = require('Choices.js')
 
 var _data = [];
 var _currentProj;
@@ -405,19 +406,7 @@ function insertDetailTemplate__NEW(data, id) {
 					'<div class="col-md-8">',
 						'<h3 style="word-wrap:break-word;">{{name}}</h3>',
 						// tags
-						'<div>',
-							'<input type="text" placeholder="Add tag" name="tag">',
-							// one new label per tag, with appropriate color
-							'<h3 style="display:inline">',
-								'<span class="badge badge-pill badge-primary">', //style="background-color:#00ffff">',
-									'Fun',
-								'</span> ',
-								'<span class="badge badge-pill badge-primary" style="background-color:#00ffff">',
-									'Party',
-								'</span> ',
-							'</h2>',
-						'</div>',
-						'<br>',
+							'<input type="text" class="choices-tags form-control choices__input is-hidden" id="tags{{name}}" multiple>',
 						'<textarea class="form-control" rows="3" placeholder="Notes" />',
 					'</div>',
 					'<div class="col-md-4">',
@@ -436,9 +425,7 @@ function insertDetailTemplate__NEW(data, id) {
 						'</div>',
 						// search bar
 						'<br>',
-						'<input type="text" placeholder="Exif search">',
-						'<tr><th> Search results </th></tr>',
-
+						'<select class="form-control choices__input is-hidden" id="search{{name}}" multiple></select>',
 					'</div>',
 				'</div>',
 			'</div>',
@@ -513,12 +500,46 @@ function insertDetailTemplate__NEW(data, id) {
 
 	setPhotoRemove(data.name);
 
+	var tags = getTagsForName(data.name);
+
+	var choices = new Choices($('#tags' + data.name)[0], {
+		items: tags,
+		removeItemButton: true,
+		editItems: true,
+		duplicateItems: false,
+		placeholder: "Enter/select a tag"
+	})
+
+	var choices = new Choices($('#search' + data.name)[0], {
+		choices: data.ref,
+		paste: false,
+		duplicateItems: false,
+		placeholder: "Enter/select a tag",
+		itemSelectText: '',
+		duplicateItems: true,
+	})
+
+}
+
+//TODO
+function getTagsForName(name) {
+	return [
+		{
+			value: 'Outdoors',
+			label: 'Outdoors',
+		},
+		{
+			value: 'Berkeley',
+			label: 'Berkeley',
+		}
+	]
 }
 function isStr(maybeString) {
 	return maybeString && !(maybeString == "");
 }
 
 function processData(data) {
+	data.ref = []
 	var file = [
 		"SourceFile",
 		"Directory",
@@ -532,6 +553,13 @@ function processData(data) {
 	]
 	var favories = getFavDataKeys();
 	for (var key in data.exifData) {
+		var val = data.exifData[key];
+		data.ref.push({
+		  value: '',
+		  label: key + ": " + val,
+		  selected: false,
+		  disabled: false,
+		})
 		if (key == "errors" && !isStr(data.exifData[key])) {
 			delete data.exifData[key];
 		}
@@ -623,7 +651,13 @@ function loadCharts() {
 		[25, 40, 100, 20],
 		"Stuff"
 	)
-	addMap("trendsmap", [{'lat':10, 'lng':10}, {'lat':20, 'lng':20}])
+	addMap(
+		"trendsmap",
+		[
+			{'lat':10, 'lng':10},
+			{'lat':20, 'lng':20},
+		]
+	)
 	var ref = document.getElementById('lineChart');
 	var div = document.getElementById('trendsmap')
 	var width = ref.offsetWidth / 2
@@ -638,10 +672,7 @@ function loadCharts() {
 // THIS IS NOT WORKING
 function selectPrep() {
 	var ts = $(".tag-selector");
-	console.log(ts)
-	console.log($)
-	console.log($.fn)
-	ts.select2({
-  	tags: true
-	});
+	// ts.select2({
+  // 	tags: true
+	// });
 }
