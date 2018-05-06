@@ -31,28 +31,25 @@ global.sharedObj = {db: db};
 
 // for testing
 db.db.serialize(function() {
-  db.has_project('testproj_name', function(bool) {
-    if (bool) {
-      console.log('testproj_name is already in db');
-    } else {
-      console.log('testproj_name is NOT in db');
-    }
-  });
+ db.add_project("TestProj", "Description", [], function(success, name, img_paths) {
+   db.add_image("Image", "Path/Image", "TestProj", function(success, proj_name, image_path, image_index) {
+     var data = {"testdata" : 1, "yuhlkamsdl" : 2, "yah" : "data"};
+     db.add_image_meta("Path/Image", "TestProj", data, function(img_path, proj_name, meta_dict, success) {
+      console.log("success?:", success);
+     });
+     db.update_favorite_image("Path/Image", "TestProj", false, function(img_path, proj_name, fave_bool, success) {
+      db.get_image_metadata("Path/Image", "TestProj", function(img_path, proj_name, success) {
 
-  db.add_project('testproj_name', 'desc', ['path1'], function(success, name, img_paths) {
-    db.add_image_meta('testpath/testname2', 'testproj_name', 'aspdokpas', true, function(bool) {
-      console.log('adding add_image_meta Exif_int')
-      db.get_metadata_fields(function(fields) {
-        console.log('recieved', fields);
       });
-      db.has_image('testpath/testname2', 'testproj_name', function(bool) {
-        db.get_image_metadata('testpath/testname2', 'testproj_name', function(fields) {});
-        db.get_selected_image_metadata('testpath/testname2', 'testproj_name', ["fuckyou"], function(fields) {});
+      db.get_favorite_images_in_project("TestProj", function(proj_name, images) {
+        console.log("fav images:", images);
       });
-
-    });
-  });
-  
+      db.update_project_name("TestProj", "NewTestProj", function(old_name, new_name, success) {
+        db.get_projects(function() {})
+      });
+     });
+   });
+ });  
 });
 
 function createWindow () {

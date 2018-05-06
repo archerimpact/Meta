@@ -92,7 +92,8 @@ class Database {
     });
   }
 
-  /* Uses callback(boolean) to return if image was added successfully or not. */
+  // TODO: Add images in bulk?
+  /* Uses callback(success, proj_name, img_path) to return if image was added successfully or not. */
   add_image(img_name, img_path, proj_name, callback) {
     // Check if image has been made yet, if not create it
     var _this = this;
@@ -112,15 +113,13 @@ class Database {
           console.log('add_image: successfully added image', img_name, img_path, proj_name)
           success = true;
         }
-        callback(success, proj_name, image_path, image_index);
+        callback(success, proj_name, img_path);
       });
     });
   }
 
-  // TODO: handle spaces in metafields(?)
-  add_image_meta(img_path, proj_name, meta_key, meta_value, callback) {
-    // set metadata for image
-    // if column doesn't exist, add column
+  /* Uses callback(img_path, proj_name, meta_dict, success) to add metadata in a dictionary. */
+  add_image_meta(img_path, proj_name, meta_dict, callback) {    
     var _this = this;
     var db = this.db;
     db.serialize(function() {
@@ -132,35 +131,96 @@ class Database {
         columns.push(col.name);
       }, function() {
         console.log('add_project: columns', columns);
-        var col_exists = (columns.indexOf(meta_key) >= 0);
-
-        if (!col_exists) {
-          var meta_type = typeof meta_value;
-          db.run("ALTER TABLE Images ADD " + meta_key + " " + meta_type + ";");
-          console.log('add_project: col added', meta_key, meta_type);
+        for (var meta_key in meta_dict) {
+          var col_exists = (columns.indexOf(meta_key) >= 0);
+          var meta_value = meta_dict[meta_key];
+          if (!col_exists) {
+            var meta_type = typeof meta_value;
+            db.run("ALTER TABLE Images ADD " + meta_key + " " + meta_type + ";");
+            console.log('add_project: col added', meta_key, meta_type);
+          } else {
+            console.log('contains column', columns[meta_key])
+          }
         }
 
         var success = false;
         _this.has_image(img_path, proj_name, function(bool) {
           if (bool) {
-            var query = "UPDATE Images SET " + meta_key + "=? WHERE path=? AND proj_name=?"
+            var add_meta = "";
+            var meta_length = Object.keys(meta_dict).length;
+            var count = 0;
+            for (var meta_key in meta_dict) {
+              add_meta += meta_key + " = \"" + meta_dict[meta_key] + "\"";
+              if (count < meta_length - 1) {
+                add_meta += ", ";
+              }
+              count++;
+            }
+            var query = "UPDATE Images SET " + add_meta + " WHERE path=? AND proj_name=?";
+            console.log(query, "query");
             var stmt = db.prepare(query);
-            stmt.run([meta_value, img_path, proj_name]);
+            stmt.run([img_path, proj_name]);
             stmt.finalize();
             success = true;
-            console.log('add_image_meta: image', img_path, 'metadata', meta_key, meta_value)
+            console.log('add_image_meta: image', img_path, 'metadata', meta_dict);
           } else {
             console.log('add_image_meta: image', img_path, 'does not exist in', proj_name);
           }
-          callback(success);
+          callback(img_path, proj_name, meta_dict, success);
         });
       });
     });
-  }
+  }  
 
+  /* Uses callback(img_path, proj_name, fave_bool, success) to add image to a projects favorites list. */
+  update_favorite_image(img_path, proj_name, fave_bool, callback) {    
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      var success = false;
+      _this.has_image(img_path, proj_name, function(bool) {
+        if (bool) {
+          var fave_int = fave_bool ? 1 : 0;
+          var query = "UPDATE Images SET favorited=? WHERE path=? AND proj_name=?";
+          console.log(query, "query");
+          var stmt = db.prepare(query);
+          stmt.run([fave_int, img_path, proj_name]);
+          stmt.finalize();
+          success = true;
+          console.log('add_favorite_image: image', img_path, 'favorited', proj_name);
+        } else {
+          console.log('add_favorite_image: image', img_path, 'does not exist in', proj_name);
+        }
+        callback(img_path, proj_name, fave_bool, success);
+      });
+    });
+  }  
+
+  /* Uses callback(old_name, new_name, success) to update a project's name. */
   update_project_name(old_name, new_name, callback) {
-    this.has_project(old_name, function(bool) {
-      callback(true);
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      var success = false;
+      _this.has_project(old_name, function(bool) {
+        if (bool) {
+          _this.has_project(new_name, function(bool) {
+            if (!bool) {
+              var query = "UPDATE Projects SET name=? WHERE name=?";
+              var stmt = db.prepare(query);
+              stmt.run([new_name, old_name]);
+              stmt.finalize();
+              success = true;
+              console.log('update_project_name: proj', old_name, 'updated', new_name);
+            } else {
+              console.log("update_project_name: proj", new_name, "is already a project");
+            }
+          });
+        } else {
+          console.log('update_project_name: proj', old_name, 'does not exist');
+        }
+        callback(old_name, new_name, success);
+      });
     });
   }
 
@@ -192,7 +252,7 @@ class Database {
   }
 
   // TODO: add support for only showing images that satisfy a certain condition
-  /* Uses callback(list) to return a list of images in a project. */
+  /* Uses callback(proj_name,  list) to return a list of images in a project. */
   get_images_in_project(proj_name, callback) {
     // return list of tuples: (img_path, proj_name) — this is the PRIMARY KEY into the Images table
     var _this = this;
@@ -220,6 +280,33 @@ class Database {
     });
   }
 
+  /* Uses callback(proj_name, list) to return a list of favorited images in a project. */
+  get_favorite_images_in_project(proj_name, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      _this.has_project(proj_name, function(bool) {
+        if (bool) {
+          var images = [];
+          var stmt = db.prepare("SELECT img_name, path FROM Images WHERE proj_name = ? AND favorited = 1");
+          stmt.each([proj_name], function(err, row) {
+            if (err) {
+              throw error;
+            }
+            images.push(row);
+          }, function() {
+            console.log('get_favorite_images_in_project:', images, 'in', proj_name);
+            callback(proj_name, images);
+          });
+          stmt.finalize();
+        } else {
+          console.error('get_favorite_images_in_project:', proj_name, "does not exist");
+          callback(proj_name, []);
+        }
+      });
+    });
+  }
+
   /* Uses callback(list) to return list of metadata fields. */
   get_metadata_fields(callback) {
     var _this = this;
@@ -227,7 +314,7 @@ class Database {
     db.serialize(function() {
       var fields = [];
       var not_metadata = ["img_name", "path", "proj_name", "creation",
-                          "last_modified", "tags", "starred", "notes"];
+                          "last_modified", "tags", "favorited", "notes"];
       db.each("PRAGMA table_info(Images)", function(err, col) {
         if (err) {
           throw error;
@@ -243,7 +330,7 @@ class Database {
     });
   }
 
-  /* Uses callback(dictionary) to return dict of metafields to metadata.
+  /* Uses callback(img_path, proj_name, dictionary) to return dict of metafields to metadata.
    * Ignores any fields that are not filled in. */
   get_image_metadata(img_path, proj_name, callback) {
     var _this = this;
@@ -252,10 +339,10 @@ class Database {
       _this.has_image(img_path, proj_name, function(bool) {
         if (!bool) {
           console.log("get_image_metadata: Image not found", img_path);
-          callback({});
+          callback(img_path, proj_name, {});
         } else {
           var not_metadata = ["img_name", "path", "proj_name", "creation",
-                      "last_modified", "tags", "starred", "notes"];
+                      "last_modified", "tags", "favorited", "notes"];
           var stmt = db.prepare("SELECT * FROM Images WHERE path=? AND proj_name=?");
           stmt.get([img_path, proj_name], function(err, row) {
             for (var key in row) {
@@ -265,14 +352,14 @@ class Database {
             }
             console.log('get_image_metadata: row', row);
             stmt.finalize();
-            callback(row);
+            callback(img_path, proj_name, row);
           });
         }
       });
     });
   }
 
-  /* Uses callback(dictionary) to return dict of metafields to metadata.
+  /* Uses callback(img_path, proj_name, dictionary) to return dict of metafields to metadata.
    * Ignores any fields that are not filled in or not selected. */
   get_selected_image_metadata(img_path, proj_name, selected, callback) {
     var _this = this;
@@ -281,10 +368,10 @@ class Database {
       _this.has_image(img_path, proj_name, function(bool) {
         if (!bool) {
           console.log("get_selected_image_metadata: Image not found", img_path);
-          callback({});
+          callback(img_path, proj_name, {});
         } else {
           var not_metadata = ["img_name", "path", "proj_name", "creation",
-                      "last_modified", "tags", "starred", "notes"];
+                      "last_modified", "tags", "favorited", "notes"];
           var stmt = db.prepare("SELECT * FROM Images WHERE path=? AND proj_name=?");
           stmt.get([img_path, proj_name], function(err, row) {
             for (var key in row) {
@@ -295,7 +382,7 @@ class Database {
             }
             console.log('get_selected_image_metadata: row', row);
             stmt.finalize();
-            callback(row);
+            callback(img_path, proj_name, row);
           });
         }
       });
@@ -329,7 +416,7 @@ class Database {
       db.get(image_query, (err, row) => {
         if (row == undefined) {
           var create_image_table = "CREATE TABLE Images (img_name TEXT, path TEXT, proj_name TEXT, " +
-                                   "creation NUMERIC, last_modified NUMERIC, tags TEXT, starred TEXT, " +
+                                   "creation NUMERIC, last_modified NUMERIC, tags TEXT, favorited TEXT, " +
                                    "notes TEXT)";
           db.run(create_image_table);
           console.log("Images table created");
