@@ -5,9 +5,13 @@ const remote = require('electron').remote
 const getProjectJsonPath = require('./project.js').getProjectJsonPath
 const loadProject = require('./project.js').loadProject
 const Mustache = require('Mustache')
-const ExifImage = require('exif').ExifImage;
+// const ExifImage = require('exif').ExifImage;
 const { ExifTool } = require("exiftool-vendored");
 const exiftool = new ExifTool();
+const Chart = require('chart.js');
+// const echarts = require('echarts');
+// const select2 = require('select2');
+const Choices = require('Choices.js')
 
 var _data = [];
 var _currentProj;
@@ -22,14 +26,14 @@ function loadDetail(projectName){
 
 	redirect('detail');
 	loadHeader(project);
+	loadCharts();
+	selectPrep();
 	var images = project.getImages();
 	images.sort(compareTimestamp);
-	// console.log("images: " + images);
 	images.forEach(function(image) {
 		var img_path = image['path'];
 		var name = image['name'];
 		var metadata = image['metadata'];
-		// console.log(metadata);
 		//detailExifDisplay(img_path, name, metadata);
 		detailExifDisplay__NEW(img_path, name, metadata)
 	});
@@ -43,126 +47,6 @@ function compareTimestamp(image1, image2){
 		return 0;
 	else
 		return 1;
-}
-
-function insertDetailTemplate(data, id) {
-	imgdata = '';
-	exifdata = '';
-	gpsdata = '';
-	count = 0;
-	if (data.error) {
-		insertErrorTemplate(data, id);
-		return;
-	}
-	var dataForCsv = {'Image Name': id};
-	for (var key in data.exifData.image) {
-		dataForCsv[key] = data.exifData.image[key];
-		if (count == 0) {
-			imgdata += '<tr><td>' + key + ': ' + data.exifData.image[key] + '</td>';
-			count = 1;
-		} else {
-			imgdata += '<td>' + key + ': ' + data.exifData.image[key] + '</td></tr>';
-			count = 0;
-		}
-	}
-	count = 0;
-	for (var key in data.exifData.exif) {
-		dataForCsv[key] = data.exifData.exif[key];
-		if (count == 0) {
-			exifdata += '<tr><td>' + key + ': ' + data.exifData.exif[key] + '</td>';
-			count = 1;
-		} else {
-			exifdata += '<td>' + key + ': ' + data.exifData.exif[key] + '</td></tr>';
-			count = 0;
-		}
-	}
-	count = 0;
-	for (var key in data.exifData.gps) {
-		dataForCsv[key] = data.exifData.gps[key];
-		if (count == 0) {
-			gpsdata += '<tr><td>' + key + ': ' + data.exifData.gps[key] + '</td>';
-			count = 1;
-		} else {
-			gpsdata += '<td>' + key + ': ' + data.exifData.gps[key] + '</td></tr>';
-			count = 0;
-		}
-	}
-	if (gpsdata === '') {
-		gpsdata = '<tr><td>No GPS information available for this image</td></tr>'
-	}
-	if (exifdata === '') {
-		exifdata = '<tr><td>No Exif information available for this image</td></tr>'
-	}
-	if (imgdata === '') {
-		imgdata = '<tr><td>No capture information available for this image</td></tr>'
-	}
-
-	_data.push(dataForCsv);
-
-	var template = [
-			'<div class="col-md-4">',
-				'<a href="#">',
-					'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">',
-				'</a>',
-			'</div>',
-			'<div class="col-md-8">',
-				'<div class="row">',
-					'<div class="col-md-9">',
-						'<h3 style="word-wrap:break-word;">{{name}}</h3>',
-					'</div>',
-					'<div class="col-md-3">',
-						'<div class="dropdown">',
-							'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
-							  // octicons uninstalled for now
-								// '<span class="octicon octicon-gear"></span>',
-								'Options',
-							'</button>',
-							'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
-								'<li id="remove{{name}}" class="dropdown-item">Remove</li>',
-								// '<li id="rename{{name}}" class="dropdown-item">Rename</li>',
-								// '<li class="dropdown-item">Star</li>',
-							'</div>',
-						'</div>',
-					'</div>',
-				'</div>',
-				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#imagedata' + id + ' ">Image Info</button></span>',
-				'<div id="imagedata' + id +' " class="container collapse">',
-					'<table class="table table-bordered">',
-						imgdata,
-					'</table>',
-				'</div>',
-				'<br>',
-				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#exifdata' + id + ' ">Exif Data</button></span>',
-				'<div id="exifdata' + id +' " class="container collapse">',
-					'<table class="table table-bordered">',
-						exifdata,
-					'</table>',
-				'</div>',
-				'<br>',
-				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#gpsdata' + id + ' ">GPS Data</button></span>',
-				'<div id="gpsdata' + id +' " class="container collapse">',
-					'<table class="table table-bordered">',
-						gpsdata,
-					'</table>',
-					'<div style="width:100%;" id="map{{name}}"></div>',
-				'</div>',
-			'</div>',
-	].join("\n");
-
-	var filler = Mustache.render(template, data);
-	$("#detail-template" + data.name).append(filler);
-
-	setPhotoRemove(data.name);
-
-	if ('GPSLongitude' in data.exifData.gps && 'GPSLatitude' in data.exifData.gps) {
-		loadMap(
-			data.name,
-			data.exifData.gps.GPSLatitude,
-			data.exifData.gps.GPSLongitude,
-			data.exifData.gps.GPSLatitudeRef,
-			data.exifData.gps.GPSLongitudeRef,
-		);
-	}
 }
 
 function insertErrorTemplate(data, id) {
@@ -221,7 +105,6 @@ function loadMap(name, lat, long, latref, longref) {
 	if (longref.toLowerCase().includes('w') && long > 0) {
 		long = -1 * long;
 	}
-	// console.log(lat, long);
 	_map = new google.maps.Map(document.getElementById('map' + name), {
 	  zoom: 15,
 	  center: {'lat': lat, 'lng': long},
@@ -247,16 +130,12 @@ function tripleToDegree(dms) {
 
 function setPhotoRemove(name) {
 	var projName = document.getElementById('project-name').innerHTML;
-	console.log(name)
 	var elem = document.getElementById("remove" + name)
 	if (!elem) {
 		return;
 	}
 	elem.onclick = function() {
 		var projectPath = storage.getProject(projName);
-		console.log(projectPath);
-		console.log(projName);
-		console.log(storage)
 		var proj = loadProject(path.join(projectPath, projName + '.json'));
 		proj.removeImage(name);
 		proj.saveProject();
@@ -371,7 +250,6 @@ function loadHeader(project) {
 	};
 
 	document.getElementById("upload" + project.getName()).onclick = function() {
-		console.log('hello');
 		let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
 		for (var index in paths) {
 			var filename = path.basename(paths[index]).split(".")[0];
@@ -389,60 +267,8 @@ function clearDetailsHtml() {
 	_data = [];
 	document.getElementById("detail-header").innerHTML = ""
 	document.getElementById("image-wrapper").innerHTML = ""
+	document.getElementById("detail-charts").innerHTML = ""
 	// document.getElementById("file-label2").innerHTML = ""
-}
-
-function detailExifDisplay(imgpath, name, metadata) {
-	// Set default template.
-	var template = [
-		'<div id="detail-template{{name}}" class="row">',
-		'</div>',
-		'<hr id="hr{{name}}">'
-	].join("\n")
-	var filler = Mustache.render(template, {name: name});
-	$("#image-wrapper").append(filler);
-	if (!metadata) {
-		metadata = {};
-	}
-
-	if (Object.keys(metadata).length == 0) {
-		try {
-			console.log("generating metadata for " + name);
-			new ExifImage({ image : imgpath }, function (error, exifData) {
-					var data = {
-						'name': name,
-						'path': imgpath,
-						'exifData': {},
-						'error': "",
-					};
-					if (error) {
-							console.log('Error: ' + error.message);
-							data.error = error.message;
-					} else {
-							var types = ['exif', 'image', 'gps'];
-							for (var ind in types) {
-								var type = types[ind];
-								data.exifData[type] = exifData[type];
-								if (!data.exifData[type]) {
-									data.exifData[type] = {};
-								}
-								// these are not web-formatted and look like random symbols
-								// consider looking into formatting these
-								delete data.exifData.exif['MakerNote'];
-								delete data.exifData.exif['UserComment'];
-							}
-					}
-					_currentProj.setImageMetadata(name, data);
-					_currentProj.saveProject();
-					insertDetailTemplate(data, name);
-			});
-		} catch (error) {
-				console.log('Exif Error: ' + error.message);
-		}
-	} else {
-		console.log("using existing metadata for " + name);
-		insertDetailTemplate(metadata, name);
-	}
 }
 
 $("#add-image").submit(function(e) {
@@ -497,11 +323,10 @@ function detailExifDisplay__NEW(imgpath, name, metadata) {
 	exiftool
 		.read(imgpath)
 		.then(function(tags) {
-			console.log(tags);
 			data.exifData = {};
 			for (var key in tags) {
 				data.exifData[key] = tags[key];
-				processData(data);
+				data = processData(data);
 			}
 			insertDetailTemplate__NEW(data, name);
 		})
@@ -512,6 +337,16 @@ function detailExifDisplay__NEW(imgpath, name, metadata) {
 		});
 }
 
+// format of data is
+// {
+//  error: String ("" if no error)
+//  name: String (photo name)
+//  path: String
+// 	exifData: {...}
+//  favData: {...}
+//  gpsData: {...}
+//  fileData: {...}
+// }
 function insertDetailTemplate__NEW(data, id) {
 	if (data.error) {
 		insertErrorTemplate(data, id);
@@ -540,19 +375,25 @@ function insertDetailTemplate__NEW(data, id) {
 		} else {
 			disableds[name] = '';
 		}
-		if (!content.endsWith('</tr>')) {
+		if (content && !content.endsWith('</tr>')) {
 			content += '</tr>';
 		}
+		contents[name] = content
 	}
 
 	// _data.push(dataForCsv);
 
 	var flag_string = 'Flagged as modified';
+	var is_modified = false
 	// TODO implement flag trigger
-	var is_modified = false;
-	var flag_trigger = '';
+	if (contents['exif'].toLowerCase().includes('adobe')) {
+		flag_string = 'File modified by Adobe software.'
+		is_modified = true
+
+	}
+	var flag_trigger = 'hidden';
 	if (is_modified) {
-		flag_trigger = 'hidden';
+		flag_trigger = '';
 	}
 
 	var template = [
@@ -565,19 +406,7 @@ function insertDetailTemplate__NEW(data, id) {
 					'<div class="col-md-8">',
 						'<h3 style="word-wrap:break-word;">{{name}}</h3>',
 						// tags
-						'<div>',
-							'<input type="text" placeholder="Add tag" name="tag">',
-							// one new label per tag, with appropriate color
-							'<h3 style="display:inline">',
-								'<span class="badge badge-pill badge-primary">', //style="background-color:#00ffff">',
-									'Fun',
-								'</span> ',
-								'<span class="badge badge-pill badge-primary" style="background-color:#00ffff">',
-									'Party',
-								'</span> ',
-							'</h2>',
-						'</div>',
-						'<br>',
+							'<input type="text" class="choices-tags form-control choices__input is-hidden" id="tags{{name}}" multiple>',
 						'<textarea class="form-control" rows="3" placeholder="Notes" />',
 					'</div>',
 					'<div class="col-md-4">',
@@ -596,9 +425,7 @@ function insertDetailTemplate__NEW(data, id) {
 						'</div>',
 						// search bar
 						'<br>',
-						'<input type="text" placeholder="Exif search">',
-						'<tr><th> Search results </th></tr>',
-
+						'<select class="form-control choices__input is-hidden" id="search{{name}}" multiple></select>',
 					'</div>',
 				'</div>',
 			'</div>',
@@ -649,6 +476,7 @@ function insertDetailTemplate__NEW(data, id) {
 					'<table class="table table-bordered">',
 						contents.gps,
 					'</table>',
+					'<div id="map{{name}}" style="width:100%;height:400px"></div>',
 				'</div>',
 			'</div>',
 		'</div>',
@@ -657,125 +485,194 @@ function insertDetailTemplate__NEW(data, id) {
 	var filler = Mustache.render(template, data);
 	$("#detail-template" + data.name).append(filler);
 
+	var latitude;
+	var longitude;
+	if ('GPSLatitude' in data.gpsData) {
+		latitude = data.gpsData.GPSLatitude
+		longitude = data.gpsData.GPSLongitude
+	}
+	addMap(
+		"map" + data.name,
+		[{'lat':latitude, 'lng':longitude}],
+	)
+
 	$('[data-toggle="tooltip"]').tooltip();
 
-	// console.log(data);
 	setPhotoRemove(data.name);
 
-	// if ('GPSLongitude' in data.exifData.gps && 'GPSLatitude' in data.exifData.gps) {
-	// 	loadMap(
-	// 		data.name,
-	// 		data.exifData.gps.GPSLatitude,
-	// 		data.exifData.gps.GPSLongitude,
-	// 		data.exifData.gps.GPSLatitudeRef,
-	// 		data.exifData.gps.GPSLongitudeRef,
-	// 	);
-	// }
+	var tags = getTagsForName(data.name);
+
+	var choices = new Choices($('#tags' + data.name)[0], {
+		items: tags,
+		removeItemButton: true,
+		editItems: true,
+		duplicateItems: false,
+		placeholder: "Enter/select a tag"
+	})
+
+	var choices = new Choices($('#search' + data.name)[0], {
+		choices: data.ref,
+		paste: false,
+		duplicateItems: false,
+		placeholder: "Enter/select a tag",
+		itemSelectText: '',
+		duplicateItems: true,
+	})
+
+}
+
+//TODO
+function getTagsForName(name) {
+	return [
+		{
+			value: 'Outdoors',
+			label: 'Outdoors',
+		},
+		{
+			value: 'Berkeley',
+			label: 'Berkeley',
+		}
+	]
 }
 function isStr(maybeString) {
 	return maybeString && !(maybeString == "");
 }
 
 function processData(data) {
-	var remove= ["FileName", "Directory", "FileTypeExtension"]
-	var files = ["SourceFile", ]
+	data.ref = []
+	var file = [
+		"SourceFile",
+		"Directory",
+		"FileType",
+		"FileTypeExtension",
+		"FileModifyDate",
+		"FileAccessDate",
+		"FilePermissions",
+		"FileInodeChangeDate",
+		"MIMEType",
+	]
+	var favories = getFavDataKeys();
 	for (var key in data.exifData) {
+		var val = data.exifData[key];
+		data.ref.push({
+		  value: '',
+		  label: key + ": " + val,
+		  selected: false,
+		  disabled: false,
+		})
 		if (key == "errors" && !isStr(data.exifData[key])) {
 			delete data.exifData[key];
 		}
-		if (key in remove) {
-			console.log("deleting " + key);
-			delete data.exifData[key];
+		if (file.includes(key)) {
+			data.fileData[key] = data.exifData[key]
+			delete data.exifData[key]
+		}
+		if (favories.includes(key)) {
+			data.favData[key] = data.exifData[key]
+			delete data.exifData[key]
 		}
 		if (key.toLowerCase().includes("gps")) {
 			data.gpsData[key] = data.exifData[key];
 			delete data.exifData['key']
 		}
-
-
 	}
+	return data
 }
 
-function newTemplate(data, id) {
-	var template = [
-		'<div class="row">',
-			'<div class="col-md-4">',
-				'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">', // add image features here
+//TODO return favorite fields as strings in array
+function getFavDataKeys() {
+	return []
+}
+
+function loadCharts() {
+	template = [
+		'<div class="row container-fluid">',
+			'<div class="col-sm-6 col-xs-12">',
+				'<div class="x_panel">',
+					'<div class="clearfix"></div>',
+					'<div class="x_content">',
+						'<canvas id="lineChart"></canvas>',
+					'</div>',
+				'</div>',
 			'</div>',
-			'<div class="col-md-8">',
-				'<div class="row">',
-					'<div class="col-md-8">',
-						'<h3 style="word-wrap:break-word;">{{name}}</h3>',
-						// tags
-						'<div>',
-							'<input type="text" placeholder="Add tag" name="tag">',
-							// one new label per tag, with appropriate color
-							'<span class="label label-success" style="background-color:#00ffff">',
-								'Fun',
-							'</span>',
-							'<span class="label label-warning" style="background-color:#00ffff">',
-								'Party',
-							'</span>',
+			'<div class="col-sm-6 col-xs-12">',
+				'<div style="width:100%;" id="trendsmap"></div>',
+			'</div>',
+		'</div>',
+		'<div class="row contriner-fluid">',
+			'<div class=" col-md-4 col-xs-12">',
+				'<div class="clearfix"></div>',
+				'<div class="panel-group">',
+					'<div class="panel panel-default">',
+						'<div class="panel-body">',
+							'<canvas id="pie1"></canvas>',
 						'</div>',
-						'<textarea class="form-control" id="exampleTextarea" rows="3" placeholder="Notes">',
 					'</div>',
-					'<div class="col-md-4">',
-
-						'<div class="row">',
-							'<img src="./assets/alert.svg"/>',
-							'<div class="dropdown">',
-								'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
-									'Options',
-								'</button>',
-								'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
-									'<li id="remove{{name}}" class="dropdown-item">Remove</li>',
-									'<li id="rename{{name}}" class="dropdown-item">Rename</li>',
-								'</div>',
-							'</div>',
-						'</div>',
-						// search bar
-						'<input type="text" placeholder="Exif search">',
-						'<tr><th> Search results </th></tr>',
-
-					'</div>',
+				'</div>',
+			'</div>',
+			'<div class=" col-md-4 col-xs-12">',
+				'<div class="clearfix"></div>',
+				'<div class="panel panel-default">',
+					'<canvas id="pie2"></canvas>',
+				'</div>',
+			'</div>',
+			'<div class=" col-md-4 col-xs-12">',
+				'<div class="clearfix"></div>',
+				'<div class="x_content">',
+					'<canvas id="pie3"></canvas>',
 				'</div>',
 			'</div>',
 		'</div>',
-		'<div class="row">',
-			'<div class="col-lg-6">',
-				// favorites
-				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#favdata' + id + ' ">Favorite fields</button></span>',
-				'<div id="favdata' + id +' " class="container collapse">',
-					'<table class="table table-bordered">',
-						exifdata,
-					'</table>',
-				'</div>',
-				'<br>',
-				//file info
-				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#filedata' + id + ' ">File Info</button></span>',
-				'<div id="filedata' + id +' " class="container collapse">',
-					'<table class="table table-bordered">',
-						exifdata,
-					'</table>',
-				'</div>',
-			'</div>',
-			'<div class="col-lg-6">',
-				// general Exif
-				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#exifdata' + id + ' ">Exif Data</button></span>',
-				'<div id="exifdata' + id +' " class="container collapse">',
-					'<table class="table table-bordered">',
-						exifdata,
-					'</table>',
-				'</div>',
-				'<br>',
-				// GPS
-				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#gpsdata' + id + ' ">GPS Data</button></span>',
-				'<div id="gpsdata' + id +' " class="container collapse">',
-					'<table class="table table-bordered">',
-						exifdata,
-					'</table>',
-				'</div>',
-			'</div>',
 	].join("\n");
-	return template;
+
+	$("#detail-charts").append(template);
+
+	addLineChart(
+		"lineChart",
+		["2000", "2001", "2002", "2003", "2004"],
+		"Photos Taken",
+		[100, 200, 400, 50, 350]
+	)
+	addPieChart(
+		"pie1",
+		["Cannon", "Nikon", "Apple", "Samsung"],
+		[25, 40, 100, 20],
+		"Cameras"
+	)
+	addPieChart(
+		"pie2",
+		["Cannon", "Nikon", "Apple", "Samsung"],
+		[25, 40, 100, 20],
+		"Data"
+	)
+	addPieChart(
+		"pie3",
+		["Cannon", "Nikon", "Apple", "Samsung"],
+		[25, 40, 100, 20],
+		"Stuff"
+	)
+	addMap(
+		"trendsmap",
+		[
+			{'lat':10, 'lng':10},
+			{'lat':20, 'lng':20},
+		]
+	)
+	var ref = document.getElementById('lineChart');
+	var div = document.getElementById('trendsmap')
+	var width = ref.offsetWidth / 2
+	if (width > 0) {
+		div.style.height = width.toString() + 'px';
+	} else {
+		div.style.height = '400px';
+	}
+
+}
+
+// THIS IS NOT WORKING
+function selectPrep() {
+	var ts = $(".tag-selector");
+	// ts.select2({
+  // 	tags: true
+	// });
 }
