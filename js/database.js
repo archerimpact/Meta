@@ -315,6 +315,33 @@ class Database {
     });
   }
 
+  /* Deletes the specified project from the database. */
+  delete_project(proj_name, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      /* Delete relevant images from Images table. */
+      stmt = db.prepare("DELETE FROM Images WHERE proj_name=?");
+      stmt.run([proj_name], function(err) {
+        if (err) {
+          throw error;
+        }
+      });
+      stmt.finalize();
+    });
+
+    /* Delete project from Projects table. */
+    var stmt = db.prepare("DELETE FROM Projects WHERE name=?");
+    stmt.run([proj_name], function(err) {
+      if (err) {
+        throw error;
+      } else {
+        callback(true);
+      }
+    });
+    stmt.finalize();
+  }
+
   init_database() {
     var db = new sqlite3.Database(db_filename, (err) => {
       if (err) {

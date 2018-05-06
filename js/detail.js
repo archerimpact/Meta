@@ -24,6 +24,14 @@ function alert_image_upload(bool, project_name, img_path, index, num_images) {
 	}
 }
 
+function delete_project_callback(bool) {
+	if (bool) {
+		redirect('projects');
+	} else {
+		alert("Unable to delete project");
+	}
+}
+
 function loadDetail(projectName) {
 	console.log("loadDetail invoked");
 	_currentProj = projectName;
@@ -455,8 +463,7 @@ function loadHeader(project) {
 	document.getElementById("delete" + project['name']).onclick = function() {
 		var ans = confirm("Are you sure you want to delete this project?");
 		if (ans) {
-			database.delete_project(project['name']);
-			redirect('projects');
+			database.delete_project(project['name'], delete_project_callback);
 		}
 	};
 
