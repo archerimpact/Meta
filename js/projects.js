@@ -1,9 +1,10 @@
 const Mustache = require('Mustache');
-const loadProject = require('./js/project.js').loadProject
 const remote = require('electron').remote;
 const fs = require('fs');
+const loadDetail = require('./js/detail.js').loadDetail;
 
-var lib = storage.getAllProjects();
+
+var database = electron.remote.getGlobal('sharedObj').db;
 
 function showProject(name, desc, imgsrc) {
   var displayName = name.replace(/__/g, " ");
@@ -62,35 +63,21 @@ function showNewProject() {
 }
 
 function populateProjectsScreen() {
-  // var storage = remote.getGlobal('sharedObj').store;
-  lib = storage.getAllProjects();
-  showNewProject();
-  var proj_list = [];
-  for (var proj in lib) {
-    proj_list.push(proj);
-  }
+  database.get_projects(function (projects_list) {
+    showNewProject();
 
-  console.log(proj_list)
+    projects_list.sort(compareTimestamp);
 
-  proj_list.sort(compareTimestamp);
-
-  proj_list.forEach(function (proj) {
-    var project = getProject(proj);
-    if (!project) {
-      storage.deleteProject(proj);
-    } else {
-      // uncomment this when images working
-      var imgsrc = project.getImages()[0]['path'];
-      if (!fs.existsSync(imgsrc)) {
-        imgsrc = "https://static1.squarespace.com/static/5a6557ae692ebe609770a2a7/t/5a67a1be0852291d033bb08b/1518849801599/?format=1500w";
-      }
-      console.log("showing " + project.getName())
-      showProject(project.getName(), project.getDescription(), imgsrc);// "https://upload.wikimedia.org/wikipedia/commons/d/d1/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg");
-    }
-  })
+    projects_list.forEach(function (proj) {
+      database.get_project_thumbnail(proj['name'], function (thumbnail_path) {
+        if (thumbnail_path == "" || !fs.existsSync(thumbnail_path)) {
+          thumbnail_path = "https://static1.squarespace.com/static/5a6557ae692ebe609770a2a7/t/5a67a1be0852291d033bb08b/1518849801599/?format=1500w";
+        }
+        showProject(proj['name'], proj['description'], thumbnail_path);// "https://upload.wikimedia.org/wikipedia/commons/d/d1/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg");
+      });
+    });
+  });
 }
-
-populateProjectsScreen()
 
 function getProject(projName) {
   if (!(projName in lib)) {
@@ -102,20 +89,14 @@ function getProject(projName) {
 }
 
 // Comparator that puts newer projects before older ones.
-function compareTimestamp(proj1, proj2){
-  console.log(proj1);
-  console.log(proj2);
-  var p1 = getProject(proj1);
-  var p2 = getProject(proj2);
-  if (!p2) {
+function compareTimestamp(proj1, proj2) {
+  if (!proj1 || !proj2) {
     return -1;
   }
-  if (!p1) {
-    return 1;
-  }
-  if (p1.getLastModified() > p2.getLastModified())
+
+  if (proj1["last_modified"] > proj2["last_modified"])
     return -1;
-  else if (p1.getLastModified() == p2.getLastModified())
+  else if (proj1["last_modified"] == proj2["last_modified"])
     return 0;
   else
     return 1;
@@ -124,5 +105,4 @@ function compareTimestamp(proj1, proj2){
 function refreshProjects() {
   document.getElementById("projects-body").innerHTML = "";
   populateProjectsScreen()
-  console.log('refresh')
 }

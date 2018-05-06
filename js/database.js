@@ -6,11 +6,12 @@ const sqlite3 = require('sqlite3')
 const userDataPath = (electron.app || electron.remote.app).getPath('userData');
 const db_filename = path.join(userDataPath, 'meta.db');
 
+console.log(db_filename);
+
 class Database {
   constructor(opts) {
     this.db = this.init_database();
     this.last_image_id = 0;
-    console.log(db_filename);
   }
 
   /* Uses callback(boolean) to return if Projects contains name. */
@@ -21,13 +22,10 @@ class Database {
       if (err) {
         throw error;
       }
-      console.log()
       if (row == undefined) {
         bool = false;
-        console.log('has_project: project', name, 'is NOT in Projects');
-      } else {
-        console.log('has_project: project', name, 'is in Projects');
       }
+
       callback(bool);
     });
     stmt.finalize();
@@ -43,7 +41,6 @@ class Database {
     var db = this.db;
     this.has_project(proj_name, function(bool) {
       if (!bool) {
-        console.log("has_image: Project not found", proj_name);
         callback(false);
       } else {
         var stmt = db.prepare("SELECT * FROM Images WHERE path = ? AND proj_name = ?");
@@ -54,10 +51,8 @@ class Database {
           }
           if (row == undefined) {
             bool = false;
-            console.log('has_image: image', img_path, 'is NOT in Images');
-          } else {
-            console.log('has_image: image', img_path, 'is in Images');
           }
+
           callback(bool);
         });
         stmt.finalize();
@@ -83,10 +78,8 @@ class Database {
           stmt.run(name, description, created, created);
           stmt.finalize();
           success = true;
-          console.log('add_project: project', name, description, 'was created successfully');
-        } else {
-          console.log('add_project: project', name, description, 'could not be created');
         }
+
         callback(success, name, img_paths);
       });
     });
@@ -98,18 +91,14 @@ class Database {
     var _this = this;
     var db = this.db;
     var success = false;
-    console.log("adding image");
     db.serialize(function() {
       _this.has_image(img_path, proj_name, function(bool) {
-        if (bool) {
-          console.log('add_image:', img_name, 'already in', proj_name);
-        } else {
+        if (!bool) {
           var stmt = db.prepare("INSERT INTO Images (img_name, path, proj_name, " +
                                 "creation, last_modified, tags, starred, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
           var created = Date.now();
           stmt.run(img_name, img_path, proj_name, created, created, "", "", "");
           stmt.finalize();
-          console.log('add_image: successfully added image', img_name, img_path, proj_name)
           success = true;
         }
         callback(success, proj_name, img_path, index, num_images);
@@ -131,13 +120,11 @@ class Database {
         }
         columns.push(col.name);
       }, function() {
-        console.log('add_project: columns', columns);
         var col_exists = (columns.indexOf(meta_key) >= 0);
 
         if (!col_exists) {
           var meta_type = typeof meta_value;
           db.run("ALTER TABLE Images ADD " + meta_key + " " + meta_type + ";");
-          console.log('add_project: col added', meta_key, meta_type);
         }
 
         var success = false;
@@ -148,10 +135,8 @@ class Database {
             stmt.run([meta_value, img_path, proj_name]);
             stmt.finalize();
             success = true;
-            console.log('add_image_meta: image', img_path, 'metadata', meta_key, meta_value)
-          } else {
-            console.log('add_image_meta: image', img_path, 'does not exist in', proj_name);
           }
+
           callback(success);
         });
       });
@@ -192,7 +177,7 @@ class Database {
     var db = this.db;
     db.serialize(function() {
       var projects = [];
-      var stmt = db.prepare("SELECT name, description FROM Projects");
+      var stmt = db.prepare("SELECT * FROM Projects");
       stmt.each(function(err, row) {
         if (err) {
           throw error;
@@ -200,10 +185,37 @@ class Database {
         projects.push(row);
         // is this syntax correct?
       }, function() {
-        console.log('get_projects: list of projects', projects);
         callback(projects);
       });
       stmt.finalize();
+    });
+  }
+
+  /* Get thumbnail for specified project. */
+  get_project_thumbnail(proj_name, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      _this.has_project(proj_name, function(bool) {
+        if (bool) {
+          var stmt = db.prepare("SELECT * FROM Images WHERE proj_name = ?");
+          stmt.get([proj_name], function(err, row) {
+            if (err) {
+              throw error;
+            }
+
+            if (row != undefined) {
+              callback(row['path']);
+            }
+            else {
+              callback("");
+            }
+          });
+          stmt.finalize();
+        } else {
+          callback("");
+        }
+      });
     });
   }
 
@@ -221,12 +233,10 @@ class Database {
             if (err) {
               throw error;
             }
-            console.log('get_images_in_project:', rows, 'in', proj_name);
             callback(proj_name, rows);
           });
           stmt.finalize();
         } else {
-          console.error('get_images_in_project:', proj_name, "does not exist");
           callback(proj_name, []);
         }
       });
@@ -250,7 +260,6 @@ class Database {
           fields.push(name);
         }
       }, function() {
-        console.log('get_metadata_fields: fields', fields);
         callback(fields);
       });
     });
@@ -264,7 +273,6 @@ class Database {
     db.serialize(function() {
       _this.has_image(img_path, proj_name, function(bool) {
         if (!bool) {
-          console.log("get_selected_image_metadata: Image not found", img_path);
           callback(false, img_name, img_path, proj_name, {});
         } else {
           var not_metadata = ["img_name", "path", "proj_name", "creation",
@@ -276,7 +284,6 @@ class Database {
                 delete row[key];
               }
             }
-            console.log('get_image_metadata: row', row);
             callback(true, img_name, img_path, proj_name, row);
           });
           stmt.finalize();
@@ -293,7 +300,6 @@ class Database {
     db.serialize(function() {
       _this.has_image(img_path, proj_name, function(bool) {
         if (!bool) {
-          console.log("get_selected_image_metadata: Image not found", img_path);
           callback({});
         } else {
           var not_metadata = ["img_name", "path", "proj_name", "creation",
@@ -306,7 +312,6 @@ class Database {
                 delete row[key];
               }
             }
-            console.log('get_image_metadata: row', row);
             stmt.finalize();
             callback(row);
           });
@@ -350,8 +355,6 @@ class Database {
 
       // if meta.db was just created, create Images and Projects tables.
       this.create_tables_if_new_db(db);
-
-      console.log('Connected to the meta database.');
     });
 
     return db;
@@ -372,13 +375,10 @@ class Database {
                                    "creation NUMERIC, last_modified NUMERIC, tags TEXT, starred TEXT, " +
                                    "notes TEXT)";
           db.run(create_image_table);
-          console.log("Images table created");
-        } else {
-          console.log("Images table loaded");
         }
 
         if (err) {
-          console.log("Error during Images construction: " + err);
+          throw err;
         }
       });
 
@@ -388,13 +388,10 @@ class Database {
           var create_project_table = "CREATE TABLE Projects (name TEXT, description TEXT," +
                                      "creation NUMERIC, last_modified NUMERIC)";
           db.run(create_project_table);
-          console.log("Projects table created");
-        } else {
-          console.log("Projects table loaded");
         }
 
         if (err) {
-          console.log("Error during Projects construction: " + err);
+          throw err;
         }
       });
 
@@ -403,13 +400,10 @@ class Database {
         if (row == undefined) {
           var create_setting_table = "CREATE TABLE Settings (type TEXT, setting TEXT)";
           db.run(create_setting_table);
-          console.log("Settings table created");
-        } else {
-          console.log("Settings table loaded");
         }
 
         if (err) {
-          console.log("Error during Settings construction: " + err);
+          throw err;
         }
       });
     });

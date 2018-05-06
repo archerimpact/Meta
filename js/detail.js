@@ -17,8 +17,6 @@ function alert_image_upload(bool, project_name, img_path, index, num_images) {
 		alert("Unable to add image");
 		return
 	} else if (index == num_images - 1) {
-		console.log("added all images");
-
 		/* Load project view. */
 		load_detail(project_name);
 	}
@@ -33,7 +31,6 @@ function delete_project_callback(bool) {
 }
 
 function loadDetail(projectName) {
-	console.log("loadDetail invoked");
 	_currentProj = projectName;
 
 	clearDetailsHtml();
@@ -42,14 +39,12 @@ function loadDetail(projectName) {
 
 	/* Display project header. */
 	database.get_project(projectName, function(row) {
-		console.log("got project");
 		loadHeader(row);
 	});
 
 	/* Display images in this project. */
 	database.get_images_in_project(projectName, function(projectName, image_list) {
 		image_list.sort(compareTimestamp);
-		console.log("got images: " + image_list.length + ", " + JSON.stringify(image_list));
 
 		image_list.forEach(function(image) {
 			var image_path = image['path'];
@@ -73,8 +68,6 @@ function compareTimestamp(image1, image2){
 
 function insert_detail_template_callback(bool, img_name, img_path, proj_name, metadata_row) {
 	if (bool) {
-		console.log("insert_detail_template_callback received: " + Object.keys(metadata_row).length);
-
 		var data = {
 				'name': img_name,
 				'path': img_path,
@@ -324,7 +317,6 @@ function loadMap(name, lat, long, latref, longref) {
 	if (longref.toLowerCase().includes('w') && long > 0) {
 		long = -1 * long;
 	}
-	// console.log(lat, long);
 	_map = new google.maps.Map(document.getElementById('map' + name), {
 	  zoom: 15,
 	  center: {'lat': lat, 'lng': long},
@@ -350,7 +342,6 @@ function tripleToDegree(dms) {
 
 function setPhotoRemove(name) {
 	var projName = document.getElementById('project-name').innerHTML;
-	console.log(name)
 	var elem = document.getElementById("remove" + name)
 	if (!elem) {
 		return;
@@ -468,7 +459,6 @@ function loadHeader(project) {
 	};
 
 	document.getElementById("upload" + project['name']).onclick = function() {
-		console.log('hello');
 		let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
 		for (var index in paths) {
 			var filename = path.basename(paths[index]).split(".")[index];
@@ -533,8 +523,6 @@ function getFavDataKeys() {
 
 function detailExifDisplay(imgpath, imgname, projname, metadata) {
 	// Set default template.
-	console.log("received metadata for image: " + imgname + ", " + metadata);
-
 	var template = [
 		'<div id="detail-template{{name}}" class="row">',
 		'</div>',
@@ -546,10 +534,6 @@ function detailExifDisplay(imgpath, imgname, projname, metadata) {
 		metadata = {};
 	}
 
-	/* Use add_image_meta(img_path, proj_name, meta_key, meta_value, callback). */
-
-	/* TODO(Franklin): Decide on image metadata groupings/how they will be stored in the table. */
-
 	if (Object.keys(metadata).length == 0) {
 		try {
 			console.log("generating metadata for " + imgname);
@@ -557,11 +541,9 @@ function detailExifDisplay(imgpath, imgname, projname, metadata) {
 			exiftool
 				.read(imgpath)
 				.then(function(tags) {
-					console.log(tags);
 					for (var key in tags) {
 						database.add_image_meta(imgpath, projname, key, tags[key], detail_exif_display_callback);
 					}
-					console.log(tags);
 					insertDetailTemplate(imgname, imgpath, projname);
 					// insertDetailTemplate__NEW(data, name);
 				})
