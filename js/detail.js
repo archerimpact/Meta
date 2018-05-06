@@ -58,7 +58,7 @@ function insertErrorTemplate(data, id) {
 	var template = [
 			'<div class="col-md-4">',
 				'<a href="#">',
-					'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">',
+					'<img class="img-responsive rounded" src="{{path}}" alt="">',
 				'</a>',
 			'</div>',
 			'<div class="col-md-8">',
@@ -399,7 +399,7 @@ function insertDetailTemplate__NEW(data, id) {
 	var template = [
 		'<div class="row">',
 			'<div class="col-md-4">',
-				'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">', // add image features here
+				'<img class="img-responsive rounded" src="{{path}}" alt="">', // add image features here
 			'</div>',
 			'<div class="col-md-8">',
 				'<div class="row">',
