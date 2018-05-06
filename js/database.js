@@ -40,12 +40,13 @@ class Database {
   has_image(img_path, proj_name, callback) {
     // return whether image with given path already exists for a given project
     var _this = this;
+    var db = this.db;
     this.has_project(proj_name, function(bool) {
       if (!bool) {
         console.log("has_image: Project not found", proj_name);
         callback(false);
       } else {
-        var stmt = _this.db.prepare("SELECT * FROM Images WHERE path = ? AND proj_name = ?");
+        var stmt = db.prepare("SELECT * FROM Images WHERE path = ? AND proj_name = ?");
         stmt.get([img_path, proj_name], function(err, row) {
           var bool = true;
           if (err) {
@@ -92,9 +93,8 @@ class Database {
     });
   }
 
-  // TODO: Add images in bulk?
-  /* Uses callback(success, proj_name, img_path) to return if image was added successfully or not. */
-  add_image(img_name, img_path, proj_name, callback) {
+  /* Uses callback(boolean) to return if image was added successfully or not. */
+  add_image(img_name, img_path, proj_name, index, num_images, callback) {
     // Check if image has been made yet, if not create it
     var _this = this;
     var db = this.db;
@@ -106,14 +106,14 @@ class Database {
           console.log('add_image:', img_name, 'already in', proj_name);
         } else {
           var stmt = db.prepare("INSERT INTO Images (img_name, path, proj_name, " +
-                                "creation, last_modified) VALUES (?, ?, ?, ?, ?)");
+                                "creation, last_modified, tags, starred, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
           var created = Date.now();
-          stmt.run(img_name, img_path, proj_name, created, created);
+          stmt.run(img_name, img_path, proj_name, created, created, "", "", "");
           stmt.finalize();
           console.log('add_image: successfully added image', img_name, img_path, proj_name)
           success = true;
         }
-        callback(success, proj_name, img_path);
+        callback(success, proj_name, img_path, index, num_images);
       });
     });
   }
@@ -230,6 +230,22 @@ class Database {
     callback(bool);
   }
 
+  /* Get information for a specific project. */
+  get_project(projectName, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      var stmt = db.prepare("SELECT * FROM Projects WHERE name=?");
+      stmt.get([projectName], function(err, row) {
+        if (err) {
+          throw error;
+        }
+        callback(row);
+      });
+      stmt.finalize();
+    });
+  }
+
   /* Use callback(list) to return a list of projects. */
   get_projects(callback) {
     var _this = this;
@@ -260,16 +276,13 @@ class Database {
     db.serialize(function() {
       _this.has_project(proj_name, function(bool) {
         if (bool) {
-          var images = [];
-          var stmt = db.prepare("SELECT img_name, path FROM Images WHERE proj_name = ?");
-          stmt.each([proj_name], function(err, row) {
+          var stmt = db.prepare("SELECT * FROM Images WHERE proj_name = ?");
+          stmt.all([proj_name], function(err, rows) {
             if (err) {
               throw error;
             }
-            images.push(row);
-          }, function() {
-            console.log('get_images_in_project:', images, 'in', proj_name);
-            callback(proj_name, images);
+            console.log('get_images_in_project:', rows, 'in', proj_name);
+            callback(proj_name, rows);
           });
           stmt.finalize();
         } else {
@@ -330,16 +343,16 @@ class Database {
     });
   }
 
-  /* Uses callback(img_path, proj_name, dictionary) to return dict of metafields to metadata.
+  /* Uses callback(bool, img_name, img_path, proj_name, {}) to return dict of metafields to metadata.
    * Ignores any fields that are not filled in. */
-  get_image_metadata(img_path, proj_name, callback) {
+  get_image_metadata(img_path, img_name, proj_name, callback) {
     var _this = this;
     var db = this.db;
     db.serialize(function() {
       _this.has_image(img_path, proj_name, function(bool) {
         if (!bool) {
-          console.log("get_image_metadata: Image not found", img_path);
-          callback(img_path, proj_name, {});
+          console.log("get_selected_image_metadata: Image not found", img_path);
+          callback(false, img_name, img_path, proj_name, {});
         } else {
           var not_metadata = ["img_name", "path", "proj_name", "creation",
                       "last_modified", "tags", "favorited", "notes"];
@@ -352,7 +365,7 @@ class Database {
             }
             console.log('get_image_metadata: row', row);
             stmt.finalize();
-            callback(img_path, proj_name, row);
+            callback(true, img_name, img_path, proj_name, row);
           });
         }
       });

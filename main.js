@@ -32,13 +32,13 @@ global.sharedObj = {db: db};
 // for testing
 db.db.serialize(function() {
  db.add_project("TestProj", "Description", [], function(success, name, img_paths) {
-   db.add_image("Image", "Path/Image", "TestProj", function(success, proj_name, image_path, image_index) {
+   db.add_image("Image", "Path/Image", "TestProj", 1, 1, function(success, proj_name, img_path, index, num_images) {
      var data = {"testdata" : 1, "yuhlkamsdl" : 2, "yah" : "data"};
      db.add_image_meta("Path/Image", "TestProj", data, function(img_path, proj_name, meta_dict, success) {
       console.log("success?:", success);
      });
      db.update_favorite_image("Path/Image", "TestProj", false, function(img_path, proj_name, fave_bool, success) {
-      db.get_image_metadata("Path/Image", "TestProj", function(img_path, proj_name, success) {
+      db.get_image_metadata("Path/Image", "Image", "TestProj", function(bool, img_name, img_path, proj_name, meta_dict) {
 
       });
       db.get_favorite_images_in_project("TestProj", function(proj_name, images) {

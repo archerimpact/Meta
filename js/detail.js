@@ -2,168 +2,266 @@ const electron = require('electron')
 const path = require('path')
 const fs = require('fs')
 const remote = require('electron').remote
-const getProjectJsonPath = require('./project.js').getProjectJsonPath
-const loadProject = require('./project.js').loadProject
 const Mustache = require('Mustache')
 const ExifImage = require('exif').ExifImage;
+const { ExifTool } = require("exiftool-vendored");
+const exiftool = new ExifTool();
 
 var _data = [];
 var _currentProj;
 var paths_global;
-//var storage = remote.getGlobal('sharedObj').store;
+var database = electron.remote.getGlobal('sharedObj').db;
 
-function loadDetail(projectName){
+function alert_image_upload(bool, project_name, img_path, index, num_images) {
+	if (!bool) {
+		alert("Unable to add image");
+		return
+	} else if (index == num_images - 1) {
+		console.log("added all images");
+
+		/* Load project view. */
+		load_detail(project_name);
+	}
+}
+
+function loadDetail(projectName) {
+	console.log("loadDetail invoked");
+	_currentProj = projectName;
+
 	clearDetailsHtml();
-	var projectPath = getProjectJsonPath(projectName);
-	var project = loadProject(projectPath);
-	_currentProj = project;
 
 	redirect('detail');
-	loadHeader(project);
-	var images = project.getImages();
-	images.sort(compareTimestamp);
-	// console.log("images: " + images);
-	images.forEach(function(image) {
-		var img_path = image['path'];
-		var name = image['name'];
-		var metadata = image['metadata'];
-		// console.log(metadata);
-		detailExifDisplay(img_path, name, metadata);
+
+	/* Display project header. */
+	database.get_project(projectName, function(row) {
+		console.log("got project");
+		loadHeader(row);
+	});
+
+	/* Display images in this project. */
+	database.get_images_in_project(projectName, function(projectName, image_list) {
+		image_list.sort(compareTimestamp);
+		console.log("got images: " + image_list.length + ", " + JSON.stringify(image_list));
+
+		image_list.forEach(function(image) {
+			var image_path = image['path'];
+			var name = image['img_name'];
+			database.get_image_metadata(image_path, name, projectName, function(bool, name, path, projectName, metadata) {
+				detailExifDisplay(image_path, name, projectName, metadata);
+			});
+		});
 	});
 }
 
-// Comparator that puts newer images before older ones.
+/* Comparator that puts newer images before older ones. */
 function compareTimestamp(image1, image2){
-	if (image1['timestamp'] > image2['timestamp'])
+	if (image1['last_modified'] > image2['last_modified'])
 		return -1;
-	else if (image1['timestamp'] == image2['timestamp'])
+	else if (image1['last_modified'] == image2['last_modified'])
 		return 0;
 	else
 		return 1;
 }
 
-function insertDetailTemplate(data, id) {
-	imgdata = '';
-	exifdata = '';
-	gpsdata = '';
-	count = 0;
+function insert_detail_template_callback(bool, img_name, img_path, proj_name, metadata_row) {
+	if (bool) {
+		console.log("insert_detail_template_callback received: " + Object.keys(metadata_row).length);
+
+		var data = {
+				'name': img_name,
+				'path': img_path,
+				'exifData': {},
+				'gpsData': {},
+				'fileData': {},
+				'error': "",
+			};
+		for (var key in metadata_row) {
+			data.exifData[key] = metadata_row[key];
+		}
+		data = processData(data);
+		populate_detail_view(data, img_name);
+	} else {
+		insertErrorTemplate(metadata_row, img_name);
+		return;
+	}
+}
+
+function populate_detail_view(data, id) {
 	if (data.error) {
 		insertErrorTemplate(data, id);
 		return;
 	}
-	var dataForCsv = {'Image Name': id};
-	for (var key in data.exifData.image) {
-		dataForCsv[key] = data.exifData.image[key];
-		if (count == 0) {
-			imgdata += '<tr><td>' + key + ': ' + data.exifData.image[key] + '</td>';
-			count = 1;
-		} else {
-			imgdata += '<td>' + key + ': ' + data.exifData.image[key] + '</td></tr>';
-			count = 0;
+	var contents = {};
+	var disableds = {};
+	var types = ['exif', 'gps', 'file', 'fav'];
+	for (var ind in types) {
+		var name = types[ind]
+		var category = data[name + 'Data'];
+		var content = '';
+		count = 0;
+		for (var key in category) {
+			if (count == 0) {
+				content += '<tr>';
+			}
+			content += '<td style="padding:1.0rem"><strong>' + key + '</strong>: ' + category[key] + '</td>';
+			if (count == 2) {
+				content += '</tr>'
+			}
+			count = (count + 1) % 3;
 		}
-	}
-	count = 0;
-	for (var key in data.exifData.exif) {
-		dataForCsv[key] = data.exifData.exif[key];
-		if (count == 0) {
-			exifdata += '<tr><td>' + key + ': ' + data.exifData.exif[key] + '</td>';
-			count = 1;
+		if (content == '') {
+			disableds[name] = 'disabled';
 		} else {
-			exifdata += '<td>' + key + ': ' + data.exifData.exif[key] + '</td></tr>';
-			count = 0;
+			disableds[name] = '';
 		}
-	}
-	count = 0;
-	for (var key in data.exifData.gps) {
-		dataForCsv[key] = data.exifData.gps[key];
-		if (count == 0) {
-			gpsdata += '<tr><td>' + key + ': ' + data.exifData.gps[key] + '</td>';
-			count = 1;
-		} else {
-			gpsdata += '<td>' + key + ': ' + data.exifData.gps[key] + '</td></tr>';
-			count = 0;
+		if (content && !content.endsWith('</tr>')) {
+			content += '</tr>';
 		}
-	}
-	if (gpsdata === '') {
-		gpsdata = '<tr><td>No GPS information available for this image</td></tr>'
-	}
-	if (exifdata === '') {
-		exifdata = '<tr><td>No Exif information available for this image</td></tr>'
-	}
-	if (imgdata === '') {
-		imgdata = '<tr><td>No capture information available for this image</td></tr>'
+		contents[name] = content
 	}
 
-	_data.push(dataForCsv);
+	// _data.push(dataForCsv);
+
+	var flag_string = 'Flagged as modified';
+	var is_modified = false
+	// TODO implement flag trigger
+	if (contents['exif'].toLowerCase().includes('adobe')) {
+		flag_string = 'File modified by Adobe software.'
+		is_modified = true
+
+	}
+	var flag_trigger = 'hidden';
+	if (is_modified) {
+		flag_trigger = '';
+	}
 
 	var template = [
+		'<div class="row">',
 			'<div class="col-md-4">',
-				'<a href="#">',
-					'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">',
-				'</a>',
+				'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">', // add image features here
 			'</div>',
 			'<div class="col-md-8">',
 				'<div class="row">',
-					'<div class="col-md-9">',
+					'<div class="col-md-8">',
 						'<h3 style="word-wrap:break-word;">{{name}}</h3>',
+						// tags
+						'<div>',
+							'<input type="text" placeholder="Add tag" name="tag">',
+							// one new label per tag, with appropriate color
+							'<h3 style="display:inline">',
+								'<span class="badge badge-pill badge-primary">', //style="background-color:#00ffff">',
+									'Fun',
+								'</span> ',
+								'<span class="badge badge-pill badge-primary" style="background-color:#00ffff">',
+									'Party',
+								'</span> ',
+							'</h2>',
+						'</div>',
+						'<br>',
+						'<textarea class="form-control" rows="3" placeholder="Notes" />',
 					'</div>',
-					'<div class="col-md-3">',
-						'<div class="dropdown">',
-							'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
-							  // octicons uninstalled for now
-								// '<span class="octicon octicon-gear"></span>',
-								'Options',
-							'</button>',
-							'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
-								'<li id="remove{{name}}" class="dropdown-item">Remove</li>',
-								// '<li id="rename{{name}}" class="dropdown-item">Rename</li>',
-								// '<li class="dropdown-item">Star</li>',
+					'<div class="col-md-4">',
+
+						'<div class="row">',
+							'<img src="./assets/alert.svg" style="height:40px" data-toggle="tooltip" data-placement="auto" ' + flag_trigger + ' title="' + flag_string + '"/>',
+							'<div class="dropdown">',
+								'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
+									'Options',
+								'</button>',
+								'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
+									'<li id="remove{{name}}" class="dropdown-item">Remove</li>',
+									'<li id="rename{{name}}" class="dropdown-item">Rename</li>',
+								'</div>',
 							'</div>',
 						'</div>',
+						// search bar
+						'<br>',
+						'<input type="text" placeholder="Exif search">',
+						'<tr><th> Search results </th></tr>',
+
 					'</div>',
 				'</div>',
-				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#imagedata' + id + ' ">Image Info</button></span>',
-				'<div id="imagedata' + id +' " class="container collapse">',
+			'</div>',
+		'</div>',
+
+		'<div class="row container-fluid" style="height:20px"></div>',
+
+		'<div class="container-fluid row">',
+			'<div class="col-md-3 text-center">',
+				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#favdata' + id + ' "' + disableds.fav + '>Favorite fields</button></span>',
+			'</div>',
+			'<div class="col-md-3 text-center">',
+				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#filedata' + id + ' "' + disableds.file + '>File Info</button></span>',
+			'</div>',
+			'<div class="col-md-3 text-center">',
+				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#exifdata' + id + ' "' + disableds.exif + '>Exif Data</button></span>',
+			'</div>',
+			'<div class="col-md-3 text-center">',
+				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#gpsdata' + id + ' "' + disableds.gps + '>GPS Data</button></span>',
+			'</div>',
+		'</div>',
+
+		'<div class="container-fluid row">',
+			'<div class="col-md-12 center-block">',
+				// favorites
+				'<div id="favdata' + id +' " class="container collapse">',
 					'<table class="table table-bordered">',
-						imgdata,
+						contents.fav,
 					'</table>',
 				'</div>',
 				'<br>',
-				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#exifdata' + id + ' ">Exif Data</button></span>',
+				//file info
+				'<div id="filedata' + id +' " class="container collapse">',
+					'<table class="table table-bordered">',
+						contents.file,
+					'</table>',
+				'</div>',
+				'<br>',
+				// general Exif
 				'<div id="exifdata' + id +' " class="container collapse">',
 					'<table class="table table-bordered">',
-						exifdata,
+						contents.exif,
 					'</table>',
 				'</div>',
 				'<br>',
-				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#gpsdata' + id + ' ">GPS Data</button></span>',
+				// GPS
 				'<div id="gpsdata' + id +' " class="container collapse">',
 					'<table class="table table-bordered">',
-						gpsdata,
+						contents.gps,
 					'</table>',
-					'<div style="width:100%;" id="map{{name}}"></div>',
+					'<div id="map{{name}}" style="width:100%;height:400px"></div>',
 				'</div>',
 			'</div>',
+		'</div>',
 	].join("\n");
 
 	var filler = Mustache.render(template, data);
 	$("#detail-template" + data.name).append(filler);
 
+	var latitude;
+	var longitude;
+	if ('GPSLatitude' in data.gpsData) {
+		latitude = data.gpsData.GPSLatitude
+		longitude = data.gpsData.GPSLongitude
+	}
+	// addMap(
+	// 	"map" + data.name,
+	// 	[{'lat':latitude, 'lng':longitude}],
+	// )
+
+	$('[data-toggle="tooltip"]').tooltip();
+
 	setPhotoRemove(data.name);
 
-	if ('GPSLongitude' in data.exifData.gps && 'GPSLatitude' in data.exifData.gps) {
-		loadMap(
-			data.name,
-			data.exifData.gps.GPSLatitude,
-			data.exifData.gps.GPSLongitude,
-			data.exifData.gps.GPSLatitudeRef,
-			data.exifData.gps.GPSLongitudeRef,
-		);
-	}
 }
 
-function insertErrorTemplate(data, id) {
-	if (data.error && data.error.includes('no such file')) {
+/* TODO(Varsha): change this so that we populate the metadata using dict returned by db. */
+function insertDetailTemplate(img_name, img_path, proj_name) {
+	database.get_image_metadata(img_path, img_name, proj_name, insert_detail_template_callback);
+}
+
+function insertErrorTemplate(error, id) {
+	if (error && error.includes('no such file')) {
 		data.error = 'This file could not be found. Is it possible ' +
 			'that it was moved? If so, either put it back, or delete ' +
 			'this entry and re-add it in its new location.'
@@ -250,23 +348,18 @@ function setPhotoRemove(name) {
 		return;
 	}
 	elem.onclick = function() {
-		var projectPath = storage.getProject(projName);
-		console.log(projectPath);
-		console.log(projName);
-		console.log(storage)
-		var proj = loadProject(path.join(projectPath, projName + '.json'));
-		proj.removeImage(name);
-		proj.saveProject();
-		var content = document.getElementById('detail-template' + name);
-		content.parentNode.removeChild(content);
-		var line = document.getElementById('hr' + name);
-		line.parentNode.removeChild(line);
-		for (var row = 0; row < _data.length; row++) {
-			if (_data[row]['Image Name'] == name) {
-				_data.splice(row, 1);
-				break;
+		database.remove_image(projName, name, function() {
+			var content = document.getElementById('detail-template' + name);
+			content.parentNode.removeChild(content);
+			var line = document.getElementById('hr' + name);
+			line.parentNode.removeChild(line);
+			for (var row = 0; row < _data.length; row++) {
+				if (_data[row]['Image Name'] == name) {
+					_data.splice(row, 1);
+					break;
+				}
 			}
-		}
+		});
 	};
 }
 
@@ -314,14 +407,14 @@ function loadHeader(project) {
 		"</div>"
   ].join("\n");
   data = {
-    projName: project.getName(),
-		displayName: project.getName().replace(/__/g, " "),
-    projDesc: project.getDescription(),
+    projName: project['name'],
+		displayName: project['name'].replace(/__/g, " "),
+    projDesc: project['description'],
   }
   var filler = Mustache.render(template, data);
   $("#detail-header").append(filler);
 
-	document.getElementById("export" + project.getName()).onclick = function() {
+	document.getElementById("export" + project['name']).onclick = function() {
 		electron.remote.dialog.showSaveDialog(function(filename, bookmark) {
 			var csvString = "";
 			var keys = new Set();
@@ -359,25 +452,21 @@ function loadHeader(project) {
 		});
 	};
 
-	document.getElementById("delete" + project.getName()).onclick = function() {
+	document.getElementById("delete" + project['name']).onclick = function() {
 		var ans = confirm("Are you sure you want to delete this project?");
 		if (ans) {
-			project.eliminate();
+			database.delete_project(project['name']);
 			redirect('projects');
 		}
 	};
 
-	document.getElementById("upload" + project.getName()).onclick = function() {
+	document.getElementById("upload" + project['name']).onclick = function() {
 		console.log('hello');
 		let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
 		for (var index in paths) {
-			var filename = path.basename(paths[index]).split(".")[0];
-			project.addImage(filename, paths[index]);
-			project.saveProject();
+			var filename = path.basename(paths[index]).split(".")[index];
+			database.add_image(filename, paths[index], project['name'], index, paths.length, alert_image_upload);
 		}
-
-		clearDetailsHtml();
-		loadDetail(project.getName());
 	};
 }
 
@@ -389,56 +478,98 @@ function clearDetailsHtml() {
 	// document.getElementById("file-label2").innerHTML = ""
 }
 
-function detailExifDisplay(imgpath, name, metadata) {
+function detail_exif_display_callback(bool) {
+	console.log("added exif to db: " + bool);
+}
+
+function processData(data) {
+	var file = [
+		"SourceFile",
+		"Directory",
+		"FileType",
+		"FileTypeExtension",
+		"FileModifyDate",
+		"FileAccessDate",
+		"FilePermissions",
+		"FileInodeChangeDate",
+		"MIMEType",
+		"FileName",
+		"ExifToolVersion",
+		"FileSize",
+		"ExifByteOrder",
+	]
+	var favorites = getFavDataKeys();
+	for (var key in data.exifData) {
+		if (key == "errors" && !isStr(data.exifData[key])) {
+			delete data.exifData[key];
+		}
+		if (file.includes(key)) {
+			data.fileData[key] = data.exifData[key]
+			delete data.exifData[key];
+		}
+		if (favorites.includes(key)) {
+			data.favData[key] = data.exifData[key]
+			delete data.exifData[key];
+		}
+		if (key.toLowerCase().includes("gps")) {
+			data.gpsData[key] = data.exifData[key];
+			delete data.exifData['key'];
+		}
+	}
+	return data;
+}
+
+//TODO return favorite fields as strings in array
+function getFavDataKeys() {
+	return [];
+}
+
+function detailExifDisplay(imgpath, imgname, projname, metadata) {
 	// Set default template.
+	console.log("received metadata for image: " + imgname + ", " + metadata);
+
 	var template = [
 		'<div id="detail-template{{name}}" class="row">',
 		'</div>',
 		'<hr id="hr{{name}}">'
 	].join("\n")
-	var filler = Mustache.render(template, {name: name});
+	var filler = Mustache.render(template, {name: imgname});
 	$("#image-wrapper").append(filler);
 	if (!metadata) {
 		metadata = {};
 	}
 
+	/* Use add_image_meta(img_path, proj_name, meta_key, meta_value, callback). */
+
+	/* TODO(Franklin): Decide on image metadata groupings/how they will be stored in the table. */
+
 	if (Object.keys(metadata).length == 0) {
 		try {
-			console.log("generating metadata for " + name);
-			new ExifImage({ image : imgpath }, function (error, exifData) {
-					var data = {
-						'name': name,
-						'path': imgpath,
-						'exifData': {},
-						'error': "",
-					};
-					if (error) {
-							console.log('Error: ' + error.message);
-							data.error = error.message;
-					} else {
-							var types = ['exif', 'image', 'gps'];
-							for (var ind in types) {
-								var type = types[ind];
-								data.exifData[type] = exifData[type];
-								if (!data.exifData[type]) {
-									data.exifData[type] = {};
-								}
-								// these are not web-formatted and look like random symbols
-								// consider looking into formatting these
-								delete data.exifData.exif['MakerNote'];
-								delete data.exifData.exif['UserComment'];
-							}
+			console.log("generating metadata for " + imgname);
+
+			exiftool
+				.read(imgpath)
+				.then(function(tags) {
+					console.log(tags);
+					for (var key in tags) {
+						database.add_image_meta(imgpath, projname, key, tags[key], detail_exif_display_callback);
 					}
-					_currentProj.setImageMetadata(name, data);
-					_currentProj.saveProject();
-					insertDetailTemplate(data, name);
-			});
+					console.log(tags);
+					insertDetailTemplate(imgname, imgpath, projname);
+					// insertDetailTemplate__NEW(data, name);
+				})
+				.catch(function(error) {
+					console.error(error);
+					data.error = error;
+					insertErrorTemplate(error, imgname)
+				});
 		} catch (error) {
-				console.log('Exif Error: ' + error.message);
+			console.log('Exif Error: ' + error.message);
+			insertErrorTemplate(error, imgname);
 		}
 	} else {
-		console.log("using existing metadata for " + name);
-		insertDetailTemplate(metadata, name);
+		console.log("using existing metadata for " + imgname);
+		insertDetailTemplate(imgname, imgpath, projname);
 	}
 }
 
@@ -447,17 +578,14 @@ $("#add-image").submit(function(e) {
 	if (!paths_global) {
 		console.log('Please select images');
 		alert('Please select images');
-		return;
-	}
-	var proj = _currentProj;
-	for (var index in paths_global) {
-		var filename = path.basename(paths_global[index]).split(".")[0];
-		proj.addImage(filename, paths_global[index]);
-		proj.saveProject();
 	}
 
-	clearDetailsHtml();
-	loadDetail(proj.getName());
+	for (var index in paths_global) {
+		var filename = path.basename(paths_global[index]).split(".")[0];
+		database.add_image(filename, paths_global[index], _currentProj, alert_image_upload);
+	}
+
+	loadDetail(_currentProj);
 	paths_global = null;
 });
 
