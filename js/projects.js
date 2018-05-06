@@ -10,7 +10,7 @@ function showProject(name, desc, imgsrc) {
   template = [
     "<div class='col-lg-4 col-sm-6 portfolio-item'>",
       "<div class='card h-100'>",
-        "<a id='photo-{{name}}' href='#'><img class='card-img-top' src='{{imgsrc}}' alt=''></a>",
+        "<a id='photo-{{name}}' href='#'><img class='card-img-top img-responsive' src='{{imgsrc}}' alt=''></a>",
         "<div class='card-body'>",
           "<h4 class='card-title'>",
             "<a id='link-{{name}}' href='#'>{{displayName}}</a>",
@@ -45,7 +45,7 @@ function showNewProject() {
   template = [
     "<div class='col-lg-4 col-sm-6 portfolio-item'>",
       "<div class='card h-100'>",
-        "<a id='new-project-photo' href='#'><img data-section='new' class='card-img-top' src='./assets/add-proj.png' alt=''></a>",
+        "<a id='new-project-photo' href='#'><img data-section='new' class='card-img-top img-responsive' src='./assets/add-proj.png' alt=''></a>",
         "<div class='card-body'>",
           "<h4 class='card-title'>",
             "<a id='new-photo-link' href='#'></a>",
