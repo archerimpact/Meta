@@ -60,6 +60,10 @@
       a:hover, a:focus {
         color: #192d42;
       }
+
+      a.side-bar:hover, a.side-bar:focus {
+        color: #192d42;
+      }
   </style>
 
 
@@ -82,13 +86,6 @@
                                 <li><a data-section="overall-compare">Compare</a>
                                 </li>
                             </ul>
-
-
-
-                  <!-- <a class="btn btn-default" data-section="overall-images.html" style="margin-top: 10px; margin-left: 20px; background-color: #192d42; color:white">Images </a>
-                  <a class="btn btn-default" data-section="landing.html" style="margin-top: 10px; margin-left: 20px; background-color: #192d42; color:white">Trends </a>
-                  <a class="btn btn-default" data-section="overall-compare.html" style="margin-top: 10px; margin-left: 20px; background-color: #192d42; color:white">Compare </a> -->
-                  <!-- <button type="button" class="btn btn-outline btn-default" style="margin-top: 10px; margin-left: 20px;" href="overall-images.html"><a href="overall-images.html"> Images </a></button> -->
               </div>
           </nav>
 
@@ -97,19 +94,19 @@
 
                <div class="navbar-default sidebar" role="navigation" style="color: white; background-color: #192d42; height:100%">
                   <div class="sidebar-nav">
-                      <ul class="nav" id="side-menu" style="padding-left: 15px; color: white; padding-top: 0;">
+                      <ul class="nav" id="side-menu" style="color: white; padding-top: 0;">
                           <li>
-                              <a data-section="landing" style="color: white"><i class="material-icons">dashboard</i> Dashboard</a>
+                              <a class="side-bar" data-section="landing" style="color: white"><i class="material-icons">dashboard</i> Dashboard</a>
                           </li>
                           <li>
-                              <a data-section="new" style="color: white"><i class="material-icons">add</i> New Project</a>
+                              <a class="side-bar" data-section="new" style="color: white"><i class="material-icons">add</i> New Project</a>
                           </li>
                           <li>
-                              <a data-section="projects" style="color: white"><i class="material-icons">folder</i> Projects</a>
+                              <a class="side-bar" data-section="projects" style="color: white"><i class="material-icons">folder</i> Projects</a>
                               <!--TODO: eventually, we'll want to put this together so that it has a listed projects underneath it, but for now we'll just redirect to the existing project page like we had beofre -->
                           </li>
                           <li>
-                              <a data-section="settings" style="color: white"><i class="material-icons">settings</i> Settings</a>
+                              <a class="side-bar" data-section="settings" style="color: white"><i class="material-icons">settings</i> Settings</a>
                           </li>
 
 
@@ -139,7 +136,7 @@
         window.$ = window.jQuery = require('./vendor/jquery/jquery.min.js');
       </script>
       <script src="vendor/jquery/jquery.min.js"></script>
-      <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+      <!-- <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script> -->
       <script src="main.js"></script>
       <script src="./js/nav.js"></script>
 

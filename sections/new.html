@@ -1,32 +1,35 @@
 <template class="section-template">
 <section id="new" class="wrapper style1 fullscreen intro">
     <div class="container">
-
+      <link href="css/new.css" rel="stylesheet">
       <!-- Page Heading -->
-      <h1 class="my-4">Create New Project</h1>
+      <h1 style="color: #192d42; padding:0px; margin-top: 20px; margin-bottom: 20px;">Create a New Project</h1>
 
       <div class="row">
-        <div class="col-md-12">
+        <div class="col-sm-8">
           <form id='new-project'>
-            <div class="form-group">
-              <label for="project-name"> Project Name </label>
-              <input type="text" id="name-input" class="form-control" id="proj-name-input" placeholder="Enter a descriptive name">
+            <div class="form-group input-group">
+                <span class="input-group-addon">PROJECT NAME</span>
+                    <input type="text" class="form-control" placeholder="Enter a project name...">
             </div>
-            <div class=form-group>
-              <label for="project-desc"> Album Description </label>
-              <textarea type="text" id="desc-input" class="form-control" id="proj-desc-input" rows="3" placeholder="Describe the project"></textarea>
-            </div>
+            <div class="form-group input-group">
+              <span class="input-group-addon">PROJECT DESCRIPTION</span>
+                <input type="text" class="form-control" placeholder="Enter a project description...">
+              </div>
             <div class="form-group">
-              <label for="proj-input">Select Media </label>
+              <label style="color: #192d42;" for="proj-input">Select Media </label>
+               <small>Click to upload media</small>
+               <p></p>
               <!-- UNCOMMENT THE FOLLOWING LINES FOR DRAG AND DROP (NOTE: NOT IMPLEMENTED ON BACK END) -->
-              <small>Click or drag and drop</small>
-              <p></p>
               <!-- ALSO CONSIDER USING previewFile() TO SEE IMAGES -->
               <!-- <input type="file" id="files-input" class="form-control-file" id="proj-file-input" multiple style="display: inline"> -->
-              <img src="assets/upload.svg" id="upload" style="display: inline">
-              <div><p id="file-label"></p></div>
+              <!-- <div id="upload"><i class="material-icons icon-blue">file upload</i></div> -->
+
+              <!-- <img src="assets/upload.svg" id="upload" style="display: inline"> -->
+              <button type="button" id="upload" class="btn btn-default btn-circle btn-xl"><i class="material-icons icon-blue">cloud</i></button>
+               <div><p id="file-label"></p></div>
             </div>
-            <button type="submit" class="btn btn-primary mb-2">Create Project</button>
+             <button type="submit" style="background-color: #0d77e2;" class="btn btn-primary btn-lg">Create Project</button>
           </form>
           <script src="./js/new.js"></script>
               <!-- Choose image: TODO: take image selection out and put in details.html -->
