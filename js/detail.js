@@ -50,11 +50,12 @@ function compareTimestamp(image1, image2){
 }
 
 function insertErrorTemplate(data, id) {
-	if (data.error && data.error.includes('no such file')) {
-		data.error = 'This file could not be found. Is it possible ' +
-			'that it was moved? If so, either put it back, or delete ' +
-			'this entry and re-add it in its new location.'
-	}
+	// TODO find out what the analog of this is for the new module
+	// if (data.error && data.error.includes('no such file')) {
+	// 	data.error = 'This file could not be found. Is it possible ' +
+	// 		'that it was moved? If so, either put it back, or delete ' +
+	// 		'this entry and re-add it in its new location.'
+	// }
 	var template = [
 			'<div class="col-md-4">',
 				'<a href="#">',
@@ -348,6 +349,7 @@ function detailExifDisplay__NEW(imgpath, name, metadata) {
 //  fileData: {...}
 // }
 function insertDetailTemplate__NEW(data, id) {
+	data.id = id
 	if (data.error) {
 		insertErrorTemplate(data, id);
 		return;
@@ -359,25 +361,32 @@ function insertDetailTemplate__NEW(data, id) {
 		var name = types[ind]
 		var category = data[name + 'Data'];
 		var content = '';
+		content += '<div class="table-responsive table-condensed">'
+		content += '<table class="table">'
+		content += '<tbody>'
 		count = 0;
+		var hasData = false
 		for (var key in category) {
+			var hasData = true;
 			if (count == 0) {
 				content += '<tr>';
 			}
 			content += '<td style="padding:1.0rem"><strong>' + key + '</strong>: ' + category[key] + '</td>';
-			if (count == 2) {
+			if (count == 1) {
 				content += '</tr>'
 			}
-			count = (count + 1) % 3;
+			count = 1 - count;
 		}
-		if (content == '') {
+		if (!hasData) {
 			disableds[name] = 'disabled';
 		} else {
 			disableds[name] = '';
 		}
-		if (content && !content.endsWith('</tr>')) {
+		if (content.includes('<tr>') && !content.endsWith('</tr>')) {
 			content += '</tr>';
 		}
+		content += '</tbody></table></div>'
+		hasData = false
 		contents[name] = content
 	}
 
@@ -395,36 +404,91 @@ function insertDetailTemplate__NEW(data, id) {
 	if (is_modified) {
 		flag_trigger = '';
 	}
+	data.flag = flag_trigger
+	data.flag_str = flag_string
 
 	var template = [
 		'<div class="row">',
 			'<div class="col-md-4">',
+				'<div class="row name-row">',
+					'<h3 class="image-name">{{name}}</h3>',
+					'<div class="dropdown" style="display:inline; float:right">',
+						'<button class="settings-button btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
+							'<i class="material-icons icon" style="height:25px;width:15px;font-size:15px;">settings</i>',
+						'</button>',
+						'<ul class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
+							'<li id="remove{{name}}" class="dropdown-item"><a href="#">Remove</a></li>',
+							'<li id="rename{{name}}" class="dropdown-item"><a href="#">Rename</a></li>',
+						'</ul>',
+					'</div>',
+					'<img class="{{flag}}" src="./assets/alert.svg" style="height:25px; display:inline; float:right;" data-toggle="tooltip" data-placement="auto" title="{{flag_str}}"/>',
+				'</div>',
 				'<img class="img-responsive rounded" src="{{path}}" alt="">', // add image features here
 			'</div>',
 			'<div class="col-md-8">',
 				'<div class="row">',
-					'<div class="col-md-8">',
-						'<h3 style="word-wrap:break-word;">{{name}}</h3>',
-						// tags
-							'<input type="text" class="choices-tags form-control choices__input is-hidden" id="tags{{name}}" multiple>',
-						'<textarea class="form-control" rows="3" placeholder="Notes" />',
-					'</div>',
-					'<div class="col-md-4">',
+					'<div class="col-md-7">',
 
-						'<div class="row">',
-							'<img src="./assets/alert.svg" style="height:40px" data-toggle="tooltip" data-placement="auto" ' + flag_trigger + ' title="' + flag_string + '"/>',
-							'<div class="dropdown">',
-								'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
-									'Options',
-								'</button>',
-								'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
-									'<li id="remove{{name}}" class="dropdown-item">Remove</li>',
-									'<li id="rename{{name}}" class="dropdown-item">Rename</li>',
+						// tags
+						'<input type="text" class="choices-tags form-control choices__input is-hidden" id="tags{{name}}" multiple>',
+
+						// accordian for exif display
+							'<div id="exif-accordian{{id}}" role="tablist" aria-multiselectable="true">',
+
+								'<div class="panel panel-default data-panel">',
+								  '<div class="panel-heading accordian-header">',
+										'<div class="" role="tab" id="trigger-fav{{id}}" style="display:inline">',
+											'<a class="collapsed accordian-link" data-toggle="collapse" data-parent="#exif-accordian{{id}}" href="#display-fav{{id}}" aria-expanded="false" aria-controls="display-fav{{id}}">',
+												'Favorite',
+											'</a>',
+										'</div>',
+								  	'<div class="" role="tab" id="trigger-file{{id}}" style="display:inline">',
+											'<a class="collapsed accordian-link" data-toggle="collapse" data-parent="#exif-accordian{{id}}" href="#display-file{{id}}" aria-expanded="false" aria-controls="display-file{{id}}">',
+												'File',
+											'</a>',
+										'</div>',
+									  '<div class="" role="tab" id="trigger-exif{{id}}" style="display:inline">',
+											'<a class="collapsed accordian-link" data-toggle="collapse" data-parent="#exif-accordian{{id}}" href="#display-exif{{id}}" aria-expanded="true" aria-controls="display-exif{{id}}">',
+												'Exif',
+											'</a>',
+										'</div>',
+								    '<div class="" role="tab" id="trigger-gps{{id}}" style="display:inline">',
+											'<a class="collapsed accordian-link" data-toggle="collapse" data-parent="#exif-accordian{{id}}" href="#display-gps{{id}}" aria-expanded="true" aria-controls="display-gps{{id}}">',
+												'GPS',
+											'</a>',
+										'</div>',
+								  '</div>',
+									'<div id="display-fav{{id}}" class="panel-collapse collapse accordian-body" role="tabpanel" aria-labelledby="trigger-fav{{id}}">',
+										'<div class="panel-body">',
+											contents.fav,
+										'</div>',
+									'</div>',
+								  '<div id="display-file{{id}}" class="panel-collapse collapse accordian-body" role="tabpanel" aria-labelledby="trigger-file{{id}}">',
+										'<div class="panel-body">',
+											contents.file,
+										'</div>',
+									'</div>',
+								  '<div id="display-exif{{id}}" class="panel-collapse collapse accordian-body" role="tabpanel" aria-labelledby="trigger-exif{{id}}">',
+										'<div class="panel-body">',
+											contents.exif,
+										'</div>',
+									'</div>',
+								  '<div id="display-gps{{id}}" class="panel-collapse collapse accordian-body" role="tabpanel" aria-labelledby="trigger-gps{{id}}">',
+										'<div class="panel-body">',
+											contents.gps,
+										'</div>',
+									'</div>',
 								'</div>',
+
 							'</div>',
-						'</div>',
+							//accordian ends
+
+
+					'</div>',
+					'<div class="col-md-5">',
+						// notes
+						'<textarea class="form-control notes" rows="3" placeholder="Notes" />',
 						// search bar
-						'<br>',
 						'<select class="form-control choices__input is-hidden" id="search{{name}}" multiple></select>',
 					'</div>',
 				'</div>',
@@ -432,54 +496,6 @@ function insertDetailTemplate__NEW(data, id) {
 		'</div>',
 
 		'<div class="row container-fluid" style="height:20px"></div>',
-
-		'<div class="container-fluid row">',
-			'<div class="col-md-3 text-center">',
-				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#favdata' + id + ' "' + disableds.fav + '>Favorite fields</button></span>',
-			'</div>',
-			'<div class="col-md-3 text-center">',
-				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#filedata' + id + ' "' + disableds.file + '>File Info</button></span>',
-			'</div>',
-			'<div class="col-md-3 text-center">',
-				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#exifdata' + id + ' "' + disableds.exif + '>Exif Data</button></span>',
-			'</div>',
-			'<div class="col-md-3 text-center">',
-				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#gpsdata' + id + ' "' + disableds.gps + '>GPS Data</button></span>',
-			'</div>',
-		'</div>',
-
-		'<div class="container-fluid row">',
-			'<div class="col-md-12 center-block">',
-				// favorites
-				'<div id="favdata' + id +' " class="container collapse">',
-					'<table class="table table-bordered">',
-						contents.fav,
-					'</table>',
-				'</div>',
-				'<br>',
-				//file info
-				'<div id="filedata' + id +' " class="container collapse">',
-					'<table class="table table-bordered">',
-						contents.file,
-					'</table>',
-				'</div>',
-				'<br>',
-				// general Exif
-				'<div id="exifdata' + id +' " class="container collapse">',
-					'<table class="table table-bordered">',
-						contents.exif,
-					'</table>',
-				'</div>',
-				'<br>',
-				// GPS
-				'<div id="gpsdata' + id +' " class="container collapse">',
-					'<table class="table table-bordered">',
-						contents.gps,
-					'</table>',
-					'<div id="map{{name}}" style="width:100%;height:400px"></div>',
-				'</div>',
-			'</div>',
-		'</div>',
 	].join("\n");
 
 	var filler = Mustache.render(template, data);
@@ -507,7 +523,7 @@ function insertDetailTemplate__NEW(data, id) {
 		removeItemButton: true,
 		editItems: true,
 		duplicateItems: false,
-		placeholder: "Enter/select a tag"
+		placeholderValue: "Add a tag",
 	})
 
 	var choices = new Choices($('#search' + data.name)[0], {
@@ -517,6 +533,7 @@ function insertDetailTemplate__NEW(data, id) {
 		placeholder: "Enter/select a tag",
 		itemSelectText: '',
 		duplicateItems: true,
+		placeholderValue: "Search Exif data",
 	})
 
 }
