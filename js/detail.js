@@ -541,9 +541,7 @@ function detailExifDisplay(imgpath, imgname, projname, metadata) {
 			exiftool
 				.read(imgpath)
 				.then(function(tags) {
-					for (var key in tags) {
-						database.add_image_meta(imgpath, projname, key, tags[key], detail_exif_display_callback);
-					}
+					database.add_image_meta(imgpath, projname, tags, detail_exif_display_callback);
 					insertDetailTemplate(imgname, imgpath, projname);
 					// insertDetailTemplate__NEW(data, name);
 				})
@@ -560,6 +558,10 @@ function detailExifDisplay(imgpath, imgname, projname, metadata) {
 		console.log("using existing metadata for " + imgname);
 		insertDetailTemplate(imgname, imgpath, projname);
 	}
+}
+
+function isStr(maybeString) {
+	return maybeString && !(maybeString == "");
 }
 
 $("#add-image").submit(function(e) {
