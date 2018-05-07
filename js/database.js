@@ -138,8 +138,10 @@ class Database {
             var add_meta = "";
             var meta_length = Object.keys(meta_dict).length;
             var count = 0;
+            var meta_values = [];
             for (var meta_key in meta_dict) {
-              add_meta += meta_key + " = \"" + meta_dict[meta_key] + "\"";
+              add_meta += meta_key + " = ?";
+              meta_values.push(meta_dict[meta_key]);
               if (count < meta_length - 1) {
                 add_meta += ", ";
               }
@@ -148,7 +150,8 @@ class Database {
             var query = "UPDATE Images SET " + add_meta + " WHERE path=? AND proj_name=?";
             console.log(query, "query");
             var stmt = db.prepare(query);
-            stmt.run([img_path, proj_name]);
+            var params = meta_values + [img_path, proj_name]
+            stmt.run(params);
             stmt.finalize();
             success = true;
           }
