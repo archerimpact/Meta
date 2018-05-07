@@ -262,7 +262,7 @@ function insertDetailTemplate(img_name, img_path, proj_name) {
 }
 
 function insertErrorTemplate(error, id) {
-	if (error && error.includes('no such file')) {
+	if (error && error.toString().includes('no such file')) {
 		data.error = 'This file could not be found. Is it possible ' +
 			'that it was moved? If so, either put it back, or delete ' +
 			'this entry and re-add it in its new location.'

@@ -140,17 +140,18 @@ class Database {
             var count = 0;
             var meta_values = [];
             for (var meta_key in meta_dict) {
-              add_meta += meta_key + " = ?";
+              add_meta += meta_key + "=?";
               meta_values.push(meta_dict[meta_key]);
               if (count < meta_length - 1) {
                 add_meta += ", ";
               }
               count++;
             }
+            console.log(meta_values);
             var query = "UPDATE Images SET " + add_meta + " WHERE path=? AND proj_name=?";
             console.log(query, "query");
             var stmt = db.prepare(query);
-            var params = meta_values + [img_path, proj_name]
+            var params = meta_values + [img_path, proj_name];
             stmt.run(params);
             stmt.finalize();
             success = true;
