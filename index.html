@@ -4,7 +4,7 @@
   <head>
 
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
     <meta name="description" content="">
     <meta name="author" content="">
 
@@ -14,6 +14,12 @@
     <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
     <link href="css/columns.css" rel="stylesheet">
+    <link href="css/home.css" rel="stylesheet">
+    <link href="css/detail.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+    <!-- <link href="css/font-awesome.min.css" rel="stylesheet"> -->
 
     <!-- reinstall octicons and uncomment this if we want github octicons -->
     <!-- <link rel="stylesheet" href="node_modules/octicons/build/build.css"> -->
@@ -22,48 +28,113 @@
     <link rel="import" href="sections/projects.html">
     <link rel="import" href="sections/detail.html">
     <link rel="import" href="sections/new.html">
+    <link rel="import" href="sections/about.html">
     <link rel="import" href="sections/settings.html">
+    <link rel="import" href="sections/overall-images.html">
+    <link rel="import" href="sections/overall-compare.html">
+
 
   </head>
-    <div id="wrapper">
+
   <body>
 
-    <!-- Navigation -->
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container">
-      <img src="archer_meta.png" height="44.8px" width ="200px" id="landing-menu" data-section="landing" class="navbar-brand" href="#">
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
+          <!-- Navigation -->
 
-  <div class="collapse navbar-collapse" id="navbarColor02">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a id="new-menu" data-section="new" class="nav-link" href="#">New Project</a>
-      </li>
-      <li class="nav-item">
-          <a id="projects-menu" data-section="projects" class="nav-link" href="#">My Projects</a>
-      </li>
-      <li class="nav-item">
-          <a id="settings-menu" data-section="settings" class="nav-link" href="#">About Us</a>
-      </li>
-    </ul>
-  </div>
-</nav>
+          <nav class="navbar navbar-default navbar-static-top" id="top-nav" role="navigation" style="margin: 0; padding: 0; background-color: #192d42; color: white; width: 100%">
+              <div class="navbar-header" style="margin-right: 0">
+                  <a class="navbar-brand" style="color:white" href="index.html">Archer Meta</a>
+
+                            <ul class="nav nav-pills n-link" style="display: inline-block; margin-top:5px">
+                                <li style="color: white"><a data-section="overall-images">Images</a>
+                                </li>
+                                <li><a data-section="landing">Trends</a>
+                                </li>
+                                <li><a data-section="overall-compare">Compare</a>
+                                </li>
+                            </ul>
+              </div>
+          </nav>
+
+              <div class="row" id="home" style="height:100%">
+                <div class="col-sm-2" id="side-nav" style="padding: 0px; height: 100%">
+
+               <div class="navbar-default sidebar" role="navigation" style="color: white; background-color: #192d42; height:100%">
+                  <div class="sidebar-nav">
+                      <ul class="nav" id="side-menu" style="color: white; padding-top: 0;">
+                          <li>
+                              <a class="side-bar" data-section="landing" style="color: white"><i class="material-icons">dashboard</i> Dashboard</a>
+                          </li>
+                          <li>
+                              <a class="side-bar" data-section="new" style="color: white"><i class="material-icons">add</i> New Project</a>
+                          </li>
+
+                          <li>
+                              <a class="side-bar" data-section="projects" style="color: white"><i class="material-icons">folder</i> Projects</a>
+                              <!--TODO: eventually, we'll want to put this together so that it has a listed projects underneath it, but for now we'll just redirect to the existing project page like we had beofre -->
+                          </li>
+                          <li>
+                              <a class="side-bar" data-section="settings" style="color: white"><i class="material-icons">settings</i> Settings</a>
+                          </li>
 
 
-    </div>
 
-    <!-- Scripts -->
-    <script>
-      window.$ = window.jQuery = require('./vendor/jquery/jquery.min.js');
-    </script>
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="main.js"></script>
-    <script src="./js/nav.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js" async defer></script>
+                      </ul>
+                  </div>
+                  <!-- /.sidebar-collapse -->
 
+               </div>
+
+              <!-- /.navbar-static-side -->
+            </div>
+            <div class="col-sm-10" id="body" style="padding: 0px; height: 100%">
+              <div id="wrapper" style="overflow-y: scroll">
+                </div>
+
+              </div>
+            </div>
+      <!-- /#wrapper -->
+
+      <script>
+        window.$ = window.jQuery = require('./vendor/jquery/jquery.min.js');
+      </script>
+
+      <script type="text/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
+      <script src="main.js"></script>
+      <script src="./js/nav.js"></script>
+
+      <script src="https://maps.googleapis.com/maps/api/js" async defer></script>
+      <script type="text/javascript">
+        $('#myModal').on('shown.bs.modal', function () {
+          console.log('hello');
+        $('#myInput').focus()
+      });
+        </script>
+
+      <script>
+        const {Menu, MenuItem} = electron.remote
+        let rightClickPosition = null
+
+        const menu = new Menu()
+        const menuItem = new MenuItem({
+          label: 'Inspect Element',
+          click: () => {
+            remote.getCurrentWindow().inspectElement(rightClickPosition.x, rightClickPosition.y)
+          }
+        })
+        menu.append(menuItem)
+
+        window.addEventListener('contextmenu', (e) => {
+          e.preventDefault()
+          rightClickPosition = {x: e.x, y: e.y}
+          menu.popup(remote.getCurrentWindow())
+        }, false)
+      </script>
+
+        <script src="./js/charts.js"></script>
+
+        <link rel="stylesheet" href="./node_modules/choices.js/assets/styles/css/choices.min.css">
+        <script src="./node_modules/choices.js/assets/scripts/dist/choices.min.js"></script>
   </body>
+
 </html>

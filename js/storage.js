@@ -12,6 +12,10 @@ class Storage {
 
     // Load all prior saved projects.
     this._projects = populateProjects(this._path, opts.defaults);
+<<<<<<< HEAD
+=======
+
+>>>>>>> new_ui_real
   }
 
   // Return the value associated with a saved project (specified by string key).
@@ -74,6 +78,11 @@ function populateProjects(filePath, defaults) {
   try {
     return JSON.parse(fs.readFileSync(filePath));
   } catch (error) {
+<<<<<<< HEAD
+=======
+    console.log(filePath);
+    console.warn("\n\nERROR:\n" + error + "\n\n");
+>>>>>>> new_ui_real
     return defaults;
   }
 }

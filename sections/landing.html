@@ -1,23 +1,83 @@
+<head><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes"></head>
 <template class="section-template">
-<section id="landing" class="wrapper style1 fullscreen intro">
-  <div class="inner">
+<section id="landing">
+  <div class="inner" style="min-height: 100%; width: device-width">
     <link href="css/landing.css" rel="stylesheet">
+    <div class="input-group custom-search-form form-group-lg absolute-center" style="width: 80%">
 
-<div class="jumbotron">
-  <h1 class="display-3">ARCHER META</h1>
-  <p class="lead">The data behind your photo.</p>
-  <hr class="my-4">
-  <div id="tool-description">
-  <p class="lead">Metadata is the data captured in your photo the moment you take it: camera make and model, aperture, geolocation, and more</p>
-  <p class="lead">Upload any jpeg file to Archer meta to extract available metadata.</p>
-  <p class="lead">Save projects of photos so that you can go back and look at them - and their metadata - later. </p>
-  <p class="lead">Export your photo metadata to CSV format to share with colleagues.</p>
-</div>
-  <p class="lead">
-    <a id="new-menu" data-section="new" class="btn btn-primary btn-lg" href="#" role="button">Create Project</a>
-    <a id="projects-menu" data-section="projects" class="btn btn-primary btn-lg" href="#" role="button">My Projects</a>
-  </p>
-</div>
+          <input type="text" class="form-control" placeholder="Search..." style="margin-top: 10%; margin-left: 18%; width: 80% width: 80%" >
+
+              <span class="input-group-btn" style="margin-left: 100%; margin-top: 5%;position: absolute;">
+                <button class="btn btn-default" type="button" >
+                  <i class="material-icons" style="font-size: 36px">search</i>
+                  </button>
+                  </span>
+                </div>
+            <div class="charts" style="padding-top:100px">
+                <div class="col-sm-6" style="padding-right: 15px">
+                              <div class="panel panel-default">
+                                  <div class="panel-heading">
+                                      Pie Chart Example
+                                  </div>
+                                  <!-- /.panel-heading -->
+                                  <div class="panel-body">
+                                      <div class="flot-chart">
+                                          <div class="flot-chart-content" id="flot-pie-chart"></div>
+                                      </div>
+                                  </div>
+                                  <!-- /.panel-body -->
+                              </div>
+                              <!-- /.panel -->
+                          </div>
+                          <!-- /.col-lg-6 -->
+                          <div class="col-sm-6" style="padding-right: 15px">
+                              <div class="panel panel-default">
+                                  <div class="panel-heading">
+                                      Multiple Axes Line Chart Example
+                                  </div>
+                                  <!-- /.panel-heading -->
+                                  <div class="panel-body">
+                                      <div class="flot-chart">
+                                          <div class="flot-chart-content" id="flot-line-chart-multi"></div>
+                                      </div>
+                                  </div>
+                                  <!-- /.panel-body -->
+                              </div>
+                              <!-- /.panel -->
+                          </div>
+                          <!-- /.col-lg-6 -->
+                          <div class="col-sm-6" style="padding-right: 15px">
+                              <div class="panel panel-default">
+                                  <div class="panel-heading">
+                                      Moving Line Chart Example
+                                  </div>
+                                  <!-- /.panel-heading -->
+                                  <div class="panel-body">
+                                      <div class="flot-chart">
+                                          <div class="flot-chart-content" id="flot-line-chart-moving"></div>
+                                      </div>
+                                  </div>
+                                  <!-- /.panel-body -->
+                              </div>
+                              <!-- /.panel -->
+                          </div>
+                          <!-- /.col-lg-6 -->
+                          <div class="col-sm-6" style="padding-right: 15px">
+                              <div class="panel panel-default">
+                                  <div class="panel-heading">
+                                      Bar Chart Example
+                                  </div>
+                                  <!-- /.panel-heading -->
+                                  <div class="panel-body">
+                                      <div class="flot-chart">
+                                          <div class="flot-chart-content" id="flot-bar-chart"></div>
+                                      </div>
+                                  </div>
+                                  <!-- /.panel-body -->
+                              </div>
+                              <!-- /.panel -->
+                          </div>
+            </div>
   </div>
 </section>
 </template>

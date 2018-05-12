@@ -11,13 +11,13 @@ function showProject(name, desc, imgsrc) {
   template = [
     "<div class='col-lg-4 col-sm-6 portfolio-item'>",
       "<div class='card h-100'>",
-        "<a id='photo-{{name}}' href='#'><img class='card-img-top' src='{{imgsrc}}' alt=''></a>",
-        "<div class='card-body'>",
+        "<a id='photo-{{name}}' href='#'><img style='width: 100%; height: 30vw; object-fit: cover' class='card-img-top img-responsive' src='{{imgsrc}}' alt=''></a>",
+        "<div class='card-block well'>",
           "<h4 class='card-title'>",
-            "<a id='link-{{name}}' href='#'>{{displayName}}</a>",
+            "<a style='padding: 0px; margin: -10px; color: #192d42' id='link-{{name}}' href='#'>{{displayName}}</a>",
           "</h4>",
-          "<p class='card-text text-truncate'>{{desc}}</p>",
-          "<a class='btn btn-primary' id='btn-{{name}}' href='#'>View</a>",
+          "<p style='padding: 0; color: 192d42' class='card-text text-truncate'>{{desc}}</p>",
+          "<a class='btn btn-primary' style='background-color: #192d42; color: white' id='btn-{{name}}' href='#'>View</a>",
         "</div>",
       "</div>",
     "</div>",
@@ -46,7 +46,7 @@ function showNewProject() {
   template = [
     "<div class='col-lg-4 col-sm-6 portfolio-item'>",
       "<div class='card h-100'>",
-        "<a id='new-project-photo' href='#'><img data-section='new' class='card-img-top' src='./assets/add-proj.png' alt=''></a>",
+        "<a id='new-project-photo' href='#'><img data-section='new' class='card-img-top img-responsive' src='./assets/add-proj.png' alt=''></a>",
         "<div class='card-body'>",
           "<h4 class='card-title'>",
             "<a id='new-photo-link' href='#'></a>",
@@ -63,6 +63,7 @@ function showNewProject() {
 }
 
 function populateProjectsScreen() {
+<<<<<<< HEAD
   database.get_projects(function (projects_list) {
     showNewProject();
 
@@ -77,6 +78,35 @@ function populateProjectsScreen() {
       });
     });
   });
+=======
+  // var storage = remote.getGlobal('sharedObj').store;
+  lib = storage.getAllProjects();
+  // showNewProject();
+  var proj_list = [];
+  for (var proj in lib) {
+    proj_list.push(proj);
+  }
+
+  proj_list.sort(compareTimestamp);
+
+  proj_list.forEach(function (proj) {
+    var project = getProject(proj);
+    if (!project) {
+      storage.deleteProject(proj);
+    } else {
+      // uncomment this when images working
+      if (project.getImages()[0]) {
+        var imgsrc = project.getImages()[0]['path'];
+      } else {
+        imgsrc = ""
+      }
+      if (imgsrc == "" || !fs.existsSync(imgsrc)) {
+        imgsrc = "https://static1.squarespace.com/static/5a6557ae692ebe609770a2a7/t/5a67a1be0852291d033bb08b/1518849801599/?format=1500w";
+      }
+      showProject(project.getName(), project.getDescription(), imgsrc);// "https://upload.wikimedia.org/wikipedia/commons/d/d1/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg");
+    }
+  })
+>>>>>>> new_ui_real
 }
 
 function getProject(projName) {
@@ -89,8 +119,15 @@ function getProject(projName) {
 }
 
 // Comparator that puts newer projects before older ones.
+<<<<<<< HEAD
 function compareTimestamp(proj1, proj2) {
   if (!proj1 || !proj2) {
+=======
+function compareTimestamp(proj1, proj2){
+  var p1 = getProject(proj1);
+  var p2 = getProject(proj2);
+  if (!p2) {
+>>>>>>> new_ui_real
     return -1;
   }
 

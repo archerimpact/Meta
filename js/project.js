@@ -177,8 +177,6 @@ class Project {
       images.push(image);
     }
 
-    console.log("in proj");
-    console.log(images);
     return images;
   }
 
@@ -203,7 +201,7 @@ function loadProject(jsonFile) {
   try {
     var rawData = fs.readFileSync(jsonFile);
   } catch (error) {
-    console.log(error);
+    console.warn(error);
     return null;
   }
   var info = JSON.parse(rawData);
@@ -212,7 +210,6 @@ function loadProject(jsonFile) {
 
   // Load images.
   project.setImages(info['images']);
-  console.log(info['images']);
 
   // Set creation timestamp.
   project.setCreation(info['creation']);

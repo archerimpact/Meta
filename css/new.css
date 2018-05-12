@@ -1,0 +1,16 @@
+.icon-blue {
+  color: #0d77e2;
+  display:inline;
+  font-size: 48px;
+}
+
+.input-group-addon {
+  background-color: #0d77e2;
+  margin-bottom: 100px;
+  color: white;
+  border: 0px;
+}
+
+.form-group {
+  margin-bottom: 40px;
+}

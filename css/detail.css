@@ -1,0 +1,43 @@
+.image-name {
+  margin-top: 0px;
+  word-wrap: break-word;
+  display: inline;
+}
+
+.name-row {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+.settings-button {
+  padding: 5px;
+  width: 27px;
+  height: 27px;
+}
+
+.accordian-link {
+  color: #192d42;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.accordian-header {
+  text-align: center;
+}
+
+.data-panel {
+  margin-top: 0px;
+}
+
+.choices {
+  margin-bottom: 10px !important;
+}
+
+.notes {
+  margin-bottom: 10px;
+}
+
+.accordian-body {
+  max-height: 300px;
+  overflow: scroll;
+}
