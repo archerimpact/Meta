@@ -40,7 +40,6 @@ function loadDetail(projectName) {
 	clearDetailsHtml();
 
 	redirect('detail');
-<<<<<<< HEAD
 
 	/* Display project header. */
 	database.get_project(projectName, function(row) {
@@ -56,21 +55,10 @@ function loadDetail(projectName) {
 			var image_path = image['path'];
 			var name = image['img_name'];
 			database.get_image_metadata(image_path, name, projectName, function(bool, name, path, projectName, metadata) {
-				detailExifDisplay(image_path, name, projectName, metadata);
+				//detailExifDisplay(image_path, name, projectName, metadata);
+				detailExifDisplay__NEW(img_path, name, metadata);
 			});
 		});
-=======
-	loadHeader(project);
-
-	var images = project.getImages();
-	images.sort(compareTimestamp);
-	images.forEach(function(image) {
-		var img_path = image['path'];
-		var name = image['name'];
-		var metadata = image['metadata'];
-		//detailExifDisplay(img_path, name, metadata);
-		detailExifDisplay__NEW(img_path, name, metadata)
->>>>>>> new_ui_real
 	});
 }
 
@@ -84,7 +72,6 @@ function compareTimestamp(image1, image2){
 		return 1;
 }
 
-<<<<<<< HEAD
 function insert_detail_template_callback(bool, img_name, img_path, proj_name, metadata_row) {
 	if (bool) {
 		var data = {
@@ -281,20 +268,18 @@ function insertDetailTemplate(img_name, img_path, proj_name) {
 }
 
 function insertErrorTemplate(error, id) {
-	if (error && error.toString().includes('no such file')) {
-		data.error = 'This file could not be found. Is it possible ' +
-			'that it was moved? If so, either put it back, or delete ' +
-			'this entry and re-add it in its new location.'
-	}
-=======
-function insertErrorTemplate(data, id) {
 	// TODO find out what the analog of this is for the new module
 	// if (data.error && data.error.includes('no such file')) {
 	// 	data.error = 'This file could not be found. Is it possible ' +
 	// 		'that it was moved? If so, either put it back, or delete ' +
 	// 		'this entry and re-add it in its new location.'
 	// }
->>>>>>> new_ui_real
+
+	if (error && error.toString().includes('no such file')) {
+		error = 'This file could not be found. Is it possible ' +
+			'that it was moved? If so, either put it back, or delete ' +
+			'this entry and re-add it in its new location.'
+	}
 	var template = [
 			'<div class="col-md-4">',
 				'<a href="#">',
@@ -323,7 +308,7 @@ function insertErrorTemplate(data, id) {
 				'<div id="imagedata' + id +' ">',
 						'<br>',
 						'<div class="alert alert-warning">',
-							'<strong>Sorry! </strong>' + data.error,
+							'<strong>Sorry! </strong>' + error,
 						'</div>',
 				'</div>',
 			'</div>',
@@ -375,7 +360,6 @@ function setPhotoRemove(name) {
 		return;
 	}
 	elem.onclick = function() {
-<<<<<<< HEAD
 		database.remove_image(projName, name, function() {
 			var content = document.getElementById('detail-template' + name);
 			content.parentNode.removeChild(content);
@@ -386,20 +370,6 @@ function setPhotoRemove(name) {
 					_data.splice(row, 1);
 					break;
 				}
-=======
-		var projectPath = storage.getProject(projName);
-		var proj = loadProject(path.join(projectPath, projName + '.json'));
-		proj.removeImage(name);
-		proj.saveProject();
-		var content = document.getElementById('detail-template' + name);
-		content.parentNode.removeChild(content);
-		var line = document.getElementById('hr' + name);
-		line.parentNode.removeChild(line);
-		for (var row = 0; row < _data.length; row++) {
-			if (_data[row]['Image Name'] == name) {
-				_data.splice(row, 1);
-				break;
->>>>>>> new_ui_real
 			}
 		});
 	};
@@ -501,11 +471,7 @@ function loadHeader(project) {
 		}
 	};
 
-<<<<<<< HEAD
 	document.getElementById("upload" + project['name']).onclick = function() {
-=======
-	document.getElementById("upload" + project.getName()).onclick = function() {
->>>>>>> new_ui_real
 		let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
 		for (var index in paths) {
 			var filename = path.basename(paths[index]).split(".")[index];
@@ -523,7 +489,6 @@ function clearDetailsHtml() {
 	// document.getElementById("file-label2").innerHTML = ""
 }
 
-<<<<<<< HEAD
 function detail_exif_display_callback(bool) {
 	console.log("added exif to db: " + bool);
 }
@@ -613,8 +578,6 @@ function isStr(maybeString) {
 	return maybeString && !(maybeString == "");
 }
 
-=======
->>>>>>> new_ui_real
 $("#add-image").submit(function(e) {
 	e.preventDefault();
 	if (!paths_global) {
@@ -1030,6 +993,6 @@ function loadCharts() {
 function selectPrep() {
 	var ts = $(".tag-selector");
 	// ts.select2({
-  // 	tags: true
+  	// 	tags: true
 	// });
 }

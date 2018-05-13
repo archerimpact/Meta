@@ -29,28 +29,28 @@ let mainWindow
 // be accessible to other scripts must go here.
 global.sharedObj = {db: db};
 
-// for testing
-db.db.serialize(function() {
- db.add_project("TestProj", "Description", [], function(success, name, img_paths) {
-   db.add_image("Image", "Path/Image", "TestProj", 1, 1, function(success, proj_name, img_path, index, num_images) {
-     var data = {"testdata" : 1, "yuhlkamsdl" : 2, "yah" : "data"};
-     db.add_image_meta("Path/Image", "TestProj", data, function(img_path, proj_name, meta_dict, success) {
-      console.log("success?:", success);
-     });
-     db.update_favorite_image("Path/Image", "TestProj", false, function(img_path, proj_name, fave_bool, success) {
-      db.get_image_metadata("Path/Image", "Image", "TestProj", function(bool, img_name, img_path, proj_name, meta_dict) {
+// // for testing
+// db.db.serialize(function() {
+//  db.add_project("TestProj", "Description", [], function(success, name, img_paths) {
+//    db.add_image("Image", "Path/Image", "TestProj", 1, 1, function(success, proj_name, img_path, index, num_images) {
+//      var data = {"testdata" : 1, "yuhlkamsdl" : 2, "yah" : "data"};
+//      db.add_image_meta("Path/Image", "TestProj", data, function(img_path, proj_name, meta_dict, success) {
+//       console.log("success?:", success);
+//      });
+//      db.update_favorite_image("Path/Image", "TestProj", false, function(img_path, proj_name, fave_bool, success) {
+//       db.get_image_metadata("Path/Image", "Image", "TestProj", function(bool, img_name, img_path, proj_name, meta_dict) {
 
-      });
-      db.get_favorite_images_in_project("TestProj", function(proj_name, images) {
-        console.log("fav images:", images);
-      });
-      db.update_project_name("TestProj", "NewTestProj", function(old_name, new_name, success) {
-        db.get_projects(function() {})
-      });
-     });
-   });
- });
-});
+//       });
+//       db.get_favorite_images_in_project("TestProj", function(proj_name, images) {
+//         console.log("fav images:", images);
+//       });
+//       db.update_project_name("TestProj", "NewTestProj", function(old_name, new_name, success) {
+//         db.get_projects(function() {})
+//       });
+//      });
+//    });
+//  });
+// });
 
 function createWindow () {
   // Create the browser window.
