@@ -24,7 +24,7 @@ global.sharedObj = {db: db};
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 1000, height: 800})
-  mainWindow.setFullScreen(true)
+  mainWindow.setFullScreen(false)
 
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({

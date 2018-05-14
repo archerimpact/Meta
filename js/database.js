@@ -107,6 +107,81 @@ class Database {
     });
   }
 
+  /* Get tags for a project. */
+  get_tags(img_name, img_path, proj_name, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      var stmt = db.prepare("SELECT tags FROM Images WHERE path=? AND proj_name=?");
+      stmt.get([img_path, proj_name], function(err, row) {
+        if (err) {
+          throw error;
+        }
+
+        if (row['tags'].length == 0) {
+          callback(img_name, proj_name, img_path, []);
+          return;
+        }
+
+        var tags = row['tags'].split(',');
+        var tags_array_dict_form = [];
+        for (var i in tags) {
+          tags_array_dict_form.push({value: tags[i], label: tags[i]});
+        }
+        callback(img_name, proj_name, img_path, tags_array_dict_form);
+      });
+      stmt.finalize();
+    });
+  }
+
+  /* Update tags. */
+  update_tag(proj_name, img_path, new_value) {
+    var _this = this;
+    var db = this.db;
+    var stmt = db.prepare("UPDATE Images SET tags=? WHERE path=? AND proj_name=?");
+    stmt.run(new_value, img_path, proj_name);
+    stmt.finalize();
+  }
+
+  /* Add tag to an image. */
+  add_tag(proj_name, img_path, tag) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      var stmt = db.prepare("SELECT tags FROM Images WHERE path=? AND proj_name=?");
+      stmt.get([img_path, proj_name], function(err, row) {
+        if (err) {
+          throw error;
+        }
+        if (row['tags'].length == 0)
+          _this.update_tag(proj_name, img_path, tag);
+        else
+          _this.update_tag(proj_name, img_path, row['tags'] + "," + tag);
+      });
+      stmt.finalize();
+    });
+  }
+
+  /* Remove a tag from an image. */
+  remove_tag(proj_name, img_path, tag) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      var stmt = db.prepare("SELECT tags FROM Images WHERE path=? AND proj_name=?");
+      stmt.get([img_path, proj_name], function(err, row) {
+        if (err) {
+          throw error;
+        }
+
+        var tags = row['tags'].split(',');
+        var index = tags.indexOf(tag);
+        tags.splice(index, 1);
+        _this.update_tag(proj_name, img_path, tags.join());
+      });
+      stmt.finalize();
+    });
+  }
+
   /* Uses callback(img_path, proj_name, meta_dict, success) to add metadata in a dictionary. */
   add_image_meta(img_path, proj_name, meta_dict, callback) {
     var _this = this;

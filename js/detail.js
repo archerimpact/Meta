@@ -56,7 +56,7 @@ function loadDetail(projectName) {
 			var name = image['img_name'];
 			database.get_image_metadata(img_path, name, projectName, function(bool, name, path, projectName, metadata) {
 				//detailExifDisplay(img_path, name, projectName, metadata);
-				detailExifDisplay__NEW(img_path, name, metadata);
+				detailExifDisplay__NEW(img_path, name, projectName, metadata);
 			});
 		});
 	});
@@ -535,45 +535,6 @@ function getFavDataKeys() {
 	return [];
 }
 
-function detailExifDisplay(imgpath, imgname, projname, metadata) {
-	// Set default template.
-	var template = [
-		'<div id="detail-template{{name}}" class="row">',
-		'</div>',
-		'<hr id="hr{{name}}">'
-	].join("\n")
-	var filler = Mustache.render(template, {name: imgname});
-	$("#image-wrapper").append(filler);
-	if (!metadata) {
-		metadata = {};
-	}
-
-	if (Object.keys(metadata).length == 0) {
-		try {
-			console.log("generating metadata for " + imgname);
-
-			exiftool
-				.read(imgpath)
-				.then(function(tags) {
-					database.add_image_meta(imgpath, projname, tags, detail_exif_display_callback);
-					insertDetailTemplate(imgname, imgpath, projname);
-					// insertDetailTemplate__NEW(data, name);
-				})
-				.catch(function(error) {
-					console.error(error);
-					data.error = error;
-					insertErrorTemplate(error, imgname)
-				});
-		} catch (error) {
-			console.log('Exif Error: ' + error.message);
-			insertErrorTemplate(error, imgname);
-		}
-	} else {
-		console.log("using existing metadata for " + imgname);
-		insertDetailTemplate(imgname, imgpath, projname);
-	}
-}
-
 function isStr(maybeString) {
 	return maybeString && !(maybeString == "");
 }
@@ -603,9 +564,9 @@ module.exports = {
 ** only when needed, then calling .end() after it is done batch processing
 ** (it does also have a batch mode)
 */
-function detailExifDisplay__NEW(imgpath, name, metadata) {
+function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 	var data = {
-		'name': name,
+		'name': imgname,
 		'path': imgpath,
 		'exifData': {},
 		'gpsData': {},
@@ -617,7 +578,7 @@ function detailExifDisplay__NEW(imgpath, name, metadata) {
 		'</div>',
 		'<hr id="hr{{name}}">'
 	].join("\n")
-	var filler = Mustache.render(template, {name: name});
+	var filler = Mustache.render(template, {name: imgname});
 	$("#image-wrapper").append(filler);
 	// if (Object.keys(metadata).length > 0) {
 	// 	data.exifData = metadata;
@@ -632,13 +593,34 @@ function detailExifDisplay__NEW(imgpath, name, metadata) {
 				data.exifData[key] = tags[key];
 				data = processData(data);
 			}
-			insertDetailTemplate__NEW(data, name);
+			insertDetailTemplate__NEW(data, imgname, imgpath, projname);
 		})
 		.catch(function(error) {
 			console.error(error);
 			data.error = error;
-			insertDetailTemplate__NEW(data, name);
+			insertDetailTemplate__NEW(data, imgname, imgpath, projname);
 		});
+}
+
+function populate_tags_view(image_name, project_name, image_path, tags) {
+	/* Set tagging actions. */
+	var choices = new Choices($('#tags' + image_name)[0], {
+		items: tags,
+		removeItemButton: true,
+		editItems: true,
+		duplicateItems: false,
+		placeholderValue: "Add a tag",
+	});
+
+	/* Add tag to database. */
+	$('#tags' + image_name)[0].addEventListener('addItem', function(event) {
+		database.add_tag(project_name, image_path, event.detail.value);
+	});
+
+	/* Remove tag from database. */
+	$('#tags' + image_name)[0].addEventListener('removeItem', function(event) {
+		database.remove_tag(project_name, image_path, event.detail.value);
+	});
 }
 
 // format of data is
@@ -651,8 +633,9 @@ function detailExifDisplay__NEW(imgpath, name, metadata) {
 //  gpsData: {...}
 //  fileData: {...}
 // }
-function insertDetailTemplate__NEW(data, id) {
-	data.id = id
+function insertDetailTemplate__NEW(data, id, path, projname) {
+	data.id = id;
+
 	if (data.error) {
 		insertErrorTemplate(data, id);
 		return;
@@ -819,16 +802,6 @@ function insertDetailTemplate__NEW(data, id) {
 
 	setPhotoRemove(data.name);
 
-	var tags = getTagsForName(data.name);
-
-	var choices = new Choices($('#tags' + data.name)[0], {
-		items: tags,
-		removeItemButton: true,
-		editItems: true,
-		duplicateItems: false,
-		placeholderValue: "Add a tag",
-	})
-
 	var choices = new Choices($('#search' + data.name)[0], {
 		choices: data.ref,
 		paste: false,
@@ -837,12 +810,15 @@ function insertDetailTemplate__NEW(data, id) {
 		itemSelectText: '',
 		duplicateItems: true,
 		placeholderValue: "Search Exif data",
-	})
+	});
 
+	/* Handle tags. */
+	database.get_tags(id, path, projname, populate_tags_view);
 }
 
 //TODO
 function getTagsForName(name) {
+	v
 	return [
 		{
 			value: 'Outdoors',
