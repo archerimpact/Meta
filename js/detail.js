@@ -52,10 +52,10 @@ function loadDetail(projectName) {
 		image_list.sort(compareTimestamp);
 
 		image_list.forEach(function(image) {
-			var image_path = image['path'];
+			var img_path = image['path'];
 			var name = image['img_name'];
-			database.get_image_metadata(image_path, name, projectName, function(bool, name, path, projectName, metadata) {
-				//detailExifDisplay(image_path, name, projectName, metadata);
+			database.get_image_metadata(img_path, name, projectName, function(bool, name, path, projectName, metadata) {
+				//detailExifDisplay(img_path, name, projectName, metadata);
 				detailExifDisplay__NEW(img_path, name, metadata);
 			});
 		});
