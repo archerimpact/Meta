@@ -107,6 +107,17 @@ class Database {
     });
   }
 
+  /* Update notes for an image. */
+  update_notes(img_path, proj_name) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      var stmt = db.prepare("UPDATE notes FROM Images WHERE path=? AND proj_name=?");
+      stmt.run(img_path, proj_name);
+      stmt.finalize();
+    });
+  }
+
   /* Get tags for a project. */
   get_tags(img_name, img_path, proj_name, callback) {
     var _this = this;
