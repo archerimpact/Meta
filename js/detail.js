@@ -360,7 +360,8 @@ function setPhotoRemove(name) {
 		return;
 	}
 	elem.onclick = function() {
-		database.remove_image(projName, name, function() {
+		database.get_projects(function(bool){});
+		database.delete_image(name, projName, function(bool) {
 			var content = document.getElementById('detail-template' + name);
 			content.parentNode.removeChild(content);
 			var line = document.getElementById('hr' + name);
