@@ -15,6 +15,7 @@ var _data = [];
 var _currentProj;
 var paths_global;
 var database = electron.remote.getGlobal('sharedObj').db;
+var _updated_notes = {};
 
 function alert_image_upload(bool, project_name, img_path, index, num_images) {
 	if (!bool) {
@@ -404,7 +405,7 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 }
 
 function populate_tags_view(image_name, project_name, image_path, tags) {
-	/* Set tagging actions. */
+	/* Set tagging actions and populate existing tags. */
 	var choices = new Choices($('#tags' + image_name)[0], {
 		items: tags,
 		removeItemButton: true,
@@ -421,6 +422,16 @@ function populate_tags_view(image_name, project_name, image_path, tags) {
 	/* Remove tag from database. */
 	$('#tags' + image_name)[0].addEventListener('removeItem', function(event) {
 		database.remove_tag(project_name, image_path, event.detail.value);
+	});
+}
+
+function populate_notes_view(image_name, project_name, image_path, notes) {
+	/* Fill existing notes. */
+	$("#notes" + image_name).val(notes);
+
+	/* Store updates to notes in the database. */
+	$("#notes" + image_name).change(function(event) {
+		database.update_notes(image_path, project_name, $("#notes" + image_name).val());
 	});
 }
 
@@ -612,6 +623,9 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 		duplicateItems: true,
 		placeholderValue: "Search Exif data",
 	});
+
+	/* Handle notes. */
+	database.get_notes(id, path, projname, populate_notes_view);
 
 	/* Handle tags. */
 	database.get_tags(id, path, projname, populate_tags_view);

@@ -107,13 +107,30 @@ class Database {
     });
   }
 
-  /* Update notes for an image. */
-  update_notes(img_path, proj_name) {
+  /* Get notes for an image. */
+  get_notes(img_name, img_path, proj_name, callback) {
     var _this = this;
     var db = this.db;
     db.serialize(function() {
-      var stmt = db.prepare("UPDATE notes FROM Images WHERE path=? AND proj_name=?");
-      stmt.run(img_path, proj_name);
+      var stmt = db.prepare("SELECT notes FROM Images WHERE path=? AND proj_name=?");
+      stmt.get([img_path, proj_name], function(err, row) {
+        if (err) {
+          throw err;
+        }
+
+        callback(img_name, proj_name, img_path, row['notes']);
+      });
+      stmt.finalize();
+    });
+  }
+
+  /* Update notes for an image. */
+  update_notes(img_path, proj_name, notes) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      var stmt = db.prepare("UPDATE Images SET notes=? WHERE path=? AND proj_name=?");
+      stmt.run(notes, img_path, proj_name);
       stmt.finalize();
     });
   }
