@@ -295,7 +295,8 @@ function clearDetailsHtml() {
 	// document.getElementById("file-label2").innerHTML = ""
 }
 
-function processData(data) {
+function processData(data, favorites) {
+	data.ref = [];
 	var file = [
 		"SourceFile",
 		"Directory",
@@ -310,31 +311,30 @@ function processData(data) {
 		"ExifToolVersion",
 		"FileSize",
 		"ExifByteOrder",
-	]
-	var favorites = getFavDataKeys();
+	];
 	for (var key in data.exifData) {
+		var val = data.exifData[key];
+		data.ref.push({
+		  value: '',
+		  label: key + ": " + val,
+		  selected: false,
+		  disabled: false,
+		})
 		if (key == "errors" && !isStr(data.exifData[key])) {
 			delete data.exifData[key];
 		}
-		if (file.includes(key)) {
-			data.fileData[key] = data.exifData[key]
-			delete data.exifData[key];
-		}
 		if (favorites.includes(key)) {
-			data.favData[key] = data.exifData[key]
+			data.favData[key] = data.exifData[key];
 			delete data.exifData[key];
-		}
-		if (key.toLowerCase().includes("gps")) {
+		} else if (file.includes(key)) {
+			data.fileData[key] = data.exifData[key];
+			delete data.exifData[key];
+		} else if (key.toLowerCase().includes("gps")) {
 			data.gpsData[key] = data.exifData[key];
 			delete data.exifData['key'];
 		}
 	}
 	return data;
-}
-
-//TODO return favorite fields as strings in array
-function getFavDataKeys() {
-	return [];
 }
 
 function isStr(maybeString) {
@@ -361,6 +361,12 @@ module.exports = {
 	loadDetail: loadDetail
 };
 
+function detail_exif_display_callback(bool) {
+	if (!bool) {
+		alert("failed to add image metadata");
+	}
+}
+
 /*
 ** Need to look into resource conservation here, by creating a new exiftool
 ** only when needed, then calling .end() after it is done batch processing
@@ -373,6 +379,7 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 		'exifData': {},
 		'gpsData': {},
 		'fileData': {},
+		'favData': {},
 		'error': "",
 	};
 	var template = [
@@ -382,20 +389,18 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 	].join("\n")
 	var filler = Mustache.render(template, {name: imgname});
 	$("#image-wrapper").append(filler);
-	// if (Object.keys(metadata).length > 0) {
-	// 	data.exifData = metadata;
-	// 	insertDetailTemplate__NEW(data, name);
-	// 	return;
-	// }
+	if (Object.keys(metadata).length > 0) {
+		data.exifData = metadata;
+		insertDetailTemplate(imgname, imgpath, projname);
+		return;
+	}
 	exiftool
 		.read(imgpath)
 		.then(function(tags) {
-			data.exifData = {};
 			for (var key in tags) {
-				data.exifData[key] = tags[key];
-				data = processData(data);
+				database.add_image_meta(imgpath, projname, key, tags[key], detail_exif_display_callback);
 			}
-			insertDetailTemplate__NEW(data, imgname, imgpath, projname);
+			insertDetailTemplate(imgname, imgpath, projname);
 		})
 		.catch(function(error) {
 			console.error(error);
@@ -435,6 +440,34 @@ function populate_notes_view(image_name, project_name, image_path, notes) {
 	});
 }
 
+function insert_detail_template_callback(bool, img_name, img_path, proj_name, metadata_row) {
+	if (bool) {
+		var data = {
+				'name': img_name,
+				'path': img_path,
+				'exifData': {},
+				'gpsData': {},
+				'favData': {},
+				'fileData': {},
+				'error': "",
+			};
+		for (var key in metadata_row) {
+			data.exifData[key] = metadata_row[key];
+		}
+		database.get_favorite_fields(function(favorites, csv) {
+			data = processData(data, favorites);
+			insertDetailTemplate__NEW(data, img_name, img_path, proj_name);
+		});
+	} else {
+		insertErrorTemplate(metadata_row, img_name);
+		return;
+	}
+}
+
+function insertDetailTemplate(img_name, img_path, proj_name) {
+	database.get_image_metadata(img_path, img_name, proj_name, insert_detail_template_callback);
+}
+
 // format of data is
 // {
 //  error: String ("" if no error)
@@ -446,6 +479,7 @@ function populate_notes_view(image_name, project_name, image_path, notes) {
 //  fileData: {...}
 // }
 function insertDetailTemplate__NEW(data, id, path, projname) {
+	console.log(data);
 	data.id = id;
 
 	if (data.error) {
@@ -605,6 +639,7 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 		latitude = data.gpsData.GPSLatitude
 		longitude = data.gpsData.GPSLongitude
 	}
+
 	addMap(
 		"map" + data.name,
 		[{'lat':latitude, 'lng':longitude}],
@@ -631,68 +666,8 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 	database.get_tags(id, path, projname, populate_tags_view);
 }
 
-//TODO
-function getTagsForName(name) {
-	v
-	return [
-		{
-			value: 'Outdoors',
-			label: 'Outdoors',
-		},
-		{
-			value: 'Berkeley',
-			label: 'Berkeley',
-		}
-	]
-}
 function isStr(maybeString) {
 	return maybeString && !(maybeString == "");
-}
-
-function processData(data) {
-	data.ref = []
-	var file = [
-		"SourceFile",
-		"Directory",
-		"FileType",
-		"FileTypeExtension",
-		"FileModifyDate",
-		"FileAccessDate",
-		"FilePermissions",
-		"FileInodeChangeDate",
-		"MIMEType",
-	]
-	var favories = getFavDataKeys();
-	for (var key in data.exifData) {
-		var val = data.exifData[key];
-		data.ref.push({
-		  value: '',
-		  label: key + ": " + val,
-		  selected: false,
-		  disabled: false,
-		})
-		if (key == "errors" && !isStr(data.exifData[key])) {
-			delete data.exifData[key];
-		}
-		if (file.includes(key)) {
-			data.fileData[key] = data.exifData[key]
-			delete data.exifData[key]
-		}
-		if (favories.includes(key)) {
-			data.favData[key] = data.exifData[key]
-			delete data.exifData[key]
-		}
-		if (key.toLowerCase().includes("gps")) {
-			data.gpsData[key] = data.exifData[key];
-			delete data.exifData['key']
-		}
-	}
-	return data
-}
-
-//TODO return favorite fields as strings in array
-function getFavDataKeys() {
-	return []
 }
 
 function loadCharts() {
