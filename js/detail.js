@@ -24,6 +24,7 @@ function loadDetail(projectName){
 	var project = loadProject(projectPath);
 	_currentProj = project;
 	$('#slidebutton').removeClass('hidden');
+	document.getElementById('slidetogglebtn').onclick = toggleSlideView
 
 	redirect('detail');
 	loadHeader(project);
@@ -269,7 +270,8 @@ function clearDetailsHtml() {
 	document.getElementById("detail-header").innerHTML = ""
 	document.getElementById("image-wrapper").innerHTML = ""
 	document.getElementById("detail-charts").innerHTML = ""
-	document.getElementById("drawer-select").innerHTML = '<h3 style="margin-left: 10px;">Filter Images</h3>'
+	document.getElementById("name-menu").innerHTML = ""
+	document.getElementById("thumb-menu").innerHTML = ""
 	// document.getElementById("file-label2").innerHTML = ""
 }
 
@@ -728,19 +730,52 @@ function loadCharts() {
 }
 
 function insertIntoSlideMenu(data, id) {
-	var menu_row = [
-		'<label class="menu-check"><input id="{{name}}check" type="checkbox" checked> {{name}}</label>',
+	// name view
+	var name_row = [
+		'<div class="row thumb-row">',
+			'<label class="menu-check">',
+				'<input id="{{name}}check" type="checkbox" checked>',
+				'{{name}}',
+			'</label>',
 
-	].join("/n")
-	var row = Mustache.render(menu_row, data);
-	$('#drawer-select').append(row);
+	].join('\n')
+	var row = Mustache.render(name_row, data);
+	$('#name-menu').append(row);
 
 	var elem = document.getElementById(data.name.toString() + 'check')
-	if (!elem) {
-		return;
+	if (elem) {
+		elem.onclick = function() {
+			$('#detail-template' + data.name).toggleClass('hidden')
+			$('#hr' + data.name).toggleClass('hidden');
+			var other = document.getElementById(data.name.toString() + 'check_thumb')
+			other.checked = !other.checked
+		};
 	}
-	elem.onclick = function() {
-		$('#detail-template' + data.name).toggleClass('hidden')
-		$('#hr' + data.name).toggleClass('hidden');
-	};
+
+	//thumbnail view
+	var thumb_row = [
+		'<div class="row thumb-row">',
+			'<input id="{{name}}check_thumb" type="checkbox" checked class="menu-check-thumb">',
+			'<div class="panel panel-defualt data-panel clearfix thumb-panel">',
+				'<img src="{{path}}" alt="{{name}}" class="thumb">',
+			'</div>',
+		'</div>',
+	].join('\n')
+	row = Mustache.render(thumb_row, data)
+	$('#thumb-menu').append(row)
+
+	elem = document.getElementById(data.name.toString() + 'check_thumb')
+	if (elem) {
+		elem.onclick = function() {
+			$('#detail-template' + data.name).toggleClass('hidden')
+			$('#hr' + data.name).toggleClass('hidden');
+			var other = document.getElementById(data.name.toString() + 'check')
+			other.checked = !other.checked
+		};
+	}
+}
+
+function toggleSlideView() {
+	$('#name-menu').toggleClass('hidden')
+	$('#thumb-menu').toggleClass('hidden')
 }

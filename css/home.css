@@ -112,17 +112,3 @@ header.masthead {
 .choices__list--dropdown .choices__item--selectable {
     padding-right: 10px !important;
 }
-
-#slidebutton {
-  width: 60px;
-  height: 40px;
-  position: absolute;
-  top: 45vh;
-  left: calc(100% - 70px);
-
-}
-
-.menu-check {
-  margin-top: 10px;
-  margin-left: 15px;
-}
