@@ -553,23 +553,29 @@ function insertDetailTemplate__NEW(data, id) {
 
 	var tags = getTagsForName(data.name);
 
-	var choices = new Choices($('#tags' + data.name)[0], {
-		items: tags,
-		removeItemButton: true,
-		editItems: true,
-		duplicateItems: false,
-		placeholderValue: "Add a tag",
-	})
+	var tagElem = $('#tags' + data.name)[0]
+	if (tagElem) {
+		var choices = new Choices(tagElem, {
+			items: tags,
+			removeItemButton: true,
+			editItems: true,
+			duplicateItems: false,
+			placeholderValue: "Add a tag",
+		})
+	}
 
-	var choices = new Choices($('#search' + data.name)[0], {
-		choices: data.ref,
-		paste: false,
-		duplicateItems: false,
-		placeholder: "Enter/select a tag",
-		itemSelectText: '',
-		duplicateItems: true,
-		placeholderValue: "Search Exif data",
-	})
+	var searchElem = $('#search' + data.name)[0]
+	if (searchElem) {
+		var choices = new Choices(searchElem, {
+			choices: data.ref,
+			paste: false,
+			duplicateItems: false,
+			placeholder: "Enter/select a tag",
+			itemSelectText: '',
+			duplicateItems: true,
+			placeholderValue: "Search Exif data",
+		})
+	}
 
 }
 
