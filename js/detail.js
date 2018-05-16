@@ -39,6 +39,11 @@ function loadDetail(projectName) {
 	_currentProj = projectName;
 
 	clearDetailsHtml();
+	var projectPath = getProjectJsonPath(projectName);
+	var project = loadProject(projectPath);
+	_currentProj = project;
+	$('#slidebutton').removeClass('hidden');
+	document.getElementById('slidetogglebtn').onclick = toggleSlideView
 
 	redirect('detail');
 
@@ -47,7 +52,6 @@ function loadDetail(projectName) {
 		loadHeader(row);
 	});
 	loadCharts();
-	selectPrep();
 	/* Display images in this project. */
 	database.get_images_in_project(projectName, function(projectName, image_list) {
 		image_list.sort(compareTimestamp);
@@ -293,6 +297,8 @@ function clearDetailsHtml() {
 	document.getElementById("detail-header").innerHTML = ""
 	document.getElementById("image-wrapper").innerHTML = ""
 	document.getElementById("detail-charts").innerHTML = ""
+	document.getElementById("name-menu").innerHTML = ""
+	document.getElementById("thumb-menu").innerHTML = ""
 	// document.getElementById("file-label2").innerHTML = ""
 }
 
@@ -409,6 +415,36 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 		});
 }
 
+function getType(info) {
+	info = info.toLowerCase()
+	if (
+		info.includes('jpg') ||
+		info.includes('jpeg') ||
+		info.includes('png') ||
+		info.includes('svg') ||
+		info.includes('gif') ||
+		info.includes('apng') ||
+		info.includes('pdf') ||
+		info.includes('bmp')
+	) {
+		return 'img'
+	} else if (
+		info.includes('mp4') ||
+		info.includes('mov') ||
+		info.includes('mpeg') ||
+		info.includes('mpg') ||
+		info.includes('avi') ||
+		info.includes('wmv') ||
+		info.includes('ogg') ||
+		info.includes('webm')
+	) {
+		return 'video'
+	} else {
+		//default to image
+		return 'img'
+	}
+}
+
 function populate_tags_view(image_name, project_name, image_path, tags) {
 	/* Set tagging actions and populate existing tags. */
 	var choices = new Choices($('#tags' + image_name)[0], {
@@ -479,8 +515,8 @@ function insertDetailTemplate(img_name, img_path, proj_name) {
 //  fileData: {...}
 // }
 function insertDetailTemplate__NEW(data, id, path, projname) {
-	data.id = id;
-
+	insertIntoSlideMenu(data, id)
+	data.id = id
 	if (data.error) {
 		insertErrorTemplate(data, id);
 		return;
@@ -538,6 +574,9 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 	data.flag = flag_trigger
 	data.flag_str = flag_string
 
+	data.media = getType(contents.file)
+	data.sorry = "Sorry, we are not able to display this file. Consider inspecting it on your computer at {{path}}. However, there may still be exif data displayed to the right."
+
 	var template = [
 		'<div class="row">',
 			'<div class="col-md-4">',
@@ -554,7 +593,7 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 					'</div>',
 					'<img class="{{flag}}" src="./assets/alert.svg" style="height:25px; display:inline; float:right;" data-toggle="tooltip" data-placement="auto" title="{{flag_str}}"/>',
 				'</div>',
-				'<img class="img-responsive rounded" src="{{path}}" alt="">', // add image features here
+				'<{{media}} class="img-responsive rounded" src="{{path}}" alt="{{sorry}}" controls>',
 			'</div>',
 			'<div class="col-md-8">',
 				'<div class="row">',
@@ -648,15 +687,31 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 
 	setPhotoRemove(data.name);
 
-	var choices = new Choices($('#search' + data.name)[0], {
-		choices: data.ref,
-		paste: false,
-		duplicateItems: false,
-		placeholder: "Enter/select a tag",
-		itemSelectText: '',
-		duplicateItems: true,
-		placeholderValue: "Search Exif data",
-	});
+	var tags = getTagsForName(data.name);
+
+	var tagElem = $('#tags' + data.name)[0]
+	if (tagElem) {
+		var choices = new Choices(tagElem, {
+			items: tags,
+			removeItemButton: true,
+			editItems: true,
+			duplicateItems: false,
+			placeholderValue: "Add a tag",
+		})
+	}
+
+	var searchElem = $('#search' + data.name)[0]
+	if (searchElem) {
+		var choices = new Choices(searchElem, {
+			choices: data.ref,
+			paste: false,
+			duplicateItems: false,
+			placeholder: "Enter/select a tag",
+			itemSelectText: '',
+			duplicateItems: true,
+			placeholderValue: "Search Exif data",
+		})
+	}
 
 	/* Handle notes. */
 	database.get_notes(id, path, projname, populate_notes_view);
@@ -754,10 +809,53 @@ function loadCharts() {
 
 }
 
-// THIS IS NOT WORKING
-function selectPrep() {
-	var ts = $(".tag-selector");
-	// ts.select2({
-  	// 	tags: true
-	// });
+function insertIntoSlideMenu(data, id) {
+	// name view
+	var name_row = [
+		'<div class="row thumb-row">',
+			'<label class="menu-check">',
+				'<input id="{{name}}check" type="checkbox" checked>',
+				'{{name}}',
+			'</label>',
+
+	].join('\n')
+	var row = Mustache.render(name_row, data);
+	$('#name-menu').append(row);
+
+	var elem = document.getElementById(data.name.toString() + 'check')
+	if (elem) {
+		elem.onclick = function() {
+			$('#detail-template' + data.name).toggleClass('hidden')
+			$('#hr' + data.name).toggleClass('hidden');
+			var other = document.getElementById(data.name.toString() + 'check_thumb')
+			other.checked = !other.checked
+		};
+	}
+
+	//thumbnail view
+	var thumb_row = [
+		'<div class="row thumb-row">',
+			'<input id="{{name}}check_thumb" type="checkbox" checked class="menu-check-thumb">',
+			'<div class="panel panel-defualt data-panel clearfix thumb-panel">',
+				'<img src="{{path}}" alt="{{name}}" class="thumb">',
+			'</div>',
+		'</div>',
+	].join('\n')
+	row = Mustache.render(thumb_row, data)
+	$('#thumb-menu').append(row)
+
+	elem = document.getElementById(data.name.toString() + 'check_thumb')
+	if (elem) {
+		elem.onclick = function() {
+			$('#detail-template' + data.name).toggleClass('hidden')
+			$('#hr' + data.name).toggleClass('hidden');
+			var other = document.getElementById(data.name.toString() + 'check')
+			other.checked = !other.checked
+		};
+	}
+}
+
+function toggleSlideView() {
+	$('#name-menu').toggleClass('hidden')
+	$('#thumb-menu').toggleClass('hidden')
 }

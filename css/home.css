@@ -42,6 +42,7 @@ a.side-bar:hover, a.side-bar:focus {
 #body {
   margin-left: 16.666%;
   margin-top: 50px;
+  transition: margin-left .5s
 }
 
 header.masthead {
@@ -77,7 +78,8 @@ header.masthead {
 
 #wrapper {
   height: 100%;
-  padding: 0
+  padding: 0;
+  transition: margin-left .5s;
 }
 .absolute-center {
     display: -ms-flexbox;
@@ -99,6 +101,12 @@ header.masthead {
 #side-nav {
   position: fixed;
   margin: 50px 0px 0px 0px;
+}
+
+.meta-nav {
+  color: white;
+  background-color: #192d42;
+  height: 100%;
 }
 
 .choices__list--dropdown .choices__item--selectable {
