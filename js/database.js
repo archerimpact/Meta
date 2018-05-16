@@ -34,7 +34,7 @@ class Database {
     // callback(bool, name, image_paths);
   }
 
-  /* Uses callback(boolean) to return whether or not proj_name has img_path. */
+  /* TODO: Uses callback(boolean) to return whether or not proj_name has img_path. */
   has_image(img_path, proj_name, callback) {
     // return whether image with given path already exists for a given project
     var _this = this;
@@ -107,8 +107,168 @@ class Database {
     });
   }
 
+  /* Get notes for an image. */
+  get_notes(img_name, img_path, proj_name, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      var stmt = db.prepare("SELECT notes FROM Images WHERE path=? AND proj_name=?");
+      stmt.get([img_path, proj_name], function(err, row) {
+        if (err) {
+          throw err;
+        }
+
+        callback(img_name, proj_name, img_path, row['notes']);
+      });
+      stmt.finalize();
+    });
+  }
+
+  /* Update notes for an image. */
+  update_notes(img_path, proj_name, notes) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      var stmt = db.prepare("UPDATE Images SET notes=? WHERE path=? AND proj_name=?");
+      stmt.run(notes, img_path, proj_name);
+      stmt.finalize();
+    });
+  }
+
+  /* Get tags for a project. */
+  get_tags(img_name, img_path, proj_name, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      var stmt = db.prepare("SELECT tags FROM Images WHERE path=? AND proj_name=?");
+      stmt.get([img_path, proj_name], function(err, row) {
+        if (err) {
+          throw error;
+        }
+
+        if (row['tags'].length == 0) {
+          callback(img_name, proj_name, img_path, []);
+          return;
+        }
+
+        var tags = row['tags'].split(',');
+        var tags_array_dict_form = [];
+        for (var i in tags) {
+          tags_array_dict_form.push({value: tags[i], label: tags[i]});
+        }
+        callback(img_name, proj_name, img_path, tags_array_dict_form);
+      });
+      stmt.finalize();
+    });
+  }
+
+  /* Update tags. */
+  update_tag(proj_name, img_path, new_value) {
+    var _this = this;
+    var db = this.db;
+    var stmt = db.prepare("UPDATE Images SET tags=? WHERE path=? AND proj_name=?");
+    stmt.run(new_value, img_path, proj_name);
+    stmt.finalize();
+  }
+
+  /* Add tag to an image. */
+  add_tag(proj_name, img_path, tag) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      var stmt = db.prepare("SELECT tags FROM Images WHERE path=? AND proj_name=?");
+      stmt.get([img_path, proj_name], function(err, row) {
+        if (err) {
+          throw error;
+        }
+        if (row['tags'].length == 0)
+          _this.update_tag(proj_name, img_path, tag);
+        else
+          _this.update_tag(proj_name, img_path, row['tags'] + "," + tag);
+      });
+      stmt.finalize();
+    });
+  }
+
+  /* Remove a tag from an image. */
+  remove_tag(proj_name, img_path, tag) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      var stmt = db.prepare("SELECT tags FROM Images WHERE path=? AND proj_name=?");
+      stmt.get([img_path, proj_name], function(err, row) {
+        if (err) {
+          throw error;
+        }
+
+        var tags = row['tags'].split(',');
+        var index = tags.indexOf(tag);
+        tags.splice(index, 1);
+        _this.update_tag(proj_name, img_path, tags.join());
+      });
+      stmt.finalize();
+    });
+  }
+
   /* Uses callback(img_path, proj_name, meta_dict, success) to add metadata in a dictionary. */
-  add_image_meta(img_path, proj_name, meta_dict, callback) {
+  // add_image_meta(img_path, proj_name, meta_dict, callback) {
+  //   var _this = this;
+  //   var db = this.db;
+  //   db.serialize(function() {
+  //     var columns = [];
+  //     db.each("PRAGMA table_info(Images)", function(err, col) {
+  //       if (err) {
+  //         throw error;
+  //       }
+  //       columns.push(col.name);
+  //     }, function() {
+  //       console.log('add_project: columns', columns);
+  //       for (var meta_key in meta_dict) {
+  //         meta_key = meta_key.replace("-", "_");
+  //         var col_exists = (columns.indexOf(meta_key) >= 0);
+  //         var meta_value = meta_dict[meta_key];
+  //         if (!col_exists) {
+  //           var meta_type = typeof meta_value;
+  //           db.run("ALTER TABLE Images ADD " + meta_key + " " + meta_type + ";");
+  //           console.log('add_project: col added', meta_key, meta_type);
+  //         } else {
+  //           console.log('contains column', columns[meta_key])
+  //         }
+  //       }
+  //
+  //       var success = false;
+  //       _this.has_image(img_path, proj_name, function(bool) {
+  //         if (bool) {
+  //           var add_meta = "";
+  //           var meta_length = Object.keys(meta_dict).length;
+  //           var count = 0;
+  //           var meta_values = [];
+  //           for (var meta_key in meta_dict) {
+  //             add_meta += meta_key + "=?";
+  //             meta_values.push(meta_dict[meta_key]);
+  //             if (count < meta_length - 1) {
+  //               add_meta += ", ";
+  //             }
+  //             count++;
+  //           }
+  //           console.log(meta_values);
+  //           var query = "UPDATE Images SET " + add_meta + " WHERE path=? AND proj_name=?";
+  //           console.log(query, "query");
+  //           var stmt = db.prepare(query);
+  //           var params = meta_values + [img_path, proj_name];
+  //           stmt.run(params);
+  //           stmt.finalize();
+  //           success = true;
+  //         }
+  //
+  //         callback(success);
+  //       });
+  //     });
+  //   });
+  // }
+  add_image_meta(img_path, proj_name, meta_key, meta_value, callback) {
+    // set metadata for image
+    // if column doesn't exist, add column
     var _this = this;
     var db = this.db;
     db.serialize(function() {
@@ -119,40 +279,19 @@ class Database {
         }
         columns.push(col.name);
       }, function() {
-        console.log('add_project: columns', columns);
-        for (var meta_key in meta_dict) {
-          var col_exists = (columns.indexOf(meta_key) >= 0);
-          var meta_value = meta_dict[meta_key];
-          if (!col_exists) {
-            var meta_type = typeof meta_value;
-            db.run("ALTER TABLE Images ADD " + meta_key + " " + meta_type + ";");
-            console.log('add_project: col added', meta_key, meta_type);
-          } else {
-            console.log('contains column', columns[meta_key])
-          }
+        var col_exists = (columns.indexOf(meta_key) >= 0);
+
+        if (!col_exists) {
+          var meta_type = typeof meta_value;
+          db.run("ALTER TABLE Images ADD " + meta_key + " " + meta_type + ";");
         }
 
         var success = false;
         _this.has_image(img_path, proj_name, function(bool) {
           if (bool) {
-            var add_meta = "";
-            var meta_length = Object.keys(meta_dict).length;
-            var count = 0;
-            var meta_values = [];
-            for (var meta_key in meta_dict) {
-              add_meta += meta_key + "=?";
-              meta_values.push(meta_dict[meta_key]);
-              if (count < meta_length - 1) {
-                add_meta += ", ";
-              }
-              count++;
-            }
-            console.log(meta_values);
-            var query = "UPDATE Images SET " + add_meta + " WHERE path=? AND proj_name=?";
-            console.log(query, "query");
+            var query = "UPDATE Images SET " + meta_key + "=? WHERE path=? AND proj_name=?"
             var stmt = db.prepare(query);
-            var params = meta_values + [img_path, proj_name];
-            stmt.run(params);
+            stmt.run([meta_value, img_path, proj_name]);
             stmt.finalize();
             success = true;
           }
@@ -215,6 +354,7 @@ class Database {
     });
   }
 
+  /* TODO */
   update_project_description(proj_name, description, callback) {
     // update project description
     var bool = true;
@@ -299,6 +439,7 @@ class Database {
             if (err) {
               throw error;
             }
+            console.log(rows);
             callback(proj_name, rows);
           });
           stmt.finalize();
@@ -355,6 +496,50 @@ class Database {
       }, function() {
         callback(fields);
       });
+    });
+  }
+
+  /* Set favorite metadata in Settings table. */
+  update_favorites_field(tag, type, checked) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      var stmt;
+      if (checked) {
+        /* Add to settings table. */
+        stmt = db.prepare("INSERT INTO Settings (type, setting) VALUES (?, ?)");
+      } else {
+        /* Remove from settings table. */
+        stmt = db.prepare("DELETE FROM Settings WHERE type=? AND setting=?");
+      }
+      stmt.run(type, tag);
+      stmt.finalize();
+      console.log("added favorite: " + tag + ", " + type + ", " + checked);
+    });
+  }
+
+  /* Get favorite metadata from Settings table. */
+  get_favorite_fields(callback) {
+    var _this = this;
+    var db = this.db;
+    db.all("SELECT * FROM Settings", [], function(err, rows) {
+      if (err) {
+        throw err;
+      }
+
+      var favorites = [];
+      var csv = [];
+      var row;
+      for (var i in rows) {
+        row = rows[i];
+        if (row["type"] == "f") {
+          favorites.push(row["setting"]);
+        } else if (row["type"] == "c") {
+          csv.push(row["setting"]);
+        }
+      }
+
+      callback(favorites, csv);
     });
   }
 

@@ -15,6 +15,7 @@ var _data = [];
 var _currentProj;
 var paths_global;
 var database = electron.remote.getGlobal('sharedObj').db;
+var _updated_notes = {};
 
 function alert_image_upload(bool, project_name, img_path, index, num_images) {
 	if (!bool) {
@@ -56,7 +57,7 @@ function loadDetail(projectName) {
 			var name = image['img_name'];
 			database.get_image_metadata(img_path, name, projectName, function(bool, name, path, projectName, metadata) {
 				//detailExifDisplay(img_path, name, projectName, metadata);
-				detailExifDisplay__NEW(img_path, name, metadata);
+				detailExifDisplay__NEW(img_path, name, projectName, metadata);
 			});
 		});
 	});
@@ -70,201 +71,6 @@ function compareTimestamp(image1, image2){
 		return 0;
 	else
 		return 1;
-}
-
-function insert_detail_template_callback(bool, img_name, img_path, proj_name, metadata_row) {
-	if (bool) {
-		var data = {
-				'name': img_name,
-				'path': img_path,
-				'exifData': {},
-				'gpsData': {},
-				'fileData': {},
-				'error': "",
-			};
-		for (var key in metadata_row) {
-			data.exifData[key] = metadata_row[key];
-		}
-		data = processData(data);
-		populate_detail_view(data, img_name);
-	} else {
-		insertErrorTemplate(metadata_row, img_name);
-		return;
-	}
-}
-
-function populate_detail_view(data, id) {
-	if (data.error) {
-		insertErrorTemplate(data, id);
-		return;
-	}
-	var contents = {};
-	var disableds = {};
-	var types = ['exif', 'gps', 'file', 'fav'];
-	for (var ind in types) {
-		var name = types[ind]
-		var category = data[name + 'Data'];
-		var content = '';
-		count = 0;
-		for (var key in category) {
-			if (count == 0) {
-				content += '<tr>';
-			}
-			content += '<td style="padding:1.0rem"><strong>' + key + '</strong>: ' + category[key] + '</td>';
-			if (count == 2) {
-				content += '</tr>'
-			}
-			count = (count + 1) % 3;
-		}
-		if (content == '') {
-			disableds[name] = 'disabled';
-		} else {
-			disableds[name] = '';
-		}
-		if (content && !content.endsWith('</tr>')) {
-			content += '</tr>';
-		}
-		contents[name] = content
-	}
-
-	// _data.push(dataForCsv);
-
-	var flag_string = 'Flagged as modified';
-	var is_modified = false
-	// TODO implement flag trigger
-	if (contents['exif'].toLowerCase().includes('adobe')) {
-		flag_string = 'File modified by Adobe software.'
-		is_modified = true
-
-	}
-	var flag_trigger = 'hidden';
-	if (is_modified) {
-		flag_trigger = '';
-	}
-
-	var template = [
-		'<div class="row">',
-			'<div class="col-md-4">',
-				'<img class="img-fluid rounded mb-3 mb-md-0" src="{{path}}" alt="">', // add image features here
-			'</div>',
-			'<div class="col-md-8">',
-				'<div class="row">',
-					'<div class="col-md-8">',
-						'<h3 style="word-wrap:break-word;">{{name}}</h3>',
-						// tags
-						'<div>',
-							'<input type="text" placeholder="Add tag" name="tag">',
-							// one new label per tag, with appropriate color
-							'<h3 style="display:inline">',
-								'<span class="badge badge-pill badge-primary">', //style="background-color:#00ffff">',
-									'Fun',
-								'</span> ',
-								'<span class="badge badge-pill badge-primary" style="background-color:#00ffff">',
-									'Party',
-								'</span> ',
-							'</h2>',
-						'</div>',
-						'<br>',
-						'<textarea class="form-control" rows="3" placeholder="Notes" />',
-					'</div>',
-					'<div class="col-md-4">',
-
-						'<div class="row">',
-							'<img src="./assets/alert.svg" style="height:40px" data-toggle="tooltip" data-placement="auto" ' + flag_trigger + ' title="' + flag_string + '"/>',
-							'<div class="dropdown">',
-								'<button class="btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
-									'Options',
-								'</button>',
-								'<div class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
-									'<li id="remove{{name}}" class="dropdown-item">Remove</li>',
-									'<li id="rename{{name}}" class="dropdown-item">Rename</li>',
-								'</div>',
-							'</div>',
-						'</div>',
-						// search bar
-						'<br>',
-						'<input type="text" placeholder="Exif search">',
-						'<tr><th> Search results </th></tr>',
-
-					'</div>',
-				'</div>',
-			'</div>',
-		'</div>',
-
-		'<div class="row container-fluid" style="height:20px"></div>',
-
-		'<div class="container-fluid row">',
-			'<div class="col-md-3 text-center">',
-				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#favdata' + id + ' "' + disableds.fav + '>Favorite fields</button></span>',
-			'</div>',
-			'<div class="col-md-3 text-center">',
-				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#filedata' + id + ' "' + disableds.file + '>File Info</button></span>',
-			'</div>',
-			'<div class="col-md-3 text-center">',
-				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#exifdata' + id + ' "' + disableds.exif + '>Exif Data</button></span>',
-			'</div>',
-			'<div class="col-md-3 text-center">',
-				'<span><button class="btn btn-primary mb-2" data-toggle="collapse" data-target="#gpsdata' + id + ' "' + disableds.gps + '>GPS Data</button></span>',
-			'</div>',
-		'</div>',
-
-		'<div class="container-fluid row">',
-			'<div class="col-md-12 center-block">',
-				// favorites
-				'<div id="favdata' + id +' " class="container collapse">',
-					'<table class="table table-bordered">',
-						contents.fav,
-					'</table>',
-				'</div>',
-				'<br>',
-				//file info
-				'<div id="filedata' + id +' " class="container collapse">',
-					'<table class="table table-bordered">',
-						contents.file,
-					'</table>',
-				'</div>',
-				'<br>',
-				// general Exif
-				'<div id="exifdata' + id +' " class="container collapse">',
-					'<table class="table table-bordered">',
-						contents.exif,
-					'</table>',
-				'</div>',
-				'<br>',
-				// GPS
-				'<div id="gpsdata' + id +' " class="container collapse">',
-					'<table class="table table-bordered">',
-						contents.gps,
-					'</table>',
-					'<div id="map{{name}}" style="width:100%;height:400px"></div>',
-				'</div>',
-			'</div>',
-		'</div>',
-	].join("\n");
-
-	var filler = Mustache.render(template, data);
-	$("#detail-template" + data.name).append(filler);
-
-	var latitude;
-	var longitude;
-	if ('GPSLatitude' in data.gpsData) {
-		latitude = data.gpsData.GPSLatitude
-		longitude = data.gpsData.GPSLongitude
-	}
-	// addMap(
-	// 	"map" + data.name,
-	// 	[{'lat':latitude, 'lng':longitude}],
-	// )
-
-	$('[data-toggle="tooltip"]').tooltip();
-
-	setPhotoRemove(data.name);
-
-}
-
-/* TODO(Varsha): change this so that we populate the metadata using dict returned by db. */
-function insertDetailTemplate(img_name, img_path, proj_name) {
-	database.get_image_metadata(img_path, img_name, proj_name, insert_detail_template_callback);
 }
 
 function insertErrorTemplate(error, id) {
@@ -490,11 +296,8 @@ function clearDetailsHtml() {
 	// document.getElementById("file-label2").innerHTML = ""
 }
 
-function detail_exif_display_callback(bool) {
-	console.log("added exif to db: " + bool);
-}
-
-function processData(data) {
+function processData(data, favorites) {
+	data.ref = [];
 	var file = [
 		"SourceFile",
 		"Directory",
@@ -509,70 +312,30 @@ function processData(data) {
 		"ExifToolVersion",
 		"FileSize",
 		"ExifByteOrder",
-	]
-	var favorites = getFavDataKeys();
+	];
 	for (var key in data.exifData) {
+		var val = data.exifData[key];
+		data.ref.push({
+		  value: '',
+		  label: key + ": " + val,
+		  selected: false,
+		  disabled: false,
+		})
 		if (key == "errors" && !isStr(data.exifData[key])) {
 			delete data.exifData[key];
 		}
-		if (file.includes(key)) {
-			data.fileData[key] = data.exifData[key]
-			delete data.exifData[key];
-		}
 		if (favorites.includes(key)) {
-			data.favData[key] = data.exifData[key]
+			data.favData[key] = data.exifData[key];
 			delete data.exifData[key];
-		}
-		if (key.toLowerCase().includes("gps")) {
+		} else if (file.includes(key)) {
+			data.fileData[key] = data.exifData[key];
+			delete data.exifData[key];
+		} else if (key.toLowerCase().includes("gps")) {
 			data.gpsData[key] = data.exifData[key];
 			delete data.exifData['key'];
 		}
 	}
 	return data;
-}
-
-//TODO return favorite fields as strings in array
-function getFavDataKeys() {
-	return [];
-}
-
-function detailExifDisplay(imgpath, imgname, projname, metadata) {
-	// Set default template.
-	var template = [
-		'<div id="detail-template{{name}}" class="row">',
-		'</div>',
-		'<hr id="hr{{name}}">'
-	].join("\n")
-	var filler = Mustache.render(template, {name: imgname});
-	$("#image-wrapper").append(filler);
-	if (!metadata) {
-		metadata = {};
-	}
-
-	if (Object.keys(metadata).length == 0) {
-		try {
-			console.log("generating metadata for " + imgname);
-
-			exiftool
-				.read(imgpath)
-				.then(function(tags) {
-					database.add_image_meta(imgpath, projname, tags, detail_exif_display_callback);
-					insertDetailTemplate(imgname, imgpath, projname);
-					// insertDetailTemplate__NEW(data, name);
-				})
-				.catch(function(error) {
-					console.error(error);
-					data.error = error;
-					insertErrorTemplate(error, imgname)
-				});
-		} catch (error) {
-			console.log('Exif Error: ' + error.message);
-			insertErrorTemplate(error, imgname);
-		}
-	} else {
-		console.log("using existing metadata for " + imgname);
-		insertDetailTemplate(imgname, imgpath, projname);
-	}
 }
 
 function isStr(maybeString) {
@@ -599,18 +362,25 @@ module.exports = {
 	loadDetail: loadDetail
 };
 
+function detail_exif_display_callback(bool) {
+	if (!bool) {
+		alert("failed to add image metadata");
+	}
+}
+
 /*
 ** Need to look into resource conservation here, by creating a new exiftool
 ** only when needed, then calling .end() after it is done batch processing
 ** (it does also have a batch mode)
 */
-function detailExifDisplay__NEW(imgpath, name, metadata) {
+function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 	var data = {
-		'name': name,
+		'name': imgname,
 		'path': imgpath,
 		'exifData': {},
 		'gpsData': {},
 		'fileData': {},
+		'favData': {},
 		'error': "",
 	};
 	var template = [
@@ -618,28 +388,85 @@ function detailExifDisplay__NEW(imgpath, name, metadata) {
 		'</div>',
 		'<hr id="hr{{name}}">'
 	].join("\n")
-	var filler = Mustache.render(template, {name: name});
+	var filler = Mustache.render(template, {name: imgname});
 	$("#image-wrapper").append(filler);
-	// if (Object.keys(metadata).length > 0) {
-	// 	data.exifData = metadata;
-	// 	insertDetailTemplate__NEW(data, name);
-	// 	return;
-	// }
+	if (Object.keys(metadata).length > 0) {
+		data.exifData = metadata;
+		insertDetailTemplate(imgname, imgpath, projname);
+		return;
+	}
 	exiftool
 		.read(imgpath)
 		.then(function(tags) {
-			data.exifData = {};
 			for (var key in tags) {
-				data.exifData[key] = tags[key];
-				data = processData(data);
+				database.add_image_meta(imgpath, projname, key, tags[key], detail_exif_display_callback);
 			}
-			insertDetailTemplate__NEW(data, name);
+			insertDetailTemplate(imgname, imgpath, projname);
 		})
 		.catch(function(error) {
 			console.error(error);
 			data.error = error;
-			insertDetailTemplate__NEW(data, name);
+			insertDetailTemplate__NEW(data, imgname, imgpath, projname);
 		});
+}
+
+function populate_tags_view(image_name, project_name, image_path, tags) {
+	/* Set tagging actions and populate existing tags. */
+	var choices = new Choices($('#tags' + image_name)[0], {
+		items: tags,
+		removeItemButton: true,
+		editItems: true,
+		duplicateItems: false,
+		placeholderValue: "Add a tag",
+	});
+
+	/* Add tag to database. */
+	$('#tags' + image_name)[0].addEventListener('addItem', function(event) {
+		database.add_tag(project_name, image_path, event.detail.value);
+	});
+
+	/* Remove tag from database. */
+	$('#tags' + image_name)[0].addEventListener('removeItem', function(event) {
+		database.remove_tag(project_name, image_path, event.detail.value);
+	});
+}
+
+function populate_notes_view(image_name, project_name, image_path, notes) {
+	/* Fill existing notes. */
+	$("#notes" + image_name).val(notes);
+
+	/* Store updates to notes in the database. */
+	$("#notes" + image_name).change(function(event) {
+		database.update_notes(image_path, project_name, $("#notes" + image_name).val());
+	});
+}
+
+function insert_detail_template_callback(bool, img_name, img_path, proj_name, metadata_row) {
+	if (bool) {
+		var data = {
+				'name': img_name,
+				'path': img_path,
+				'exifData': {},
+				'gpsData': {},
+				'favData': {},
+				'fileData': {},
+				'error': "",
+			};
+		for (var key in metadata_row) {
+			data.exifData[key] = metadata_row[key];
+		}
+		database.get_favorite_fields(function(favorites, csv) {
+			data = processData(data, favorites);
+			insertDetailTemplate__NEW(data, img_name, img_path, proj_name);
+		});
+	} else {
+		insertErrorTemplate(metadata_row, img_name);
+		return;
+	}
+}
+
+function insertDetailTemplate(img_name, img_path, proj_name) {
+	database.get_image_metadata(img_path, img_name, proj_name, insert_detail_template_callback);
 }
 
 // format of data is
@@ -652,8 +479,10 @@ function detailExifDisplay__NEW(imgpath, name, metadata) {
 //  gpsData: {...}
 //  fileData: {...}
 // }
-function insertDetailTemplate__NEW(data, id) {
-	data.id = id
+function insertDetailTemplate__NEW(data, id, path, projname) {
+	console.log(data);
+	data.id = id;
+
 	if (data.error) {
 		insertErrorTemplate(data, id);
 		return;
@@ -791,7 +620,7 @@ function insertDetailTemplate__NEW(data, id) {
 					'</div>',
 					'<div class="col-md-5">',
 						// notes
-						'<textarea class="form-control notes" rows="3" placeholder="Notes" />',
+						'<textarea class="form-control notes" rows="3" placeholder="Notes" id="notes{{name}}"/>',
 						// search bar
 						'<select class="form-control choices__input is-hidden" id="search{{name}}" multiple></select>',
 					'</div>',
@@ -811,6 +640,7 @@ function insertDetailTemplate__NEW(data, id) {
 		latitude = data.gpsData.GPSLatitude
 		longitude = data.gpsData.GPSLongitude
 	}
+
 	addMap(
 		"map" + data.name,
 		[{'lat':latitude, 'lng':longitude}],
@@ -820,16 +650,6 @@ function insertDetailTemplate__NEW(data, id) {
 
 	setPhotoRemove(data.name);
 
-	var tags = getTagsForName(data.name);
-
-	var choices = new Choices($('#tags' + data.name)[0], {
-		items: tags,
-		removeItemButton: true,
-		editItems: true,
-		duplicateItems: false,
-		placeholderValue: "Add a tag",
-	})
-
 	var choices = new Choices($('#search' + data.name)[0], {
 		choices: data.ref,
 		paste: false,
@@ -838,71 +658,17 @@ function insertDetailTemplate__NEW(data, id) {
 		itemSelectText: '',
 		duplicateItems: true,
 		placeholderValue: "Search Exif data",
-	})
+	});
 
+	/* Handle notes. */
+	database.get_notes(id, path, projname, populate_notes_view);
+
+	/* Handle tags. */
+	database.get_tags(id, path, projname, populate_tags_view);
 }
 
-//TODO
-function getTagsForName(name) {
-	return [
-		{
-			value: 'Outdoors',
-			label: 'Outdoors',
-		},
-		{
-			value: 'Berkeley',
-			label: 'Berkeley',
-		}
-	]
-}
 function isStr(maybeString) {
 	return maybeString && !(maybeString == "");
-}
-
-function processData(data) {
-	data.ref = []
-	var file = [
-		"SourceFile",
-		"Directory",
-		"FileType",
-		"FileTypeExtension",
-		"FileModifyDate",
-		"FileAccessDate",
-		"FilePermissions",
-		"FileInodeChangeDate",
-		"MIMEType",
-	]
-	var favories = getFavDataKeys();
-	for (var key in data.exifData) {
-		var val = data.exifData[key];
-		data.ref.push({
-		  value: '',
-		  label: key + ": " + val,
-		  selected: false,
-		  disabled: false,
-		})
-		if (key == "errors" && !isStr(data.exifData[key])) {
-			delete data.exifData[key];
-		}
-		if (file.includes(key)) {
-			data.fileData[key] = data.exifData[key]
-			delete data.exifData[key]
-		}
-		if (favories.includes(key)) {
-			data.favData[key] = data.exifData[key]
-			delete data.exifData[key]
-		}
-		if (key.toLowerCase().includes("gps")) {
-			data.gpsData[key] = data.exifData[key];
-			delete data.exifData['key']
-		}
-	}
-	return data
-}
-
-//TODO return favorite fields as strings in array
-function getFavDataKeys() {
-	return []
 }
 
 function loadCharts() {

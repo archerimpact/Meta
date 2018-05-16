@@ -7,55 +7,24 @@ const BrowserWindow = electron.BrowserWindow
 const path = require('path')
 const url = require('url')
 
-// Instance of storage class. Will be used to ensure that files persist across
-// application instances.
-const Storage = require('./js/storage.js');
-const storage = new Storage({
-  defaults: {}
-});
-
 // Import database file.
 const Database = require('./js/database.js');
 const db = new Database({
   defaults: {}
 });
-// const db = init_database();
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
-// Set storage instance to be used across js files. All constants that should
+// Set database instance to be used across js files. All constants that should
 // be accessible to other scripts must go here.
 global.sharedObj = {db: db};
-
-// // for testing
-// db.db.serialize(function() {
-//  db.add_project("TestProj", "Description", [], function(success, name, img_paths) {
-//    db.add_image("Image", "Path/Image", "TestProj", 1, 1, function(success, proj_name, img_path, index, num_images) {
-//      var data = {"testdata" : 1, "yuhlkamsdl" : 2, "yah" : "data"};
-//      db.add_image_meta("Path/Image", "TestProj", data, function(img_path, proj_name, meta_dict, success) {
-//       console.log("success?:", success);
-//      });
-//      db.update_favorite_image("Path/Image", "TestProj", false, function(img_path, proj_name, fave_bool, success) {
-//       db.get_image_metadata("Path/Image", "Image", "TestProj", function(bool, img_name, img_path, proj_name, meta_dict) {
-
-//       });
-//       db.get_favorite_images_in_project("TestProj", function(proj_name, images) {
-//         console.log("fav images:", images);
-//       });
-//       db.update_project_name("TestProj", "NewTestProj", function(old_name, new_name, success) {
-//         db.get_projects(function() {})
-//       });
-//      });
-//    });
-//  });
-// });
 
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 1000, height: 800})
-  mainWindow.setFullScreen(true)
+  mainWindow.setFullScreen(false)
 
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
