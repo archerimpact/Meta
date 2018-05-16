@@ -42,6 +42,7 @@ a.side-bar:hover, a.side-bar:focus {
 #body {
   margin-left: 16.666%;
   margin-top: 50px;
+  transition: margin-left .5s
 }
 
 header.masthead {
@@ -77,7 +78,8 @@ header.masthead {
 
 #wrapper {
   height: 100%;
-  padding: 0
+  padding: 0;
+  transition: margin-left .5s;
 }
 .absolute-center {
     display: -ms-flexbox;
@@ -101,6 +103,26 @@ header.masthead {
   margin: 50px 0px 0px 0px;
 }
 
+.meta-nav {
+  color: white;
+  background-color: #192d42;
+  height: 100%;
+}
+
 .choices__list--dropdown .choices__item--selectable {
     padding-right: 10px !important;
+}
+
+#slidebutton {
+  width: 60px;
+  height: 40px;
+  position: absolute;
+  top: 45vh;
+  left: calc(100% - 70px);
+
+}
+
+.menu-check {
+  margin-top: 10px;
+  margin-left: 15px;
 }

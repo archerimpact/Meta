@@ -23,11 +23,11 @@ function loadDetail(projectName){
 	var projectPath = getProjectJsonPath(projectName);
 	var project = loadProject(projectPath);
 	_currentProj = project;
+	$('#slidebutton').removeClass('hidden');
 
 	redirect('detail');
 	loadHeader(project);
 	loadCharts();
-	selectPrep();
 	var images = project.getImages();
 	images.sort(compareTimestamp);
 	images.forEach(function(image) {
@@ -269,6 +269,7 @@ function clearDetailsHtml() {
 	document.getElementById("detail-header").innerHTML = ""
 	document.getElementById("image-wrapper").innerHTML = ""
 	document.getElementById("detail-charts").innerHTML = ""
+	document.getElementById("drawer-select").innerHTML = '<h3 style="margin-left: 10px;">Filter Images</h3>'
 	// document.getElementById("file-label2").innerHTML = ""
 }
 
@@ -330,12 +331,42 @@ function detailExifDisplay__NEW(imgpath, name, metadata) {
 				data = processData(data);
 			}
 			insertDetailTemplate__NEW(data, name);
-		})
-		.catch(function(error) {
-			console.error(error);
-			data.error = error;
-			insertDetailTemplate__NEW(data, name);
 		});
+		// .catch(function(error) {
+		// 	console.error(error);
+		// 	data.error = error;
+		// 	insertDetailTemplate__NEW(data, name);
+		// });
+}
+
+function getType(info) {
+	info = info.toLowerCase()
+	if (
+		info.includes('jpg') ||
+		info.includes('jpeg') ||
+		info.includes('png') ||
+		info.includes('svg') ||
+		info.includes('gif') ||
+		info.includes('apng') ||
+		info.includes('pdf') ||
+		info.includes('bmp')
+	) {
+		return 'img'
+	} else if (
+		info.includes('mp4') ||
+		info.includes('mov') ||
+		info.includes('mpeg') ||
+		info.includes('mpg') ||
+		info.includes('avi') ||
+		info.includes('wmv') ||
+		info.includes('ogg') ||
+		info.includes('webm')
+	) {
+		return 'video'
+	} else {
+		//default to image
+		return 'img'
+	}
 }
 
 // format of data is
@@ -349,6 +380,7 @@ function detailExifDisplay__NEW(imgpath, name, metadata) {
 //  fileData: {...}
 // }
 function insertDetailTemplate__NEW(data, id) {
+	insertIntoSlideMenu(data, id)
 	data.id = id
 	if (data.error) {
 		insertErrorTemplate(data, id);
@@ -407,6 +439,9 @@ function insertDetailTemplate__NEW(data, id) {
 	data.flag = flag_trigger
 	data.flag_str = flag_string
 
+	data.media = getType(contents.file)
+	data.sorry = "Sorry, we are not able to display this file. Consider inspecting it on your computer at {{path}}. However, there may still be exif data displayed to the right."
+
 	var template = [
 		'<div class="row">',
 			'<div class="col-md-4">',
@@ -423,7 +458,7 @@ function insertDetailTemplate__NEW(data, id) {
 					'</div>',
 					'<img class="{{flag}}" src="./assets/alert.svg" style="height:25px; display:inline; float:right;" data-toggle="tooltip" data-placement="auto" title="{{flag_str}}"/>',
 				'</div>',
-				'<img class="img-responsive rounded" src="{{path}}" alt="">', // add image features here
+				'<{{media}} class="img-responsive rounded" src="{{path}}" alt="{{sorry}}" controls>',
 			'</div>',
 			'<div class="col-md-8">',
 				'<div class="row">',
@@ -686,10 +721,20 @@ function loadCharts() {
 
 }
 
-// THIS IS NOT WORKING
-function selectPrep() {
-	var ts = $(".tag-selector");
-	// ts.select2({
-  // 	tags: true
-	// });
+function insertIntoSlideMenu(data, id) {
+	var menu_row = [
+		'<label class="menu-check"><input id="{{name}}check" type="checkbox" checked> {{name}}</label>',
+
+	].join("/n")
+	var row = Mustache.render(menu_row, data);
+	$('#drawer-select').append(row);
+
+	var elem = document.getElementById(data.name.toString() + 'check')
+	if (!elem) {
+		return;
+	}
+	elem.onclick = function() {
+		$('#detail-template' + data.name).toggleClass('hidden')
+		$('#hr' + data.name).toggleClass('hidden');
+	};
 }
