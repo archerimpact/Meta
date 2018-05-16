@@ -52,12 +52,13 @@ function loadDetail(projectName) {
 	database.get_images_in_project(projectName, function(projectName, image_list) {
 		image_list.sort(compareTimestamp);
 
-		image_list.forEach(function(image) {
-			var img_path = image['path'];
-			var name = image['img_name'];
-			database.get_image_metadata(img_path, name, projectName, function(bool, name, path, projectName, metadata) {
-				//detailExifDisplay(img_path, name, projectName, metadata);
-				detailExifDisplay__NEW(img_path, name, projectName, metadata);
+		database.get_database().serialize(function() {
+			image_list.forEach(function(image) {
+				var img_path = image['path'];
+				var name = image['img_name'];
+				database.get_image_metadata(img_path, name, projectName, function(bool, name, path, projectName, metadata) {
+					detailExifDisplay__NEW(img_path, name, projectName, metadata);
+				});
 			});
 		});
 	});
