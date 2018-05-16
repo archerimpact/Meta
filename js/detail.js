@@ -344,7 +344,6 @@ function isStr(maybeString) {
 $("#add-image").submit(function(e) {
 	e.preventDefault();
 	if (!paths_global) {
-		console.log('Please select images');
 		alert('Please select images');
 	}
 
@@ -479,7 +478,6 @@ function insertDetailTemplate(img_name, img_path, proj_name) {
 //  fileData: {...}
 // }
 function insertDetailTemplate__NEW(data, id, path, projname) {
-	console.log(data);
 	data.id = id;
 
 	if (data.error) {

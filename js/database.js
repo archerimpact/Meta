@@ -289,7 +289,7 @@ class Database {
         var success = false;
         _this.has_image(img_path, proj_name, function(bool) {
           if (bool) {
-            var query = "UPDATE Images SET " + meta_key + "=? WHERE path=? AND proj_name=?"
+            var query = "UPDATE Images SET " + meta_key + "=? WHERE path=? AND proj_name=?";
             var stmt = db.prepare(query);
             stmt.run([meta_value, img_path, proj_name]);
             stmt.finalize();
@@ -439,7 +439,6 @@ class Database {
             if (err) {
               throw error;
             }
-            console.log(rows);
             callback(proj_name, rows);
           });
           stmt.finalize();
