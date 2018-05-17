@@ -405,7 +405,9 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 		.read(imgpath)
 		.then(function(tags) {
 			for (var key in tags) {
-				database.add_image_meta(imgname, imgpath, projname, key, tags[key], detail_exif_display_callback);
+				if (tags[key]) {
+					database.add_image_meta(imgname, imgpath, projname, key, tags[key], detail_exif_display_callback);
+				}
 			}
 			insert_detail_template_callback(true, imgname, imgpath, projname, tags);
 

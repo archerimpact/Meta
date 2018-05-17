@@ -280,6 +280,8 @@ class Database {
   //   });
   // }
   add_image_meta(imgname, img_path, proj_name, meta_key, meta_value, callback) {
+    meta_value = JSON.stringify(meta_value).replace("-", "_");
+    meta_key = meta_key.replace("-", "_");
     console.log("add " + meta_key + ", " + meta_value);
 
     // set metadata for image
@@ -294,14 +296,12 @@ class Database {
           callback(false);
           return;
         }
-
         columns.push(col.name);
       }, function() {
         var col_exists = (columns.indexOf(meta_key) >= 0);
-
         if (!col_exists) {
+          console.log('!col_exists:', meta_key);
           var meta_type = typeof meta_value;
-          meta_key = JSON.stringify(meta_key).replace("-", "_");
           db.run("ALTER TABLE Images ADD " + meta_key + " " + meta_type + ";");
         }
 
@@ -310,7 +310,7 @@ class Database {
           if (bool) {
             var query = "UPDATE Images SET " + meta_key + "=? WHERE path=? AND proj_name=?";
             var stmt = db.prepare(query);
-            stmt.run([JSON.stringify(meta_value).replace("-", "_"), img_path, proj_name]);
+            stmt.run([meta_value, img_path, proj_name]);
             stmt.finalize();
             success = true;
           }
