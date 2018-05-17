@@ -49,6 +49,7 @@ a.side-bar:hover, a.side-bar:focus {
   margin-top: 50px;
   transition: margin-left .5s;
   font: "Nunito Sans";
+  min-width: 772px;
 }
 
 header.masthead {
