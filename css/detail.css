@@ -55,6 +55,7 @@
     transition: 0.2s; /* 0.5 second transition effect to slide in the sidenav */
     margin-left: 16.666%;
     border-left: 2px solid white;
+    color: white;
 }
 
 .thumb {

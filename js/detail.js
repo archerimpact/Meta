@@ -39,9 +39,7 @@ function loadDetail(projectName) {
 	_currentProj = projectName;
 
 	clearDetailsHtml();
-	// var projectPath = getProjectJsonPath(projectName);
-	// var project = loadProject(projectPath);
-	// _currentProj = project;
+
 	$('#slidebutton').removeClass('hidden');
 	document.getElementById('slidetogglebtn').onclick = toggleSlideView
 	document.getElementById('checkbtn').onclick = checkAll
@@ -59,7 +57,7 @@ function loadDetail(projectName) {
 		}
 
 	});
-	loadCharts();
+
 	/* Display images in this project. */
 	database.get_images_in_project(projectName, function(projectName, image_list) {
 		image_list.sort(compareTimestamp);
@@ -74,6 +72,8 @@ function loadDetail(projectName) {
 			});
 		});
 	});
+
+	loadCharts(projectName);
 }
 
 /* Comparator that puts newer images before older ones. */
@@ -179,7 +179,8 @@ function setPhotoRemove(name) {
 		return;
 	}
 	elem.onclick = function() {
-		database.remove_image(projName, name, function() {
+		database.get_projects(function(bool){});
+		database.delete_image(name, projName, function(bool) {
 			var content = document.getElementById('detail-template' + name);
 			content.parentNode.removeChild(content);
 			var line = document.getElementById('hr' + name);
@@ -378,7 +379,7 @@ module.exports = {
 	loadDetail: loadDetail
 };
 
-function detail_exif_display_callback(bool) {
+function detail_exif_display_callback(bool, imgname, img_path, proj_name, meta_key, meta_value) {
 	if (!bool) {
 		alert("failed to add image metadata");
 	}
@@ -415,9 +416,10 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 		.read(imgpath)
 		.then(function(tags) {
 			for (var key in tags) {
-				database.add_image_meta(imgpath, projname, key, tags[key], detail_exif_display_callback);
+				database.add_image_meta(imgname, imgpath, projname, key, tags[key], detail_exif_display_callback);
 			}
-			insertDetailTemplate(imgname, imgpath, projname);
+			insert_detail_template_callback(true, imgname, imgpath, projname, tags);
+
 		})
 		.catch(function(error) {
 			console.error(error);
@@ -506,7 +508,10 @@ function insert_detail_template_callback(bool, img_name, img_path, proj_name, me
 			data.exifData[key] = metadata_row[key];
 		}
 		database.get_favorite_fields(function(favorites, csv) {
+			console.log("preprocessing");
 			data = processData(data, favorites);
+			console.log("finished processing data: ");
+			console.log(data);
 			insertDetailTemplate__NEW(data, img_name, img_path, proj_name);
 		});
 	} else {
@@ -530,8 +535,11 @@ function insertDetailTemplate(img_name, img_path, proj_name) {
 //  fileData: {...}
 // }
 function insertDetailTemplate__NEW(data, id, path, projname) {
-	insertIntoSlideMenu(data, id)
-	data.id = id
+	insertIntoSlideMenu(data, id);
+	console.log("finished insert");
+
+	data.id = id;
+
 	if (data.error) {
 		insertErrorTemplate(data, id);
 		return;
@@ -702,19 +710,10 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 
 	setPhotoRemove(data.name);
 
-	// var tagElem = $('#tags' + data.name)[0]
-	// if (tagElem) {
-	// 	var choices = new Choices(tagElem, {
-	// 		items: data.tags,
-	// 		removeItemButton: true,
-	// 		editItems: true,
-	// 		duplicateItems: false,
-	// 		placeholderValue: "Add a tag",
-	// 	})
-	// }
-
 	var searchElem = $('#search' + data.name)[0]
-	if (searchElem) {
+	if (!searchElem) {
+		return;
+	} else {
 		var choices = new Choices(searchElem, {
 			choices: data.ref,
 			paste: false,
@@ -723,7 +722,7 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 			itemSelectText: '',
 			duplicateItems: true,
 			placeholderValue: "Search Exif data",
-		})
+		});
 	}
 
 	/* Handle notes. */
@@ -737,7 +736,7 @@ function isStr(maybeString) {
 	return maybeString && !(maybeString == "");
 }
 
-function loadCharts() {
+function loadCharts(proj_name) {
 	template = [
 		'<div class="row container-fluid">',
 			'<div class="col-sm-6 col-xs-12">',
@@ -769,48 +768,17 @@ function loadCharts() {
 					'<canvas id="pie2"></canvas>',
 				'</div>',
 			'</div>',
-			'<div class=" col-md-4 col-xs-12">',
-				'<div class="clearfix"></div>',
-				'<div class="x_content">',
-					'<canvas id="pie3"></canvas>',
-				'</div>',
-			'</div>',
+			// '<div class=" col-md-4 col-xs-12">',
+			// 	'<div class="clearfix"></div>',
+			// 	'<div class="x_content">',
+			// 		'<canvas id="pie3"></canvas>',
+			// 	'</div>',
+			// '</div>',
 		'</div>',
 	].join("\n");
 
 	$("#detail-charts").append(template);
 
-	addLineChart(
-		"lineChart",
-		["2000", "2001", "2002", "2003", "2004"],
-		"Photos Taken",
-		[100, 200, 400, 50, 350]
-	)
-	addPieChart(
-		"pie1",
-		["Cannon", "Nikon", "Apple", "Samsung"],
-		[25, 40, 100, 20],
-		"Cameras"
-	)
-	addPieChart(
-		"pie2",
-		["Cannon", "Nikon", "Apple", "Samsung"],
-		[25, 40, 100, 20],
-		"Data"
-	)
-	addPieChart(
-		"pie3",
-		["Cannon", "Nikon", "Apple", "Samsung"],
-		[25, 40, 100, 20],
-		"Stuff"
-	)
-	addMap(
-		"trendsmap",
-		[
-			{'lat':10, 'lng':10},
-			{'lat':20, 'lng':20},
-		]
-	)
 	var ref = document.getElementById('lineChart');
 	var div = document.getElementById('trendsmap')
 	var width = ref.offsetWidth / 2
@@ -820,6 +788,65 @@ function loadCharts() {
 		div.style.height = '400px';
 	}
 
+	database.get_images_by_date(proj_name, function(dates, counts) {
+		console.log("images by date: " + dates + ", " + counts);
+
+		/* Set content to "no data exists" image if needed. */
+		if (dates.length == 0) {
+
+		} else {
+			addLineChart(
+				"lineChart",
+				dates,
+				"Photos Taken",
+				counts
+			);
+		}
+	});
+
+	database.get_camera_models(proj_name, function(models, counts) {
+		console.log("camera models: " + models + ", " + counts);
+
+		/* Set content to "no data exists" image if needed. */
+		if (models.length == 0) {
+
+		} else {
+			addPieChart(
+				"pie1",
+				models,
+				counts,
+				"Cameras"
+			);
+		}
+	});
+
+	database.get_locations_for_images(proj_name, function(locations) {
+		/* Set content to "no data exists" image if needed. */
+		if (locations.length == 0) {
+
+		} else {
+			addMap(
+				"trendsmap",
+				locations
+			);
+		}
+	});
+
+	database.get_apertures(proj_name, function(apertures, counts) {
+		console.log("apertures: " + apertures + ", " + counts);
+
+		/* Set content to "no data exists" image if needed. */
+		if (apertures.length == 0) {
+
+		} else {
+			addPieChart(
+				"pie2",
+				apertures,
+				counts,
+				"Apertures"
+			);
+		}
+	});
 }
 
 function insertIntoSlideMenu(data, id) {

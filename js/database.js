@@ -20,7 +20,9 @@ class Database {
     var stmt = this.db.prepare("SELECT * FROM Projects WHERE name = ?");
     stmt.get([name], function(err, row) {
       if (err) {
-        throw error;
+        console.error("FAILING: " + err);
+        callback(false);
+        return;
       }
       if (row == undefined) {
         bool = false;
@@ -47,7 +49,9 @@ class Database {
         stmt.get([img_path, proj_name], function(err, row) {
           var bool = true;
           if (err) {
-            throw error;
+            console.error("FAILING: " + err);
+            callback(false);
+            return;
           }
           if (row == undefined) {
             bool = false;
@@ -88,6 +92,8 @@ class Database {
 
   /* Uses callback(boolean) to return if image was added successfully or not. */
   add_image(img_name, img_path, proj_name, index, num_images, callback) {
+    console.log("adding image: " + img_name);
+
     // Check if image has been made yet, if not create it
     var _this = this;
     var db = this.db;
@@ -115,7 +121,9 @@ class Database {
       var stmt = db.prepare("SELECT notes FROM Images WHERE path=? AND proj_name=?");
       stmt.get([img_path, proj_name], function(err, row) {
         if (err) {
-          throw err;
+          console.error("FAILING: " + err);
+          callback(img_name, proj_name, img_path, "");
+          return;
         }
 
         callback(img_name, proj_name, img_path, row['notes']);
@@ -143,7 +151,9 @@ class Database {
       var stmt = db.prepare("SELECT tags FROM Images WHERE path=? AND proj_name=?");
       stmt.get([img_path, proj_name], function(err, row) {
         if (err) {
-          throw error;
+          console.error("FAILING: " + err);
+          callback(img_name, proj_name, img_path, []);
+          return;
         }
 
         if (row['tags'].length == 0) {
@@ -179,8 +189,10 @@ class Database {
       var stmt = db.prepare("SELECT tags FROM Images WHERE path=? AND proj_name=?");
       stmt.get([img_path, proj_name], function(err, row) {
         if (err) {
-          throw error;
+          console.error("FAILING: " + err);
+          return;
         }
+
         if (row['tags'].length == 0)
           _this.update_tag(proj_name, img_path, tag);
         else
@@ -198,7 +210,8 @@ class Database {
       var stmt = db.prepare("SELECT tags FROM Images WHERE path=? AND proj_name=?");
       stmt.get([img_path, proj_name], function(err, row) {
         if (err) {
-          throw error;
+          console.error("FAILING: " + err);
+          return;
         }
 
         var tags = row['tags'].split(',');
@@ -218,7 +231,7 @@ class Database {
   //     var columns = [];
   //     db.each("PRAGMA table_info(Images)", function(err, col) {
   //       if (err) {
-  //         throw error;
+  //         console.error("FAILING: " + err);
   //       }
   //       columns.push(col.name);
   //     }, function() {
@@ -266,7 +279,9 @@ class Database {
   //     });
   //   });
   // }
-  add_image_meta(img_path, proj_name, meta_key, meta_value, callback) {
+  add_image_meta(imgname, img_path, proj_name, meta_key, meta_value, callback) {
+    console.log("add " + meta_key + ", " + meta_value);
+
     // set metadata for image
     // if column doesn't exist, add column
     var _this = this;
@@ -275,14 +290,18 @@ class Database {
       var columns = [];
       db.each("PRAGMA table_info(Images)", function(err, col) {
         if (err) {
-          throw error;
+          console.error("FAILING: " + err);
+          callback(false);
+          return;
         }
+
         columns.push(col.name);
       }, function() {
         var col_exists = (columns.indexOf(meta_key) >= 0);
 
         if (!col_exists) {
           var meta_type = typeof meta_value;
+          meta_key = JSON.stringify(meta_key).replace("-", "_");
           db.run("ALTER TABLE Images ADD " + meta_key + " " + meta_type + ";");
         }
 
@@ -291,12 +310,12 @@ class Database {
           if (bool) {
             var query = "UPDATE Images SET " + meta_key + "=? WHERE path=? AND proj_name=?";
             var stmt = db.prepare(query);
-            stmt.run([meta_value, img_path, proj_name]);
+            stmt.run([JSON.stringify(meta_value).replace("-", "_"), img_path, proj_name]);
             stmt.finalize();
             success = true;
           }
 
-          callback(success);
+          callback(success, imgname, img_path, proj_name, meta_key, meta_value);
         });
       });
     });
@@ -369,8 +388,11 @@ class Database {
       var stmt = db.prepare("SELECT * FROM Projects WHERE name=?");
       stmt.get([projectName], function(err, row) {
         if (err) {
-          throw error;
+          console.error("FAILING: " + err);
+          callback({});
+          return;
         }
+
         callback(row);
       });
       stmt.finalize();
@@ -386,10 +408,12 @@ class Database {
       var stmt = db.prepare("SELECT * FROM Projects");
       stmt.each(function(err, row) {
         if (err) {
-          throw error;
+          console.error("FAILING: " + err);
+          callback([]);
+          return;
         }
+
         projects.push(row);
-        // is this syntax correct?
       }, function() {
         callback(projects);
       });
@@ -407,7 +431,9 @@ class Database {
           var stmt = db.prepare("SELECT * FROM Images WHERE proj_name = ?");
           stmt.get([proj_name], function(err, row) {
             if (err) {
-              throw error;
+              console.error("FAILING: " + err);
+              callback("");
+              return;
             }
 
             if (row != undefined) {
@@ -437,8 +463,11 @@ class Database {
           var stmt = db.prepare("SELECT * FROM Images WHERE proj_name = ?");
           stmt.all([proj_name], function(err, rows) {
             if (err) {
-              throw error;
+              console.error("FAILING: " + err);
+              callback(proj_name, []);
+              return;
             }
+
             callback(proj_name, rows);
           });
           stmt.finalize();
@@ -460,8 +489,11 @@ class Database {
           var stmt = db.prepare("SELECT img_name, path FROM Images WHERE proj_name = ? AND favorited = 1");
           stmt.each([proj_name], function(err, row) {
             if (err) {
-              throw error;
+              console.error("FAILING: " + err);
+              callback(proj_name, []);
+              return;
             }
+
             images.push(row);
           }, function() {
             console.log('get_favorite_images_in_project:', images, 'in', proj_name);
@@ -486,8 +518,11 @@ class Database {
                           "last_modified", "tags", "favorited", "notes"];
       db.each("PRAGMA table_info(Images)", function(err, col) {
         if (err) {
-          throw error;
+          console.error("FAILING: " + err);
+          callback([]);
+          return;
         }
+
         var name = col.name;
         if (not_metadata.indexOf(name) < 0) {
           fields.push(name);
@@ -523,7 +558,9 @@ class Database {
     var db = this.db;
     db.all("SELECT * FROM Settings", [], function(err, rows) {
       if (err) {
-        throw err;
+        console.error("FAILING: " + err);
+        callback([], []);
+        return;
       }
 
       var favorites = [];
@@ -542,6 +579,25 @@ class Database {
     });
   }
 
+  /* Returns whether a particular image has the specified metadata attribute. */
+  has_metadata_attr(meta_attr, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      _this.get_metadata_fields(function(fields) {
+        var attr;
+        for (var i in meta_attr) {
+          attr = meta_attr[i];
+          if (fields.indexOf(attr) < 0) {
+            callback(false);
+            return;
+          }
+        }
+        callback(true);
+      });
+    });
+  }
+
   /* Uses callback(bool, img_name, img_path, proj_name, {}) to return dict of metafields to metadata.
    * Ignores any fields that are not filled in. */
   get_image_metadata(img_path, img_name, proj_name, callback) {
@@ -553,7 +609,7 @@ class Database {
           callback(false, img_name, img_path, proj_name, {});
         } else {
           var not_metadata = ["img_name", "path", "proj_name", "creation",
-                      "last_modified", "tags", "favorited", "notes"];
+                              "last_modified", "tags", "favorited", "notes"];
           var stmt = db.prepare("SELECT * FROM Images WHERE path=? AND proj_name=?");
           stmt.get([img_path, proj_name], function(err, row) {
             for (var key in row) {
@@ -564,6 +620,156 @@ class Database {
             callback(true, img_name, img_path, proj_name, row);
           });
           stmt.finalize();
+        }
+      });
+    });
+  }
+
+  // date when image was created/Taken
+  /* Get count of images by the date at which they were taken, for the specified project. */
+  get_images_by_date(proj_name, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      _this.has_project(proj_name, function(bool) {
+        if (bool) {
+          _this.has_metadata_attr(['CreateDate'], function(attr_exists) {
+            if (attr_exists) {
+              var dates = [];
+              var counts = [];
+              var stmt = db.prepare("SELECT COUNT(*) AS Count, CreateDate FROM Images WHERE CreateDate IS NOT NULL GROUP BY CreateDate");
+              stmt.each([proj_name], function(err, row) {
+                if (err) {
+                  console.error("FAILING: " + err);
+                  callback([], []);
+                  return;
+                }
+
+                dates.push(row['CreateDate']);
+                counts.push(row['Count']);
+              }, function() {
+                callback(dates, counts);
+              });
+            } else {
+              console.error("column DNE: CreateDate");
+              callback([], []);
+            }
+          });
+        } else {
+          console.error("no image dates found");
+          callback([], []);
+        }
+      });
+    });
+  }
+
+  /* Get list of (lat, lon) tuples for each image in a specific project, to represent the image location. */
+  get_locations_for_images(proj_name, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      _this.has_project(proj_name, function(bool) {
+        if (bool) {
+          _this.has_metadata_attr(['GPSLatitude', 'GPSLongitude'], function(attr_exists) {
+            if (attr_exists) {
+              var coords = [];
+              var stmt = db.prepare("SELECT GPSLatitude, GPSLongitude FROM Images WHERE proj_name = ? AND GPSLatitude IS NOT NULL AND GPSLongitude IS NOT NULL");
+              stmt.each([proj_name], function(err, row) {
+                if (err) {
+                  console.error("FAILING: " + err);
+                  callback([]);
+                  return;
+                }
+
+                coords.push({'lat': row['GPSLatitude'], 'lng': row['GPSLongitude']});
+              }, function() {
+                console.log('get_locations_for_images:', coords, 'in', proj_name);
+                callback(coords);
+              });
+              stmt.finalize();
+            } else {
+              console.error("column DNE: GPSLatitude, GPSLongitude");
+              callback([]);
+            }
+          });
+        } else {
+          console.error('get_locations_for_images:', proj_name, "does not exist");
+          callback([]);
+        }
+      });
+    });
+  }
+
+  // camera breakdown (have toggle to change attr for pie chart)
+  get_camera_models(proj_name, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      _this.has_project(proj_name, function(bool) {
+        if (bool) {
+          _this.has_metadata_attr(['Model'], function(attr_exists) {
+            if (attr_exists) {
+              var models = [];
+              var counts = [];
+              var stmt = db.prepare("SELECT Model, COUNT(*) AS Count FROM Images WHERE proj_name=? AND Model IS NOT NULL GROUP BY Model");
+              stmt.each([proj_name], function(err, row) {
+                if (err) {
+                  console.error("FAILING: " + err);
+                  callback([], []);
+                  return;
+                }
+
+                models.push(row['Model']);
+                counts.push(row['Count']);
+              }, function() {
+                callback(models, counts);
+              });
+            } else {
+              console.error("columns DNE: Model");
+              callback([], []);
+            }
+          });
+        } else {
+          console.error('get_locations_for_images:', proj_name, "does not exist");
+          callback([], []);
+        }
+      });
+    });
+  }
+
+  // aperture (pie chart)
+  get_apertures(proj_name, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      _this.has_project(proj_name, function(bool) {
+        if (bool) {
+          _this.has_metadata_attr(['Aperture'], function(attr_exists) {
+            if (attr_exists) {
+              var apertures = [];
+              var counts = [];
+              var stmt = db.prepare("SELECT COUNT(*) as Count, Aperture FROM Images WHERE proj_name=? AND Aperture IS NOT NULL GROUP BY Aperture");
+              stmt.each([proj_name], function(err, row) {
+                if (err) {
+                  console.error("FAILING: " + err);
+                  callback([], []);
+                  return;
+                }
+
+                apertures.push(row['Aperture']);
+                counts.push(row['Count']);
+              }, function() {
+                callback(apertures, counts);
+              });
+              stmt.finalize();
+            } else {
+              console.error("column DNE: Aperture");
+              callback([], []);
+            }
+          });
+        } else {
+          console.error('get_apertures:', proj_name, "does not exist");
+          callback([], []);
         }
       });
     });
@@ -606,17 +812,22 @@ class Database {
       stmt = db.prepare("DELETE FROM Images WHERE proj_name=?");
       stmt.run([proj_name], function(err) {
         if (err) {
-          throw error;
+          console.error("FAILING: " + err);
+          callback(false);
+          return;
         }
       });
       stmt.finalize();
+      callback(true);
     });
 
     /* Delete project from Projects table. */
     var stmt = db.prepare("DELETE FROM Projects WHERE name=?");
     stmt.run([proj_name], function(err) {
       if (err) {
-        throw error;
+        console.error("FAILING: " + err);
+        callback(false);
+        return;
       } else {
         callback(true);
       }
@@ -624,10 +835,29 @@ class Database {
     stmt.finalize();
   }
 
+  /* Deletes the specified image from the project. */
+  delete_image(img_name, proj_name, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      /* Delete relevant images from Images table. */
+      var stmt = db.prepare("DELETE FROM Images WHERE img_name=? AND proj_name=?");
+      stmt.run([img_name, proj_name], function(err) {
+        if (err) {
+          console.error("FAILING: " + err);
+          callback(false);
+        } else {
+          callback(true);
+        }
+      });
+      stmt.finalize();
+    });
+  }
+
   init_database() {
     var db = new sqlite3.Database(db_filename, (err) => {
       if (err) {
-        console.error(err.message);
+        throw err;
       }
 
       // if meta.db was just created, create Images and Projects tables.
@@ -701,4 +931,4 @@ class Database {
   }
 }
 
-module.exports = Database
+module.exports = Database;

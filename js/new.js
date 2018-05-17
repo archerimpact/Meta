@@ -62,11 +62,12 @@ function unacceptableFormat(name) {
 $("#new-project").submit(function(e) {
 	e.preventDefault();
 	var projectName = createProject();
-    // if (projectName) {
-    // 	clearNew();
-    //   	load_detail(projectName);
+    if (projectName) {
+    	clearNew();
+      	load_detail(projectName);
 		// refreshProjects();
-    // } else {
+    }
+		// else {
     //     console.log(projectName + ": project not created")
     // }
 });
