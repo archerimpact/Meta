@@ -41,3 +41,63 @@
   max-height: 300px;
   overflow: scroll;
 }
+
+/*  slide out menu */
+.sidenav {
+    height: 100%; /* 100% Full-height */
+    width: 0; /* 0 width - change this with JavaScript */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Stay on top */
+    top: 0; /* Stay at the top */
+    left: 0;
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 50px; /* Place content 60px from the top */
+    transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+    margin-left: 16.666%;
+    border-left: 2px solid white;
+}
+
+.thumb {
+  max-width: 92%;
+  margin-left: 4%;
+  margin-top: 4%;
+  margin-bottom: 4%;
+}
+
+#slidebutton {
+  width: 60px;
+  height: 40px;
+  position: absolute;
+  top: 45vh;
+  left: calc(100% - 70px);
+
+}
+
+.menu-check {
+  margin-top: 10px;
+  margin-left: 15px !important;
+  word-wrap: break-word;
+  max-width: calc(100% - 20px)
+}
+
+.menu-check-thumb {
+  margin-top: 25% !important;
+  margin-left: 15px !important;
+}
+
+.thumb-panel {
+  margin-right: 10px;
+  float: right;
+  max-width: calc(100% - 40px);
+}
+
+#slidetogglebtn {
+  margin-left: calc((100% - 86px)/2);
+  margin-right: calc((100% - 86px)/2);
+  margin-top: 10px;
+}
+
+.thumb-row {
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}

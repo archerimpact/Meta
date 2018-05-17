@@ -39,6 +39,9 @@ function(n, dest) {
      if (sectionId == "projects") {
       refreshProjects();
      }
+     if (sectionId !== 'detail') {
+       $('#slidebutton').addClass('hidden');
+     }
      $('#' + sectionId).show()
      $('#' + sectionId + ' section').show()
    },

@@ -5,7 +5,7 @@
  */
 /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
 html {
-  font-family: sans-serif;
+  font-family: 'Nunito Sans', sans-serif;
   -webkit-text-size-adjust: 100%;
       -ms-text-size-adjust: 100%;
 }
@@ -4008,6 +4008,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   background-color: #eee;
   border-color: #337ab7;
 }
+/*perhaps go back and change the background color?? */
 .nav .nav-divider {
   height: 1px;
   margin: 9px 0;
@@ -4216,7 +4217,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
     padding-right: 0;
     padding-left: 0;
     margin: 0px;
-    background-color: #192d42;
+    background-color: #0d77e2;
   }
 }
 .navbar-fixed-top .navbar-collapse,
@@ -4948,7 +4949,7 @@ a.badge:focus {
 }
 .list-group-item.active > .badge,
 .nav-pills > .active > a > .badge {
-  color: #192d42;
+  color: #0d77e2;
   background-color: #fff;
 }
 .list-group-item > .badge {
