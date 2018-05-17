@@ -16,3 +16,9 @@ function slideDrawer() {
 		// body.style.width = newWidth.toString() + 'px'
 	}
 }
+
+function checkSlideDrawer() {
+	if (document.getElementById('drawer-select').style.width === '16.666%') {
+		slideDrawer()
+	}
+}

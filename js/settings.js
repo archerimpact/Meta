@@ -1,3 +1,8 @@
+function clearSettings() {
+  document.getElementById('fav-settings-wrapper').innerHTML = ''
+  document.getElementById('csv-settings-wrapper').innerHTML = ''
+}
+
 var database = electron.remote.getGlobal('sharedObj').db;
 
 function populate_settings_view(fields, favorite_fields, csv_fields) {
