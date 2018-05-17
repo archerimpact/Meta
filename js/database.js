@@ -11,7 +11,7 @@ console.log(db_filename);
 class Database {
   constructor(opts) {
     this.db = this.init_database();
-    this.last_image_id = 0;
+    // this.last_image_id = 0;
   }
 
   /* Uses callback(boolean) to return if Projects contains name. */
@@ -280,8 +280,6 @@ class Database {
   //   });
   // }
   add_image_meta(imgname, img_path, proj_name, meta_key, meta_value, callback) {
-    console.log("add " + meta_key + ", " + meta_value);
-
     // set metadata for image
     // if column doesn't exist, add column
     var _this = this;
@@ -297,20 +295,21 @@ class Database {
 
         columns.push(col.name);
       }, function() {
+        meta_key = meta_key.replace("-", "_");
+        meta_value = JSON.stringify(meta_value);
+
         var col_exists = (columns.indexOf(meta_key) >= 0);
 
         if (!col_exists) {
-          var meta_type = typeof meta_value;
-          meta_key = JSON.stringify(meta_key).replace("-", "_");
-          db.run("ALTER TABLE Images ADD " + meta_key + " " + meta_type + ";");
+          db.run("ALTER TABLE Images ADD " + meta_key + " TEXT;");
         }
-
+        
         var success = false;
         _this.has_image(img_path, proj_name, function(bool) {
           if (bool) {
             var query = "UPDATE Images SET " + meta_key + "=? WHERE path=? AND proj_name=?";
             var stmt = db.prepare(query);
-            stmt.run([JSON.stringify(meta_value).replace("-", "_"), img_path, proj_name]);
+            stmt.run([meta_value, img_path, proj_name]);
             stmt.finalize();
             success = true;
           }
@@ -635,18 +634,21 @@ class Database {
         if (bool) {
           _this.has_metadata_attr(['CreateDate'], function(attr_exists) {
             if (attr_exists) {
+              console.log("CreateDate exists");
               var dates = [];
               var counts = [];
-              var stmt = db.prepare("SELECT COUNT(*) AS Count, CreateDate FROM Images WHERE CreateDate IS NOT NULL GROUP BY CreateDate");
+              var stmt = db.prepare("SELECT CreateDate FROM Images");
               stmt.each([proj_name], function(err, row) {
                 if (err) {
-                  console.error("FAILING: " + err);
+                  console.error("FAILING CreateDate: " + err);
                   callback([], []);
                   return;
                 }
 
-                dates.push(row['CreateDate']);
-                counts.push(row['Count']);
+                console.log("row: " + row['CreateDate']);
+                console.log("parsed: " + JSON.parse(row['CreateDate']));
+                dates.push(JSON.parse(row['CreateDate']));
+                counts.push(1/* row['Count']*/);
               }, function() {
                 callback(dates, counts);
               });
@@ -681,7 +683,7 @@ class Database {
                   return;
                 }
 
-                coords.push({'lat': row['GPSLatitude'], 'lng': row['GPSLongitude']});
+                coords.push({'lat': JSON.parse(row['GPSLatitude']), 'lng': JSON.parse(row['GPSLongitude'])});
               }, function() {
                 console.log('get_locations_for_images:', coords, 'in', proj_name);
                 callback(coords);
@@ -719,7 +721,7 @@ class Database {
                   return;
                 }
 
-                models.push(row['Model']);
+                models.push(JSON.parse(row['Model']));
                 counts.push(row['Count']);
               }, function() {
                 callback(models, counts);
@@ -756,7 +758,7 @@ class Database {
                   return;
                 }
 
-                apertures.push(row['Aperture']);
+                apertures.push(JSON.parse(row['Aperture']));
                 counts.push(row['Count']);
               }, function() {
                 callback(apertures, counts);
@@ -793,9 +795,12 @@ class Database {
               if (row[key] == null || not_metadata.indexOf(key) >= 0
                   || selected.indexOf(key) < 0) {
                 delete row[key];
+              } else {
+                row[key] = JSON.parse(row[key]);
               }
             }
             stmt.finalize();
+
             callback(img_path, proj_name, row);
           });
         }
