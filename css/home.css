@@ -20,20 +20,15 @@
   /* Support for IE. */
   font-feature-settings: 'liga';
 }
-.material-icons.md-18 { font-size: 18px; }
-.material-icons.md-24 { font-size: 24px; }
-.material-icons.md-36 { font-size: 36px; }
-.material-icons.md-48 { font-size: 48px; }
-
 a {
   color: white;
 }
 a:hover, a:focus {
-  color: #0d77e2;
+  color: #192d42;
 }
 
 a.side-bar:hover, a.side-bar:focus {
-  color: #0d77e2;
+  color: #192d42;
 }
 
 #top-nav {
@@ -46,9 +41,7 @@ a.side-bar:hover, a.side-bar:focus {
 
 #body {
   margin-left: 16.666%;
-  margin-top: 50px;
-  transition: margin-left .5s;
-  font: "Nunito Sans";
+  transition: margin-left .2s
 }
 
 header.masthead {
@@ -110,13 +103,15 @@ header.masthead {
 }
 
 .meta-nav {
-  color: #8b99a7;
-  background-color: #0d77e2;
+  color: white;
+  background-color: #192d42;
   height: 100%;
-  font-size:18px;
-  padding-right: 0px;
 }
 
 .choices__list--dropdown .choices__item--selectable {
     padding-right: 10px !important;
+}
+
+.thumb-btn {
+  max-width: 28%;
 }

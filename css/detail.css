@@ -51,10 +51,11 @@
     top: 0; /* Stay at the top */
     left: 0;
     overflow-x: hidden; /* Disable horizontal scroll */
-    padding-top: 50px; /* Place content 60px from the top */
-    transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+    padding-top: 20px; /* Place content 60px from the top */
+    transition: 0.2s; /* 0.5 second transition effect to slide in the sidenav */
     margin-left: 16.666%;
     border-left: 2px solid white;
+    color: white;
 }
 
 .thumb {
@@ -91,11 +92,11 @@
   max-width: calc(100% - 40px);
 }
 
-#slidetogglebtn {
+/* #slidetogglebtn {
   margin-left: calc((100% - 86px)/2);
   margin-right: calc((100% - 86px)/2);
   margin-top: 10px;
-}
+} */
 
 .thumb-row {
   margin-left: 0px !important;
