@@ -39,9 +39,9 @@ function loadDetail(projectName) {
 	_currentProj = projectName;
 
 	clearDetailsHtml();
-	var projectPath = getProjectJsonPath(projectName);
-	var project = loadProject(projectPath);
-	_currentProj = project;
+	// var projectPath = getProjectJsonPath(projectName);
+	// var project = loadProject(projectPath);
+	// _currentProj = project;
 	$('#slidebutton').removeClass('hidden');
 	document.getElementById('slidetogglebtn').onclick = toggleSlideView
 
@@ -687,18 +687,16 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 
 	setPhotoRemove(data.name);
 
-	var tags = getTagsForName(data.name);
-
-	var tagElem = $('#tags' + data.name)[0]
-	if (tagElem) {
-		var choices = new Choices(tagElem, {
-			items: tags,
-			removeItemButton: true,
-			editItems: true,
-			duplicateItems: false,
-			placeholderValue: "Add a tag",
-		})
-	}
+	// var tagElem = $('#tags' + data.name)[0]
+	// if (tagElem) {
+	// 	var choices = new Choices(tagElem, {
+	// 		items: data.tags,
+	// 		removeItemButton: true,
+	// 		editItems: true,
+	// 		duplicateItems: false,
+	// 		placeholderValue: "Add a tag",
+	// 	})
+	// }
 
 	var searchElem = $('#search' + data.name)[0]
 	if (searchElem) {
