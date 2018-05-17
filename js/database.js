@@ -292,14 +292,12 @@ class Database {
           callback(false);
           return;
         }
-
         columns.push(col.name);
       }, function() {
         meta_key = meta_key.replace("-", "_");
         meta_value = JSON.stringify(meta_value);
 
         var col_exists = (columns.indexOf(meta_key) >= 0);
-
         if (!col_exists) {
           db.run("ALTER TABLE Images ADD " + meta_key + " TEXT;");
         }

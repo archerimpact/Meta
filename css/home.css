@@ -24,11 +24,11 @@ a {
   color: white;
 }
 a:hover, a:focus {
-  color: #0d77e2;
+  color: #192d42;
 }
 
 a.side-bar:hover, a.side-bar:focus {
-  color: #0d77e2;
+  color: #192d42;
 }
 
 #top-nav {
@@ -41,9 +41,7 @@ a.side-bar:hover, a.side-bar:focus {
 
 #body {
   margin-left: 16.666%;
-  margin-top: 50px;
-  transition: margin-left .5s;
-  font: "Nunito Sans";
+  transition: margin-left .2s
 }
 
 header.masthead {
@@ -105,12 +103,15 @@ header.masthead {
 }
 
 .meta-nav {
-  color: #8b99a7;
-  background-color: #0d77e2;
+  color: white;
+  background-color: #192d42;
   height: 100%;
-  size:
 }
 
 .choices__list--dropdown .choices__item--selectable {
     padding-right: 10px !important;
+}
+
+.thumb-btn {
+  max-width: 28%;
 }

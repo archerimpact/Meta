@@ -42,6 +42,11 @@ function(n, dest) {
      if (sectionId !== 'detail') {
        $('#slidebutton').addClass('hidden');
      }
+     if (sectionId === 'settings') {
+       clearSettings()
+       loadSettings()
+     }
+     checkSlideDrawer()
      $('#' + sectionId).show()
      $('#' + sectionId + ' section').show()
    },
