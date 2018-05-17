@@ -362,7 +362,7 @@ module.exports = {
 	loadDetail: loadDetail
 };
 
-function detail_exif_display_callback(bool) {
+function detail_exif_display_callback(bool, imgname, img_path, proj_name, meta_key, meta_value) {
 	if (!bool) {
 		alert("failed to add image metadata");
 	}
@@ -387,7 +387,7 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 		'<div id="detail-template{{name}}" class="row">',
 		'</div>',
 		'<hr id="hr{{name}}">'
-	].join("\n")
+	].join("\n");
 	var filler = Mustache.render(template, {name: imgname});
 	$("#image-wrapper").append(filler);
 	if (Object.keys(metadata).length > 0) {
@@ -399,9 +399,11 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 		.read(imgpath)
 		.then(function(tags) {
 			for (var key in tags) {
-				database.add_image_meta(imgpath, projname, key, tags[key], detail_exif_display_callback);
+				database.add_image_meta(imgname, imgpath, projname, key, tags[key], detail_exif_display_callback);
 			}
-			insertDetailTemplate(imgname, imgpath, projname);
+			//insertDetailTemplate(imgname, imgpath, projname);
+			insert_detail_template_callback(true, imgname, imgpath, projname, tags);
+
 		})
 		.catch(function(error) {
 			console.error(error);
@@ -412,13 +414,18 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 
 function populate_tags_view(image_name, project_name, image_path, tags) {
 	/* Set tagging actions and populate existing tags. */
-	var choices = new Choices($('#tags' + image_name)[0], {
-		items: tags,
-		removeItemButton: true,
-		editItems: true,
-		duplicateItems: false,
-		placeholderValue: "Add a tag",
-	});
+	var searchElem = $('#tags' + image_name)[0];
+	if (!searchElem) {
+		return;
+	} else {
+		var choices = new Choices(searchElem, {
+			items: tags,
+			removeItemButton: true,
+			editItems: true,
+			duplicateItems: false,
+			placeholderValue: "Add a tag",
+		});
+	}
 
 	/* Add tag to database. */
 	$('#tags' + image_name)[0].addEventListener('addItem', function(event) {
@@ -649,15 +656,20 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 
 	setPhotoRemove(data.name);
 
-	var choices = new Choices($('#search' + data.name)[0], {
-		choices: data.ref,
-		paste: false,
-		duplicateItems: false,
-		placeholder: "Enter/select a tag",
-		itemSelectText: '',
-		duplicateItems: true,
-		placeholderValue: "Search Exif data",
-	});
+	var searchElem = $('#search' + data.name)[0]
+	if (!searchElem) {
+		return;
+	} else {
+		var choices = new Choices(searchElem, {
+			choices: data.ref,
+			paste: false,
+			duplicateItems: false,
+			placeholder: "Enter/select a tag",
+			itemSelectText: '',
+			duplicateItems: true,
+			placeholderValue: "Search Exif data",
+		});
+	}
 
 	/* Handle notes. */
 	database.get_notes(id, path, projname, populate_notes_view);

@@ -266,7 +266,7 @@ class Database {
   //     });
   //   });
   // }
-  add_image_meta(img_path, proj_name, meta_key, meta_value, callback) {
+  add_image_meta(imgname, img_path, proj_name, meta_key, meta_value, callback) {
     // set metadata for image
     // if column doesn't exist, add column
     var _this = this;
@@ -296,7 +296,7 @@ class Database {
             success = true;
           }
 
-          callback(success);
+          callback(success, imgname, img_path, proj_name, meta_key, meta_value);
         });
       });
     });
