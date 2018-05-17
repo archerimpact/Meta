@@ -102,3 +102,15 @@
   margin-left: 0px !important;
   margin-right: 0px !important;
 }
+
+#toggledetail {
+  background-color: #0d77e2;
+  color: white;
+  border-color: #0d77e2;
+  padding: 10px;
+  margin-left: 10px;
+}
+
+.command-buttons {
+  margin-left: 10px; 
+}
