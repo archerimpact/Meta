@@ -20,6 +20,11 @@
   /* Support for IE. */
   font-feature-settings: 'liga';
 }
+.material-icons.md-18 { font-size: 18px; }
+.material-icons.md-24 { font-size: 24px; }
+.material-icons.md-36 { font-size: 36px; }
+.material-icons.md-48 { font-size: 48px; }
+
 a {
   color: white;
 }
@@ -108,7 +113,8 @@ header.masthead {
   color: #8b99a7;
   background-color: #0d77e2;
   height: 100%;
-  size:
+  font-size:18px;
+  padding-right: 0px;
 }
 
 .choices__list--dropdown .choices__item--selectable {

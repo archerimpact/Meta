@@ -66,9 +66,10 @@ $("#new-project").submit(function(e) {
     	clearNew();
       	load_detail(projectName);
 		// refreshProjects();
-    } else {
-        console.log(projectName + ": project not created")
     }
+		// else {
+    //     console.log(projectName + ": project not created")
+    // }
 });
 
 function clearNew() {
