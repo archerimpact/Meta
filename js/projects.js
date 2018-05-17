@@ -64,7 +64,7 @@ function showNewProject() {
 
 function populateProjectsScreen() {
   database.get_projects(function (projects_list) {
-    showNewProject();
+    // showNewProject();
 
     projects_list.sort(compareTimestamp);
 
