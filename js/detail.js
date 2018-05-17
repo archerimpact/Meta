@@ -52,8 +52,8 @@ function loadDetail(projectName) {
 	database.get_project(projectName, function(row) {
 		loadHeader(row);
 		document.getElementById('toggledetail').onclick = toggleDetail
-		if ($('#detail-charts').hasClass('hidden')) {
-			$('#toggledetail').html('View Trends')
+		if ($('#image-wrapper').hasClass('hidden')) {
+			$('#toggledetail').html('View Images')
 		}
 
 	});
@@ -222,7 +222,7 @@ function loadHeader(project) {
 		    "<h1 id='name-header' class='my-4' style='word-wrap:break-word;'>{{displayName}}</h1>",
 				"<h4 style='word-wrap:break-word;'>{{projDesc}}</h4>",
 					"<div class='btn btn-primary btn-md' id='toggledetail'>",
-						"View Images",
+						"View Trends",
 					"</div>",
 			"</div>",
 			"<div class='col-md-2'>",
@@ -947,9 +947,9 @@ function toggleDetail() {
 	$('#image-wrapper').toggleClass('hidden')
 	var btn = $('#toggledetail')
 	console.log(btn.html())
-	if (btn.html().toString().toLowerCase().includes('images')) {
-		btn.html("View Trends")
-	} else {
+	if (btn.html().toString().toLowerCase().includes('trends')) {
 		btn.html("View Images")
+	} else {
+		btn.html("View Trends")
 	}
 }
