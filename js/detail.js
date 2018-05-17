@@ -39,9 +39,7 @@ function loadDetail(projectName) {
 	_currentProj = projectName;
 
 	clearDetailsHtml();
-	// var projectPath = getProjectJsonPath(projectName);
-	// var project = loadProject(projectPath);
-	// _currentProj = project;
+
 	$('#slidebutton').removeClass('hidden');
 	document.getElementById('slidetogglebtn').onclick = toggleSlideView
 
@@ -409,7 +407,6 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 			for (var key in tags) {
 				database.add_image_meta(imgname, imgpath, projname, key, tags[key], detail_exif_display_callback);
 			}
-			//insertDetailTemplate(imgname, imgpath, projname);
 			insert_detail_template_callback(true, imgname, imgpath, projname, tags);
 
 		})
@@ -501,7 +498,10 @@ function insert_detail_template_callback(bool, img_name, img_path, proj_name, me
 			data.exifData[key] = metadata_row[key];
 		}
 		database.get_favorite_fields(function(favorites, csv) {
+			console.log("preprocessing");
 			data = processData(data, favorites);
+			console.log("finished processing data: ");
+			console.log(data);
 			insertDetailTemplate__NEW(data, img_name, img_path, proj_name);
 		});
 	} else {
@@ -525,8 +525,11 @@ function insertDetailTemplate(img_name, img_path, proj_name) {
 //  fileData: {...}
 // }
 function insertDetailTemplate__NEW(data, id, path, projname) {
-	insertIntoSlideMenu(data, id)
-	data.id = id
+	insertIntoSlideMenu(data, id);
+	console.log("finished insert");
+
+	data.id = id;
+
 	if (data.error) {
 		insertErrorTemplate(data, id);
 		return;
