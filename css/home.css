@@ -41,8 +41,7 @@ a.side-bar:hover, a.side-bar:focus {
 
 #body {
   margin-left: 16.666%;
-  margin-top: 50px;
-  transition: margin-left .5s
+  transition: margin-left .2s
 }
 
 header.masthead {
@@ -111,4 +110,8 @@ header.masthead {
 
 .choices__list--dropdown .choices__item--selectable {
     padding-right: 10px !important;
+}
+
+.thumb-btn {
+  max-width: 28%;
 }

@@ -44,12 +44,20 @@ function loadDetail(projectName) {
 	// _currentProj = project;
 	$('#slidebutton').removeClass('hidden');
 	document.getElementById('slidetogglebtn').onclick = toggleSlideView
+	document.getElementById('checkbtn').onclick = checkAll
+
+	// document.getElementById('checknonebtn').onclick = uncheckAll
 
 	redirect('detail');
 
 	/* Display project header. */
 	database.get_project(projectName, function(row) {
 		loadHeader(row);
+		document.getElementById('toggledetail').onclick = toggleDetail
+		if ($('#detail-charts').hasClass('hidden')) {
+			$('#toggledetail').html('View Trends')
+		}
+
 	});
 	loadCharts();
 	/* Display images in this project. */
@@ -212,6 +220,9 @@ function loadHeader(project) {
 			"<div class='col-md-10'>",
 		    "<h1 id='name-header' class='my-4' style='word-wrap:break-word;'>{{displayName}}</h1>",
 				"<h4 style='word-wrap:break-word;'>{{projDesc}}</h4>",
+					"<div class='btn btn-primary btn-md' id='toggledetail'>",
+						"View Images",
+					"</div>",
 			"</div>",
 			"<div class='col-md-2'>",
 				"<br><br><br>",
@@ -389,9 +400,9 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 		'error': "",
 	};
 	var template = [
-		'<div id="detail-template{{name}}" class="row">',
+		'<div id="detail-template{{name}}" class="row detail_template">',
 		'</div>',
-		'<hr id="hr{{name}}">'
+		'<hr id="hr{{name}}" class="detail_template">'
 	].join("\n")
 	var filler = Mustache.render(template, {name: imgname});
 	$("#image-wrapper").append(filler);
@@ -447,7 +458,11 @@ function getType(info) {
 
 function populate_tags_view(image_name, project_name, image_path, tags) {
 	/* Set tagging actions and populate existing tags. */
-	var choices = new Choices($('#tags' + image_name)[0], {
+	var tagsElem = $('#tags' + image_name)[0]
+	if (!tagsElem) {
+		return;
+	}
+	var choices = new Choices(tagsElem, {
 		items: tags,
 		removeItemButton: true,
 		editItems: true,
@@ -812,7 +827,7 @@ function insertIntoSlideMenu(data, id) {
 	var name_row = [
 		'<div class="row thumb-row">',
 			'<label class="menu-check">',
-				'<input id="{{name}}check" type="checkbox" checked>',
+				'<input id="{{name}}check" class="name-checkbox" type="checkbox" checked>',
 				'{{name}}',
 			'</label>',
 
@@ -856,4 +871,58 @@ function insertIntoSlideMenu(data, id) {
 function toggleSlideView() {
 	$('#name-menu').toggleClass('hidden')
 	$('#thumb-menu').toggleClass('hidden')
+}
+
+function checkAll() {
+	var boxes = document.getElementsByClassName('menu-check-thumb')
+	for (var ind in boxes) {
+		var input = boxes[ind]
+		input.checked = true
+	}
+	boxes = document.getElementsByClassName('name-checkbox')
+	for (var ind in boxes) {
+		var input = boxes[ind]
+		input.checked = true
+	}
+	var templates = document.getElementsByClassName('detail_template')
+	for (var ind in templates) {
+		var template = templates[ind]
+		if (template.classList) {
+			template.classList.remove('hidden')
+		}
+	}
+	document.getElementById('checkbtn').onclick = uncheckAll
+}
+
+function uncheckAll() {
+	var boxes = document.getElementsByClassName('menu-check-thumb')
+	for (var ind in boxes) {
+		var input = boxes[ind]
+		input.checked = false
+	}
+	boxes = document.getElementsByClassName('name-checkbox')
+	for (var ind in boxes) {
+		var input = boxes[ind]
+		input.checked = false
+	}
+	var templates = document.getElementsByClassName('detail_template')
+	for (var ind in templates) {
+		var template = templates[ind]
+		if (template.classList) {
+			template.classList.add('hidden')
+		}
+	}
+	document.getElementById('checkbtn').onclick = checkAll
+}
+
+function toggleDetail() {
+	$('#detail-charts').toggleClass('hidden')
+	$('#image-wrapper').toggleClass('hidden')
+	var btn = $('#toggledetail')
+	console.log(btn.html())
+	if (btn.html().toString().toLowerCase().includes('images')) {
+		btn.html("View Trends")
+	} else {
+		btn.html("View Images")
+	}
 }
