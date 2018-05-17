@@ -2,7 +2,7 @@
   font-family: 'Material Icons';
   font-weight: normal;
   font-style: normal;
-  font-size: 36px;  /* Preferred icon size */
+  font-size: 24px;  /* Preferred icon size */
   vertical-align: bottom;
   display: inline-block;
   line-height: 1;
@@ -113,7 +113,7 @@ header.masthead {
   color: #8b99a7;
   background-color: #0d77e2;
   height: 100%;
-  font-size:24px;
+  font-size:18px;
   padding-right: 0px;
 }
 

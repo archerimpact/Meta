@@ -266,7 +266,7 @@ class Database {
   //     });
   //   });
   // }
-  add_image_meta(img_path, proj_name, meta_key, meta_value, callback) {
+  add_image_meta(imgname, img_path, proj_name, meta_key, meta_value, callback) {
     // set metadata for image
     // if column doesn't exist, add column
     var _this = this;
@@ -296,7 +296,7 @@ class Database {
             success = true;
           }
 
-          callback(success);
+          callback(success, imgname, img_path, proj_name, meta_key, meta_value);
         });
       });
     });
@@ -781,6 +781,25 @@ class Database {
     stmt.finalize();
   }
 
+  /* Deletes the specified image from the project. */
+  delete_image(img_name, proj_name, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      /* Delete relevant images from Images table. */
+      var stmt = db.prepare("DELETE FROM Images WHERE img_name=? AND proj_name=?");
+      stmt.run([img_name, proj_name], function(err) {
+        if (err) {
+          throw error;
+          callback(false);
+        } else {
+          callback(true);
+        }
+      });
+      stmt.finalize();
+    });
+  }
+
   init_database() {
     var db = new sqlite3.Database(db_filename, (err) => {
       if (err) {
@@ -858,4 +877,4 @@ class Database {
   }
 }
 
-module.exports = Database
+module.exports = Database;

@@ -173,7 +173,8 @@ function setPhotoRemove(name) {
 		return;
 	}
 	elem.onclick = function() {
-		database.remove_image(projName, name, function() {
+		database.get_projects(function(bool){});
+		database.delete_image(name, projName, function(bool) {
 			var content = document.getElementById('detail-template' + name);
 			content.parentNode.removeChild(content);
 			var line = document.getElementById('hr' + name);
@@ -369,7 +370,7 @@ module.exports = {
 	loadDetail: loadDetail
 };
 
-function detail_exif_display_callback(bool) {
+function detail_exif_display_callback(bool, imgname, img_path, proj_name, meta_key, meta_value) {
 	if (!bool) {
 		alert("failed to add image metadata");
 	}
@@ -394,7 +395,7 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 		'<div id="detail-template{{name}}" class="row">',
 		'</div>',
 		'<hr id="hr{{name}}">'
-	].join("\n")
+	].join("\n");
 	var filler = Mustache.render(template, {name: imgname});
 	$("#image-wrapper").append(filler);
 	if (Object.keys(metadata).length > 0) {
@@ -406,9 +407,11 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 		.read(imgpath)
 		.then(function(tags) {
 			for (var key in tags) {
-				database.add_image_meta(imgpath, projname, key, tags[key], detail_exif_display_callback);
+				database.add_image_meta(imgname, imgpath, projname, key, tags[key], detail_exif_display_callback);
 			}
-			insertDetailTemplate(imgname, imgpath, projname);
+			//insertDetailTemplate(imgname, imgpath, projname);
+			insert_detail_template_callback(true, imgname, imgpath, projname, tags);
+
 		})
 		.catch(function(error) {
 			console.error(error);
@@ -449,13 +452,18 @@ function getType(info) {
 
 function populate_tags_view(image_name, project_name, image_path, tags) {
 	/* Set tagging actions and populate existing tags. */
-	var choices = new Choices($('#tags' + image_name)[0], {
-		items: tags,
-		removeItemButton: true,
-		editItems: true,
-		duplicateItems: false,
-		placeholderValue: "Add a tag",
-	});
+	var searchElem = $('#tags' + image_name)[0];
+	if (!searchElem) {
+		return;
+	} else {
+		var choices = new Choices(searchElem, {
+			items: tags,
+			removeItemButton: true,
+			editItems: true,
+			duplicateItems: false,
+			placeholderValue: "Add a tag",
+		});
+	}
 
 	/* Add tag to database. */
 	$('#tags' + image_name)[0].addEventListener('addItem', function(event) {
@@ -690,7 +698,9 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 	setPhotoRemove(data.name);
 
 	var searchElem = $('#search' + data.name)[0]
-	if (searchElem) {
+	if (!searchElem) {
+		return;
+	} else {
 		var choices = new Choices(searchElem, {
 			choices: data.ref,
 			paste: false,
@@ -699,7 +709,7 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 			itemSelectText: '',
 			duplicateItems: true,
 			placeholderValue: "Search Exif data",
-		})
+		});
 	}
 
 	/* Handle notes. */
