@@ -687,17 +687,6 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 
 	setPhotoRemove(data.name);
 
-	// var tagElem = $('#tags' + data.name)[0]
-	// if (tagElem) {
-	// 	var choices = new Choices(tagElem, {
-	// 		items: data.tags,
-	// 		removeItemButton: true,
-	// 		editItems: true,
-	// 		duplicateItems: false,
-	// 		placeholderValue: "Add a tag",
-	// 	})
-	// }
-
 	var searchElem = $('#search' + data.name)[0]
 	if (searchElem) {
 		var choices = new Choices(searchElem, {
