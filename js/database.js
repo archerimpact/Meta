@@ -542,6 +542,25 @@ class Database {
     });
   }
 
+  /* Returns whether a particular image has the specified metadata attribute. */
+  has_metadata_attr(meta_attr, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      _this.get_metadata_fields(function(fields) {
+        var attr;
+        for (var i in meta_attr) {
+          attr = meta_attr[i];
+          if (fields.indexOf(attr) < 0) {
+            callback(false);
+            return;
+          }
+        }
+        callback(true);
+      });
+    });
+  }
+
   /* Uses callback(bool, img_name, img_path, proj_name, {}) to return dict of metafields to metadata.
    * Ignores any fields that are not filled in. */
   get_image_metadata(img_path, img_name, proj_name, callback) {
@@ -553,7 +572,7 @@ class Database {
           callback(false, img_name, img_path, proj_name, {});
         } else {
           var not_metadata = ["img_name", "path", "proj_name", "creation",
-                      "last_modified", "tags", "favorited", "notes"];
+                              "last_modified", "tags", "favorited", "notes"];
           var stmt = db.prepare("SELECT * FROM Images WHERE path=? AND proj_name=?");
           stmt.get([img_path, proj_name], function(err, row) {
             for (var key in row) {
@@ -564,6 +583,144 @@ class Database {
             callback(true, img_name, img_path, proj_name, row);
           });
           stmt.finalize();
+        }
+      });
+    });
+  }
+
+  // date when image was created/Taken
+  /* Get count of images by the date at which they were taken, for the specified project. */
+  get_images_by_date(proj_name, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      _this.has_project(proj_name, function(bool) {
+        if (bool) {
+          _this.has_metadata_attr(['CreateDate'], function(attr_exists) {
+            if (attr_exists) {
+              var dates = [];
+              var counts = [];
+              var stmt = db.prepare("SELECT COUNT(*) AS Count, CreateDate FROM Images WHERE CreateDate IS NOT NULL GROUP BY CreateDate");
+              stmt.each([proj_name], function(err, row) {
+                if (err)
+                  throw err;
+
+                dates.push(row['CreateDate']);
+                counts.push(row['Count']);
+              }, function() {
+                callback(dates, counts);
+              });
+            } else {
+              console.error("column DNE: CreateDate");
+              callback([], []);
+            }
+          });
+        } else {
+          console.error("no image dates found");
+          callback([], []);
+        }
+      });
+    });
+  }
+
+  /* Get list of (lat, lon) tuples for each image in a specific project, to represent the image location. */
+  get_locations_for_images(proj_name, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      _this.has_project(proj_name, function(bool) {
+        if (bool) {
+          _this.has_metadata_attr(['GPSLatitude', 'GPSLongitude'], function(attr_exists) {
+            if (attr_exists) {
+              var coords = [];
+              var stmt = db.prepare("SELECT GPSLatitude, GPSLongitude FROM Images WHERE proj_name = ? AND GPSLatitude IS NOT NULL AND GPSLongitude IS NOT NULL");
+              stmt.each([proj_name], function(err, row) {
+                if (err) {
+                  throw error;
+                }
+                coords.push({'lat': row['GPSLatitude'], 'lng': row['GPSLongitude']});
+              }, function() {
+                console.log('get_locations_for_images:', coords, 'in', proj_name);
+                callback(coords);
+              });
+              stmt.finalize();
+            } else {
+              console.error("column DNE: GPSLatitude, GPSLongitude");
+              callback([]);
+            }
+          });
+        } else {
+          console.error('get_locations_for_images:', proj_name, "does not exist");
+          callback([]);
+        }
+      });
+    });
+  }
+
+  // camera breakdown (have toggle to change attr for pie chart)
+  get_camera_models(proj_name, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      _this.has_project(proj_name, function(bool) {
+        if (bool) {
+          _this.has_metadata_attr(['Model'], function(attr_exists) {
+            if (attr_exists) {
+              var models = [];
+              var counts = [];
+              var stmt = db.prepare("SELECT Model, COUNT(*) AS Count FROM Images WHERE proj_name=? AND Model IS NOT NULL GROUP BY Model");
+              stmt.each([proj_name], function(err, row) {
+                if (err) {
+                  throw err;
+                }
+                models.push(row['Model']);
+                counts.push(row['Count']);
+              }, function() {
+                callback(models, counts);
+              });
+            } else {
+              console.error("columns DNE: Model");
+              callback([], []);
+            }
+          });
+        } else {
+          console.error('get_locations_for_images:', proj_name, "does not exist");
+          callback([], []);
+        }
+      });
+    });
+  }
+
+  // aperture (pie chart)
+  get_apertures(proj_name, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      _this.has_project(proj_name, function(bool) {
+        if (bool) {
+          _this.has_metadata_attr(['Aperture'], function(attr_exists) {
+            if (attr_exists) {
+              var apertures = [];
+              var counts = [];
+              var stmt = db.prepare("SELECT COUNT(*) as Count, Aperture FROM Images WHERE proj_name=? AND Aperture IS NOT NULL GROUP BY Aperture");
+              stmt.each([proj_name], function(err, row) {
+                if (err) {
+                  throw err;
+                }
+                apertures.push(row['Aperture']);
+                counts.push(row['Count']);
+              }, function() {
+                callback(apertures, counts);
+              });
+              stmt.finalize();
+            } else {
+              console.error("column DNE: Aperture");
+              callback([], []);
+            }
+          });
+        } else {
+          console.error('get_apertures:', proj_name, "does not exist");
+          callback([], []);
         }
       });
     });

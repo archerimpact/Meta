@@ -51,7 +51,7 @@ function loadDetail(projectName) {
 	database.get_project(projectName, function(row) {
 		loadHeader(row);
 	});
-	loadCharts();
+
 	/* Display images in this project. */
 	database.get_images_in_project(projectName, function(projectName, image_list) {
 		image_list.sort(compareTimestamp);
@@ -66,6 +66,8 @@ function loadDetail(projectName) {
 			});
 		});
 	});
+
+	loadCharts(projectName);
 }
 
 /* Comparator that puts newer images before older ones. */
@@ -711,7 +713,7 @@ function isStr(maybeString) {
 	return maybeString && !(maybeString == "");
 }
 
-function loadCharts() {
+function loadCharts(proj_name) {
 	template = [
 		'<div class="row container-fluid">',
 			'<div class="col-sm-6 col-xs-12">',
@@ -743,48 +745,17 @@ function loadCharts() {
 					'<canvas id="pie2"></canvas>',
 				'</div>',
 			'</div>',
-			'<div class=" col-md-4 col-xs-12">',
-				'<div class="clearfix"></div>',
-				'<div class="x_content">',
-					'<canvas id="pie3"></canvas>',
-				'</div>',
-			'</div>',
+			// '<div class=" col-md-4 col-xs-12">',
+			// 	'<div class="clearfix"></div>',
+			// 	'<div class="x_content">',
+			// 		'<canvas id="pie3"></canvas>',
+			// 	'</div>',
+			// '</div>',
 		'</div>',
 	].join("\n");
 
 	$("#detail-charts").append(template);
 
-	addLineChart(
-		"lineChart",
-		["2000", "2001", "2002", "2003", "2004"],
-		"Photos Taken",
-		[100, 200, 400, 50, 350]
-	)
-	addPieChart(
-		"pie1",
-		["Cannon", "Nikon", "Apple", "Samsung"],
-		[25, 40, 100, 20],
-		"Cameras"
-	)
-	addPieChart(
-		"pie2",
-		["Cannon", "Nikon", "Apple", "Samsung"],
-		[25, 40, 100, 20],
-		"Data"
-	)
-	addPieChart(
-		"pie3",
-		["Cannon", "Nikon", "Apple", "Samsung"],
-		[25, 40, 100, 20],
-		"Stuff"
-	)
-	addMap(
-		"trendsmap",
-		[
-			{'lat':10, 'lng':10},
-			{'lat':20, 'lng':20},
-		]
-	)
 	var ref = document.getElementById('lineChart');
 	var div = document.getElementById('trendsmap')
 	var width = ref.offsetWidth / 2
@@ -794,6 +765,65 @@ function loadCharts() {
 		div.style.height = '400px';
 	}
 
+	database.get_images_by_date(proj_name, function(dates, counts) {
+		console.log("images by date: " + dates + ", " + counts);
+
+		/* Set content to "no data exists" image if needed. */
+		if (dates.length == 0) {
+
+		} else {
+			addLineChart(
+				"lineChart",
+				dates,
+				"Photos Taken",
+				counts
+			);
+		}
+	});
+
+	database.get_camera_models(proj_name, function(models, counts) {
+		console.log("camera models: " + models + ", " + counts);
+
+		/* Set content to "no data exists" image if needed. */
+		if (models.length == 0) {
+
+		} else {
+			addPieChart(
+				"pie1",
+				models,
+				counts,
+				"Cameras"
+			);
+		}
+	});
+
+	database.get_locations_for_images(proj_name, function(locations) {
+		/* Set content to "no data exists" image if needed. */
+		if (locations.length == 0) {
+
+		} else {
+			addMap(
+				"trendsmap",
+				locations
+			);
+		}
+	});
+
+	database.get_apertures(proj_name, function(apertures, counts) {
+		console.log("apertures: " + apertures + ", " + counts);
+
+		/* Set content to "no data exists" image if needed. */
+		if (apertures.length == 0) {
+
+		} else {
+			addPieChart(
+				"pie2",
+				apertures,
+				counts,
+				"Apertures"
+			);
+		}
+	});
 }
 
 function insertIntoSlideMenu(data, id) {
