@@ -301,7 +301,7 @@ class Database {
         if (!col_exists) {
           db.run("ALTER TABLE Images ADD " + meta_key + " TEXT;");
         }
-        
+
         var success = false;
         _this.has_image(img_path, proj_name, function(bool) {
           if (bool) {
@@ -622,6 +622,17 @@ class Database {
     });
   }
 
+  /* Helper function to convert an ExifDateTime instance to an appropriate format for the timeline chart. */
+  date_to_chart_format(exifDateTime) {
+    var year = exifDateTime.year;
+    var month = exifDateTime.month;
+    var day = exifDateTime.day;
+    var hour = exifDateTime.hour;
+    var minute = exifDateTime.minute;
+
+    return month + "/" + day + "/" + year + " at " + hour + ":" + minute;
+  }
+
   // date when image was created/Taken
   /* Get count of images by the date at which they were taken, for the specified project. */
   get_images_by_date(proj_name, callback) {
@@ -635,7 +646,7 @@ class Database {
               console.log("CreateDate exists");
               var dates = [];
               var counts = [];
-              var stmt = db.prepare("SELECT CreateDate FROM Images");
+              var stmt = db.prepare("SELECT CreateDate, COUNT(*) as Count FROM Images WHERE proj_name = ? AND CreateDate IS NOT NULL GROUP BY CreateDate");
               stmt.each([proj_name], function(err, row) {
                 if (err) {
                   console.error("FAILING CreateDate: " + err);
@@ -643,10 +654,10 @@ class Database {
                   return;
                 }
 
-                console.log("row: " + row['CreateDate']);
-                console.log("parsed: " + JSON.parse(row['CreateDate']));
-                dates.push(JSON.parse(row['CreateDate']));
-                counts.push(1/* row['Count']*/);
+                var date = _this.date_to_chart_format(JSON.parse(row['CreateDate']));
+
+                dates.push(date);
+                counts.push(row['Count']);
               }, function() {
                 callback(dates, counts);
               });

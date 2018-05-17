@@ -32,8 +32,25 @@ function addLineChart(id, xlabels, ylabel, values) {
 				// pointBorderWidth: 1,
 				// data: [82, 23, 66, 9, 99, 4, 2]
 		  //}]
-    ]
-		},
+    ]},
+    options: {
+      responsive: true,
+      animation: {
+        animateScale: true
+      },
+      scales: {
+        xAxes: [{
+          display: false
+        }],
+        yAxes: [{
+          ticks: {
+            beginAtZero: true,
+            callback: function (value) { if (Number.isInteger(value)) { return value; } },
+            stepSize: 1
+          }
+        }]
+      }
+    }
   });
 }
 
