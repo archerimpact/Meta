@@ -104,12 +104,13 @@
 }
 
 .menulink {
-  text-decoration: underline solid white;
+  text-decoration: underline solid #0d77e2;
   margin: 5px;
+  color: #0d77e2;
 }
 
 .menulink:hover {
-  color: '#337ab7';
+  color: #4baffd;
 }
 
 #toggledetail {
