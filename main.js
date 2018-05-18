@@ -23,7 +23,12 @@ global.sharedObj = {db: db};
 
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 1000, height: 800})
+  mainWindow = new BrowserWindow({
+    width: 1000,
+    height: 800,
+    'minHeight': 500,
+    'minWidth': 770,
+  })
   mainWindow.setFullScreen(false)
 
   // and load the index.html of the app.

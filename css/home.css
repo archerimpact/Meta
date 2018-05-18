@@ -41,12 +41,20 @@ a.side-bar:hover, a.side-bar:focus {
 
 #body {
   margin-left: 16.666%;
+<<<<<<< HEAD
+  /* max-width: 83.333%; */
+}
+
+#width-mod {
+  transition: margin-left .2s;
+=======
   margin-top: 50px;
   transition: margin-left .5s;
   font: "Nunito Sans";
   min-width: 772px;
   transition: margin-left .2s;
   color: #3d3d3d;
+>>>>>>> 3a1381d6ca0ab02a5154bfa55922fc0f9ac29003
 }
 
 header.masthead {
@@ -84,6 +92,7 @@ header.masthead {
   height: 100%;
   padding: 0;
   transition: margin-left .5s;
+  max-width: 100%;
 }
 .absolute-center {
     display: -ms-flexbox;
@@ -120,3 +129,5 @@ header.masthead {
 .thumb-btn {
   max-width: 28%;
 }
+
+.toggleLink
