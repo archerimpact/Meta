@@ -51,7 +51,7 @@
     top: 0; /* Stay at the top */
     left: 0;
     overflow-x: hidden; /* Disable horizontal scroll */
-    padding-top: 20px; /* Place content 60px from the top */
+    padding-top: 10px; /* Place content 60px from the top */
     transition: 0.2s; /* 0.5 second transition effect to slide in the sidenav */
     margin-left: 16.666%;
     border-left: 2px solid white;
@@ -101,4 +101,13 @@
 .thumb-row {
   margin-left: 0px !important;
   margin-right: 0px !important;
+}
+
+.menulink {
+  text-decoration: underline solid white;
+  margin: 5px;
+}
+
+.menulink:hover {
+  color: '#337ab7';
 }

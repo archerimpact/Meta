@@ -41,7 +41,11 @@ a.side-bar:hover, a.side-bar:focus {
 
 #body {
   margin-left: 16.666%;
-  transition: margin-left .2s
+  /* max-width: 83.333%; */
+}
+
+#width-mod {
+  transition: margin-left .2s;
 }
 
 header.masthead {
@@ -79,6 +83,7 @@ header.masthead {
   height: 100%;
   padding: 0;
   transition: margin-left .5s;
+  max-width: 100%;
 }
 .absolute-center {
     display: -ms-flexbox;
@@ -115,3 +120,5 @@ header.masthead {
 .thumb-btn {
   max-width: 28%;
 }
+
+.toggleLink

@@ -42,7 +42,10 @@ function loadDetail(projectName) {
 
 	$('#slidebutton').removeClass('hidden');
 	document.getElementById('slidetogglebtn').onclick = toggleSlideView
-	document.getElementById('checkbtn').onclick = checkAll
+	//document.getElementById('checkbtn').onclick = checkAll
+	document.getElementById('checkLink').onclick = checkAll
+	document.getElementById('uncheckLink').onclick = uncheckAll
+
 
 	// document.getElementById('checknonebtn').onclick = uncheckAll
 
@@ -604,7 +607,7 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 
 	var template = [
 		'<div class="row">',
-			'<div class="col-md-4">',
+			'<div class="col-md-4 col-xs-6">',
 				'<div class="row name-row">',
 					'<h3 class="image-name">{{name}}</h3>',
 					'<div class="dropdown" style="display:inline; float:right">',
@@ -620,9 +623,9 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 				'</div>',
 				'<{{media}} class="img-responsive rounded" src="{{path}}" alt="{{sorry}}" controls>',
 			'</div>',
-			'<div class="col-md-8">',
+			'<div class="col-md-8 col-xs-6">',
 				'<div class="row">',
-					'<div class="col-md-7">',
+					'<div class="col-md-7 col-xs-12">',
 
 						// tags
 						'<input type="text" class="choices-tags form-control choices__input is-hidden" id="tags{{name}}" multiple>',
@@ -680,7 +683,7 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 
 
 					'</div>',
-					'<div class="col-md-5">',
+					'<div class="col-md-5 col-xs-12">',
 						// notes
 						'<textarea class="form-control notes" rows="3" placeholder="Notes" id="notes{{name}}"/>',
 						// search bar
