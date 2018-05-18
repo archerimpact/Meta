@@ -51,7 +51,7 @@
     top: 0; /* Stay at the top */
     left: 0;
     overflow-x: hidden; /* Disable horizontal scroll */
-    padding-top: 20px; /* Place content 60px from the top */
+    padding-top: 10px; /* Place content 60px from the top */
     transition: 0.2s; /* 0.5 second transition effect to slide in the sidenav */
     margin-left: 16.666%;
     border-left: 2px solid white;
@@ -103,6 +103,15 @@
   margin-right: 0px !important;
 }
 
+<<<<<<< HEAD
+.menulink {
+  text-decoration: underline solid white;
+  margin: 5px;
+}
+
+.menulink:hover {
+  color: '#337ab7';
+=======
 #toggledetail {
   background-color: #0d77e2;
   color: white;
@@ -112,5 +121,7 @@
 }
 
 .command-buttons {
-  margin-left: 10px; 
+  margin-left: 10px;
+  margin-bottom: 5px;
+>>>>>>> 3a1381d6ca0ab02a5154bfa55922fc0f9ac29003
 }

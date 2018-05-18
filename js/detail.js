@@ -42,7 +42,10 @@ function loadDetail(projectName) {
 
 	$('#slidebutton').removeClass('hidden');
 	document.getElementById('slidetogglebtn').onclick = toggleSlideView
-	document.getElementById('checkbtn').onclick = checkAll
+	//document.getElementById('checkbtn').onclick = checkAll
+	document.getElementById('checkLink').onclick = checkAll
+	document.getElementById('uncheckLink').onclick = uncheckAll
+
 
 	// document.getElementById('checknonebtn').onclick = uncheckAll
 
@@ -52,8 +55,8 @@ function loadDetail(projectName) {
 	database.get_project(projectName, function(row) {
 		loadHeader(row);
 		document.getElementById('toggledetail').onclick = toggleDetail
-		if ($('#detail-charts').hasClass('hidden')) {
-			$('#toggledetail').html('View Trends')
+		if ($('#image-wrapper').hasClass('hidden')) {
+			$('#toggledetail').html('View Images')
 		}
 
 	});
@@ -222,20 +225,22 @@ function loadHeader(project) {
 		    "<h1 id='name-header' class='my-4' style='word-wrap:break-word; color: #3d3d3d'>{{displayName}}</h1>",
 				"<h4 style='word-wrap:break-word; color: #b1b1b1'>{{projDesc}}</h4>",
 					"<div class='btn btn-primary btn-md' id='toggledetail'>",
-						"View Images",
+						"View Trends",
 					"</div>",
 			"</div>",
 			"<div class='col-md-2'>",
 				"<br><br><br>",
-				"<button type='' class='btn btn-primary float-right mb-2 command-buttons' id='export{{projName}}'>",
-					"Export to CSV",
+				"<button type='' class='btn btn-primary float-right mb-2 command-buttons' data-toggle='tooltip' data-placement='left' title='Download as CSV' style='border-color: #0d77e2; background-color: #0d77e2; color=white' id='export{{projName}}'>",
+					"<i class='material-icons'>file_download</i>",
 				"</button>",
 				'<br>',
-				"<button type='' class='btn btn-danger float-right mb-2 command-buttons' id='delete{{projName}}'>",
-					"Delete Project",
+				"<button type='' class='btn btn-danger float-right mb-2 command-buttons' data-toggle='tooltip' data-placement='left' title='Delete Project' style='border-color:#ff0099; background-color: #ff0099; color=white;' id='delete{{projName}}'>",
+					"<i class='material-icons'>delete</i>",
 				"</button>",
 				"<br>",
-				"<button type='' id='upload{{projName}}' class='btn btn-primary float-right mb-2 command-buttons'>Add Image</button>",
+				"<button type='' id='upload{{projName}}' class='btn btn-primary float-right mb-2 command-buttons' data-toggle='tooltip' data-placement='left' title='Add New Image' style='border-color: #0d77e2; background-color: #0d77e2; color: white'>",
+				"<i class='material-icons'>add</i>",
+				"</button>",
 				"<br>",
 			"</div>",
 			"<div id='project-name' hidden=true>{{projName}}</div>",
@@ -599,25 +604,24 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 
 	var template = [
 		'<div class="row">',
-			'<div class="col-md-4">',
+			'<div class="col-md-4 col-xs-6">',
 				'<div class="row name-row">',
 					'<h3 class="image-name">{{name}}</h3>',
 					'<div class="dropdown" style="display:inline; float:right">',
-						'<button class="settings-button btn btn-outline-secondary float-right dropdown-toggle" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
+						'<button class="settings-button btn btn-outline-secondary float-right dropdown-toggle" style="background-color: #89cafd; margin-bottom: 2px; color: white" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
 							'<i class="material-icons icon" style="height:25px;width:15px;font-size:15px;">settings</i>',
 						'</button>',
 						'<ul class="dropdown-menu" aria-labelledby="dropdown' + id + '">',
 							'<li id="remove{{name}}" class="dropdown-item"><a href="#">Remove</a></li>',
-							'<li id="rename{{name}}" class="dropdown-item"><a href="#">Rename</a></li>',
 						'</ul>',
 					'</div>',
-					'<img class="{{flag}}" src="./assets/alert.svg" style="height:25px; display:inline; float:right;" data-toggle="tooltip" data-placement="auto" title="{{flag_str}}"/>',
+					'<i class="material-icons" style="color: #f8e408; height:25px; display:inline; float:right;" data-toggle="tooltip" data-placement="auto" title="{{flag_str}}">error</i/>',
 				'</div>',
 				'<{{media}} class="img-responsive rounded" src="{{path}}" alt="{{sorry}}" controls>',
 			'</div>',
-			'<div class="col-md-8">',
+			'<div class="col-md-8 col-xs-6">',
 				'<div class="row">',
-					'<div class="col-md-7">',
+					'<div class="col-md-7 col-xs-12">',
 
 						// tags
 						'<input type="text" class="choices-tags form-control choices__input is-hidden" id="tags{{name}}" multiple>',
@@ -675,7 +679,7 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 
 
 					'</div>',
-					'<div class="col-md-5">',
+					'<div class="col-md-5 col-xs-12">',
 						// notes
 						'<textarea class="form-control notes" rows="3" placeholder="Notes" id="notes{{name}}"/>',
 						// search bar
@@ -859,14 +863,16 @@ function insertIntoSlideMenu(data, id) {
 	var row = Mustache.render(name_row, data);
 	$('#name-menu').append(row);
 
-	var elem = document.getElementById(data.name.toString() + 'check')
-	if (elem) {
-		elem.onclick = function() {
-			$('#detail-template' + data.name).toggleClass('hidden')
-			$('#hr' + data.name).toggleClass('hidden');
-			var other = document.getElementById(data.name.toString() + 'check_thumb')
-			other.checked = !other.checked
-		};
+	if (data.name) {
+		var elem = document.getElementById(data.name.toString() + 'check')
+		if (elem) {
+			elem.onclick = function() {
+				$('#detail-template' + data.name).toggleClass('hidden')
+				$('#hr' + data.name).toggleClass('hidden');
+				var other = document.getElementById(data.name.toString() + 'check_thumb')
+				other.checked = !other.checked
+			};
+		}
 	}
 
 	//thumbnail view
@@ -881,14 +887,16 @@ function insertIntoSlideMenu(data, id) {
 	row = Mustache.render(thumb_row, data)
 	$('#thumb-menu').append(row)
 
-	elem = document.getElementById(data.name.toString() + 'check_thumb')
-	if (elem) {
-		elem.onclick = function() {
-			$('#detail-template' + data.name).toggleClass('hidden')
-			$('#hr' + data.name).toggleClass('hidden');
-			var other = document.getElementById(data.name.toString() + 'check')
-			other.checked = !other.checked
-		};
+	if (data.name) {
+		elem = document.getElementById(data.name.toString() + 'check_thumb')
+		if (elem) {
+			elem.onclick = function() {
+				$('#detail-template' + data.name).toggleClass('hidden')
+				$('#hr' + data.name).toggleClass('hidden');
+				var other = document.getElementById(data.name.toString() + 'check')
+				other.checked = !other.checked
+			};
+		}
 	}
 }
 
@@ -944,9 +952,9 @@ function toggleDetail() {
 	$('#image-wrapper').toggleClass('hidden')
 	var btn = $('#toggledetail')
 	console.log(btn.html())
-	if (btn.html().toString().toLowerCase().includes('images')) {
-		btn.html("View Trends")
-	} else {
+	if (btn.html().toString().toLowerCase().includes('trends')) {
 		btn.html("View Images")
+	} else {
+		btn.html("View Trends")
 	}
 }
