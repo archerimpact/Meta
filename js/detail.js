@@ -256,39 +256,34 @@ function loadHeader(project) {
 
 	document.getElementById("export" + project['name']).onclick = function() {
 		electron.remote.dialog.showSaveDialog(function(filename, bookmark) {
-			var csvString = "";
-			var keys = new Set();
-			for (var row = 0; row < _data.length; row++) {
-				Object.keys(_data[row]).map(function(key) {
-					keys.add(key);
+			database.get_images_in_project(project['name'], function(projName, rows) {
+				database.get_metadata_fields(function(columns) {
+					/* Create CSV Header. */
+					var csvString = "";
+					columns.forEach(function(col) {
+						csvString += col + ", ";
+					});
+					csvString += "\n";
+
+					rows.forEach(function(row) {
+						columns.forEach(function(col) {
+							var value = row[col];
+							console.log("type:", typeof value);
+							if (typeof value != "string") {
+								value = JSON.stringify(value);
+							}
+							console.log("pre:", value);
+							// value.replace(/,/g , "");
+							value = value.split(',').join(" ");
+							//value.replace("", "");
+							console.log("post:", value);
+							csvString += value + ", ";
+						});
+						csvString += "\n";
+					});
+					fs.writeFileSync(filename+".csv", csvString);
 				});
-			}
-			var csvHeader = "";
-			keys.forEach(function(k) {
-				csvHeader += k + ",";
 			});
-			csvString += csvHeader.slice(0, csvHeader.length - 1);
-			csvString += "\n";
-			var rowString;
-			for (var row = 0; row < _data.length; row++) {
-				rowString = "";
-				keys.forEach(function(k) {
-					if (_data[row][k]) {
-						var value = _data[row][k].toString();
-						if (value.includes(',')) {
-							rowString += '"' + value + '",';
-						} else {
-							rowString += _data[row][k] + ",";
-						}
-					}
-					else {
-						rowString += ",";
-					}
-				});
-				csvString += rowString.slice(0, rowString.length - 1);
-				csvString += "\n";
-			}
-			fs.writeFileSync(filename+".csv", csvString);
 		});
 	};
 
@@ -404,7 +399,7 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 		'gpsData': {},
 		'fileData': {},
 		'favData': {},
-		'error': "",
+		'error': ""
 	};
 	var template = [
 		'<div id="detail-template{{name}}" class="row detail_template">',
@@ -422,7 +417,7 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 		.read(imgpath)
 		.then(function(tags) {
 			for (var key in tags) {
-				if (tags[key]) {
+				if (tags[key] && key != "error") { // TODO: maybe allow error array?
 					database.add_image_meta(imgname, imgpath, projname, key, tags[key], detail_exif_display_callback);
 				}
 			}
@@ -504,14 +499,14 @@ function populate_notes_view(image_name, project_name, image_path, notes) {
 function insert_detail_template_callback(bool, img_name, img_path, proj_name, metadata_row) {
 	if (bool) {
 		var data = {
-				'name': img_name,
-				'path': img_path,
-				'exifData': {},
-				'gpsData': {},
-				'favData': {},
-				'fileData': {},
-				'error': "",
-			};
+			'name': img_name,
+			'path': img_path,
+			'exifData': {},
+			'gpsData': {},
+			'favData': {},
+			'fileData': {},
+			'error': ""
+		};
 		for (var key in metadata_row) {
 			data.exifData[key] = metadata_row[key];
 		}
@@ -556,7 +551,7 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 	var disableds = {};
 	var types = ['exif', 'gps', 'file', 'fav'];
 	for (var ind in types) {
-		var name = types[ind]
+		var name = types[ind];
 		var category = data[name + 'Data'];
 		var content = '';
 		content += '<div class="table-responsive table-condensed">'
@@ -747,42 +742,53 @@ function isStr(maybeString) {
 
 function loadCharts(proj_name) {
 	template = [
+		'<div class="charts" id="chart-wrapper" style="padding-top:100px">',
 		'<div class="row container-fluid">',
-			'<div class="col-sm-6 col-xs-12">',
-				'<div class="x_panel">',
-					'<div class="clearfix"></div>',
-					'<div class="x_content">',
+			'<div class="col-sm-6 col-xs-12" style="padding-right: 15px">',
+				'<div class="panel panel-default">',
+					'<div class="panel-heading"> Image Creation Date </div>',
+					'<div class="panel-body">',
+					'<div class="flot-chart">',
 						'<canvas id="lineChart"></canvas>',
 					'</div>',
+				'</div>',
+				'</div>',
 				'</div>',
 			'</div>',
 			'<div class="col-sm-6 col-xs-12">',
 				'<div style="width:100%;" id="trendsmap"></div>',
 			'</div>',
 		'</div>',
-		'<div class="row contriner-fluid">',
+		'<div class="row container-fluid">',
 			'<div class=" col-md-4 col-xs-12">',
-				'<div class="clearfix"></div>',
-				'<div class="panel-group">',
-					'<div class="panel panel-default">',
-						'<div class="panel-body">',
-							'<canvas id="pie1"></canvas>',
-						'</div>',
-					'</div>',
-				'</div>',
-			'</div>',
-			'<div class=" col-md-4 col-xs-12">',
-				'<div class="clearfix"></div>',
 				'<div class="panel panel-default">',
-					'<canvas id="pie2"></canvas>',
-				'</div>',
-			'</div>',
+				   '<div class="panel-heading"> Camera Make </div>',
+					 '<div class="panel-body">',
+					 '<div class="flot-chart">',
+					   '<canvas id="pie1"></canvas>',
+						 '</div>',
+						 '</div>',
+						 '</div>',
+						 '</div>',
+						 '</div>',
+			'<div class=" col-md-4 col-xs-12">',
+				'<div class="panel panel-default">',
+				   '<div class="panel-heading"> Image Aperture </div>',
+					 '<div class="panel-body">',
+					 '<div class="flot-chart">',
+					   '<canvas id="pie2"></canvas>',
+						 '</div>',
+						 '</div>',
+						 '</div>',
+						 '</div>',
+						 '</div>',
 			// '<div class=" col-md-4 col-xs-12">',
 			// 	'<div class="clearfix"></div>',
 			// 	'<div class="x_content">',
 			// 		'<canvas id="pie3"></canvas>',
 			// 	'</div>',
 			// '</div>',
+			'</div>',
 		'</div>',
 	].join("\n");
 
@@ -871,14 +877,16 @@ function insertIntoSlideMenu(data, id) {
 	var row = Mustache.render(name_row, data);
 	$('#name-menu').append(row);
 
-	var elem = document.getElementById(data.name.toString() + 'check')
-	if (elem) {
-		elem.onclick = function() {
-			$('#detail-template' + data.name).toggleClass('hidden')
-			$('#hr' + data.name).toggleClass('hidden');
-			var other = document.getElementById(data.name.toString() + 'check_thumb')
-			other.checked = !other.checked
-		};
+	if (data.name) {
+		var elem = document.getElementById(data.name.toString() + 'check')
+		if (elem) {
+			elem.onclick = function() {
+				$('#detail-template' + data.name).toggleClass('hidden')
+				$('#hr' + data.name).toggleClass('hidden');
+				var other = document.getElementById(data.name.toString() + 'check_thumb')
+				other.checked = !other.checked
+			};
+		}
 	}
 
 	//thumbnail view
@@ -893,14 +901,16 @@ function insertIntoSlideMenu(data, id) {
 	row = Mustache.render(thumb_row, data)
 	$('#thumb-menu').append(row)
 
-	elem = document.getElementById(data.name.toString() + 'check_thumb')
-	if (elem) {
-		elem.onclick = function() {
-			$('#detail-template' + data.name).toggleClass('hidden')
-			$('#hr' + data.name).toggleClass('hidden');
-			var other = document.getElementById(data.name.toString() + 'check')
-			other.checked = !other.checked
-		};
+	if (data.name) {
+		elem = document.getElementById(data.name.toString() + 'check_thumb')
+		if (elem) {
+			elem.onclick = function() {
+				$('#detail-template' + data.name).toggleClass('hidden')
+				$('#hr' + data.name).toggleClass('hidden');
+				var other = document.getElementById(data.name.toString() + 'check')
+				other.checked = !other.checked
+			};
+		}
 	}
 }
 

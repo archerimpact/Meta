@@ -530,6 +530,27 @@ class Database {
     });
   }
 
+  /* Uses callback(list) to return list of columns. */
+  get_columns(callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      var fields = [];
+      db.each("PRAGMA table_info(Images)", function(err, col) {
+        if (err) {
+          console.error("FAILING: " + err);
+          callback([]);
+          return;
+        }
+
+        var name = col.name;
+        fields.push(name);
+      }, function() {
+        callback(fields);
+      });
+    });
+  }
+
   /* Set favorite metadata in Settings table. */
   update_favorites_field(tag, type, checked) {
     var _this = this;
