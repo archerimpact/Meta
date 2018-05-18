@@ -398,7 +398,7 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 		'gpsData': {},
 		'fileData': {},
 		'favData': {},
-		'error': "",
+		'error': ""
 	};
 	var template = [
 		'<div id="detail-template{{name}}" class="row detail_template">',
@@ -416,7 +416,7 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 		.read(imgpath)
 		.then(function(tags) {
 			for (var key in tags) {
-				if (tags[key]) {
+				if (tags[key] && key != "error") {
 					database.add_image_meta(imgname, imgpath, projname, key, tags[key], detail_exif_display_callback);
 				}
 			}
@@ -498,14 +498,14 @@ function populate_notes_view(image_name, project_name, image_path, notes) {
 function insert_detail_template_callback(bool, img_name, img_path, proj_name, metadata_row) {
 	if (bool) {
 		var data = {
-				'name': img_name,
-				'path': img_path,
-				'exifData': {},
-				'gpsData': {},
-				'favData': {},
-				'fileData': {},
-				'error': "",
-			};
+			'name': img_name,
+			'path': img_path,
+			'exifData': {},
+			'gpsData': {},
+			'favData': {},
+			'fileData': {},
+			'error': ""
+		};
 		for (var key in metadata_row) {
 			data.exifData[key] = metadata_row[key];
 		}
@@ -550,7 +550,7 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 	var disableds = {};
 	var types = ['exif', 'gps', 'file', 'fav'];
 	for (var ind in types) {
-		var name = types[ind]
+		var name = types[ind];
 		var category = data[name + 'Data'];
 		var content = '';
 		content += '<div class="table-responsive table-condensed">'
