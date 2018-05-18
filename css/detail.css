@@ -103,6 +103,7 @@
   margin-right: 0px !important;
 }
 
+<<<<<<< HEAD
 .menulink {
   text-decoration: underline solid white;
   margin: 5px;
@@ -110,4 +111,17 @@
 
 .menulink:hover {
   color: '#337ab7';
+=======
+#toggledetail {
+  background-color: #0d77e2;
+  color: white;
+  border-color: #0d77e2;
+  padding: 10px;
+  margin-left: 10px;
+}
+
+.command-buttons {
+  margin-left: 10px;
+  margin-bottom: 5px;
+>>>>>>> 3a1381d6ca0ab02a5154bfa55922fc0f9ac29003
 }

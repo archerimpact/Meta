@@ -12,12 +12,12 @@ function showProject(name, desc, imgsrc) {
     "<div class='col-lg-4 col-sm-6 portfolio-item'>",
       "<div class='card h-100'>",
         "<a id='photo-{{name}}' href='#'><img style='width: 100%; height: 30vw; object-fit: cover' class='card-img-top img-responsive' src='{{imgsrc}}' alt=''></a>",
-        "<div class='card-block well'>",
+        "<div class='card-block well' style='border-radius: 0px'>",
           "<h4 class='card-title'>",
-            "<a style='padding: 0px; margin: -10px; color: #192d42' id='link-{{name}}' href='#'>{{displayName}}</a>",
+            "<a style='padding: 0px; margin: -10px; color: #3d3d3d' id='link-{{name}}' href='#'>{{displayName}}</a>",
           "</h4>",
-          "<p style='padding: 0; color: 192d42' class='card-text text-truncate'>{{desc}}</p>",
-          "<a class='btn btn-primary' style='background-color: #192d42; color: white' id='btn-{{name}}' href='#'>View</a>",
+          "<p style='padding: 0; color: #b1b1b1' class='card-text text-truncate'>{{desc}}</p>",
+          "<a class='btn btn-primary' style='background-color: #0d77e2; color: white' id='btn-{{name}}' href='#'>View</a>",
         "</div>",
       "</div>",
     "</div>",
@@ -52,7 +52,7 @@ function showNewProject() {
             "<a id='new-photo-link' href='#'></a>",
           "</h4>",
           "<p class='card-text'></p>",
-          "<a data-section='new' class='btn btn-primary js-scroll-trigger' style='background-color: #192d42; color: white' id='new-photo-btn' href='#'>Add New Project</a>",
+          "<a data-section='new' class='btn btn-primary js-scroll-trigger' style='background-color: #3d3d3d; color: white' id='new-photo-btn' href='#'>Add New Project</a>",
         "</div>",
       "</div>",
     "</div>",
@@ -64,7 +64,6 @@ function showNewProject() {
 
 function populateProjectsScreen() {
   database.get_projects(function (projects_list) {
-    //showNewProject();
 
     projects_list.sort(compareTimestamp);
 

@@ -11,7 +11,7 @@ console.log(db_filename);
 class Database {
   constructor(opts) {
     this.db = this.init_database();
-    this.last_image_id = 0;
+    // this.last_image_id = 0;
   }
 
   /* Uses callback(boolean) to return if Projects contains name. */
@@ -280,10 +280,6 @@ class Database {
   //   });
   // }
   add_image_meta(imgname, img_path, proj_name, meta_key, meta_value, callback) {
-    meta_value = JSON.stringify(meta_value).replace("-", "_");
-    meta_key = meta_key.replace("-", "_");
-    console.log("add " + meta_key + ", " + meta_value);
-
     // set metadata for image
     // if column doesn't exist, add column
     var _this = this;
@@ -298,11 +294,12 @@ class Database {
         }
         columns.push(col.name);
       }, function() {
+        meta_key = meta_key.replace("-", "_");
+        meta_value = JSON.stringify(meta_value);
+
         var col_exists = (columns.indexOf(meta_key) >= 0);
         if (!col_exists) {
-          console.log('!col_exists:', meta_key);
-          var meta_type = typeof meta_value;
-          db.run("ALTER TABLE Images ADD " + meta_key + " " + meta_type + ";");
+          db.run("ALTER TABLE Images ADD " + meta_key + " TEXT;");
         }
 
         var success = false;
@@ -625,7 +622,17 @@ class Database {
     });
   }
 
-  // date when image was created/Taken
+  /* Helper function to convert an ExifDateTime instance to an appropriate format for the timeline chart. */
+  date_to_chart_format(exifDateTime) {
+    var year = exifDateTime.year;
+    var month = exifDateTime.month;
+    var day = exifDateTime.day;
+    var hour = exifDateTime.hour;
+    var minute = exifDateTime.minute;
+
+    return month + "/" + day + "/" + year + " at " + hour + ":" + minute;
+  }
+
   /* Get count of images by the date at which they were taken, for the specified project. */
   get_images_by_date(proj_name, callback) {
     var _this = this;
@@ -635,18 +642,25 @@ class Database {
         if (bool) {
           _this.has_metadata_attr(['CreateDate'], function(attr_exists) {
             if (attr_exists) {
+              console.log("CreateDate exists");
               var dates = [];
               var counts = [];
-              var stmt = db.prepare("SELECT COUNT(*) AS Count, CreateDate FROM Images WHERE CreateDate IS NOT NULL GROUP BY CreateDate");
+              var stmt = db.prepare("SELECT CreateDate, COUNT(*) as Count FROM Images WHERE proj_name = ? AND CreateDate IS NOT NULL GROUP BY CreateDate");
               stmt.each([proj_name], function(err, row) {
                 if (err) {
-                  console.error("FAILING: " + err);
+                  console.error("FAILING CreateDate: " + err);
                   callback([], []);
                   return;
                 }
 
-                dates.push(row['CreateDate']);
-                counts.push(row['Count']);
+                var date = _this.date_to_chart_format(JSON.parse(row['CreateDate']));
+
+                if (dates.indexOf(date) >= 0) {
+                  counts[dates.indexOf(date)] += 1;
+                } else {
+                  dates.push(date);
+                  counts.push(row['Count']);
+                }
               }, function() {
                 callback(dates, counts);
               });
@@ -681,7 +695,7 @@ class Database {
                   return;
                 }
 
-                coords.push({'lat': row['GPSLatitude'], 'lng': row['GPSLongitude']});
+                coords.push({'lat': JSON.parse(row['GPSLatitude']), 'lng': JSON.parse(row['GPSLongitude'])});
               }, function() {
                 console.log('get_locations_for_images:', coords, 'in', proj_name);
                 callback(coords);
@@ -700,7 +714,7 @@ class Database {
     });
   }
 
-  // camera breakdown (have toggle to change attr for pie chart)
+  /* Get count of images by the camera model used to take the image, for the specified project. */
   get_camera_models(proj_name, callback) {
     var _this = this;
     var db = this.db;
@@ -719,7 +733,7 @@ class Database {
                   return;
                 }
 
-                models.push(row['Model']);
+                models.push(JSON.parse(row['Model']));
                 counts.push(row['Count']);
               }, function() {
                 callback(models, counts);
@@ -737,7 +751,7 @@ class Database {
     });
   }
 
-  // aperture (pie chart)
+  /* Get count of images by aperture, for the specified project. */
   get_apertures(proj_name, callback) {
     var _this = this;
     var db = this.db;
@@ -756,7 +770,156 @@ class Database {
                   return;
                 }
 
-                apertures.push(row['Aperture']);
+                apertures.push(JSON.parse(row['Aperture']));
+                counts.push(row['Count']);
+              }, function() {
+                callback(apertures, counts);
+              });
+              stmt.finalize();
+            } else {
+              console.error("column DNE: Aperture");
+              callback([], []);
+            }
+          });
+        } else {
+          console.error('get_apertures:', proj_name, "does not exist");
+          callback([], []);
+        }
+      });
+    });
+  }
+
+  /* Get counts of images by date across all projects. */
+  get_all_image_dates(callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      _this.has_metadata_attr(['CreateDate'], function(attr_exists) {
+        if (attr_exists) {
+          console.log("CreateDate exists");
+          var dates = [];
+          var counts = [];
+          var stmt = db.prepare("SELECT CreateDate, COUNT(*) as Count FROM Images WHERE CreateDate IS NOT NULL GROUP BY CreateDate");
+          stmt.each([], function(err, row) {
+            if (err) {
+              console.error("FAILING CreateDate: " + err);
+              callback([], []);
+              return;
+            }
+
+            var date = _this.date_to_chart_format(JSON.parse(row['CreateDate']));
+
+            if (dates.indexOf(date) >= 0) {
+              counts[dates.indexOf(date)] += 1;
+            } else {
+              dates.push(date);
+              counts.push(row['Count']);
+            }
+          }, function() {
+            callback(dates, counts);
+          });
+        } else {
+          console.error("column DNE: CreateDate");
+          callback([], []);
+        }
+      });
+    });
+  }
+
+  /* Get locations for images across all projects. */
+  get_all_image_locations(callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      _this.has_project(proj_name, function(bool) {
+        if (bool) {
+          _this.has_metadata_attr(['GPSLatitude', 'GPSLongitude'], function(attr_exists) {
+            if (attr_exists) {
+              var coords = [];
+              var stmt = db.prepare("SELECT GPSLatitude, GPSLongitude FROM Images WHERE GPSLatitude IS NOT NULL AND GPSLongitude IS NOT NULL");
+              stmt.each([], function(err, row) {
+                if (err) {
+                  console.error("FAILING: " + err);
+                  callback([]);
+                  return;
+                }
+
+                coords.push({'lat': JSON.parse(row['GPSLatitude']), 'lng': JSON.parse(row['GPSLongitude'])});
+              }, function() {
+                console.log('get_locations_for_images:', coords, 'in', proj_name);
+                callback(coords);
+              });
+              stmt.finalize();
+            } else {
+              console.error("column DNE: GPSLatitude, GPSLongitude");
+              callback([]);
+            }
+          });
+        } else {
+          console.error('get_locations_for_images:', proj_name, "does not exist");
+          callback([]);
+        }
+      });
+    });
+  }
+
+  /* Get camera models for images across all projects. */
+  get_all_image_models(callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      _this.has_project(proj_name, function(bool) {
+        if (bool) {
+          _this.has_metadata_attr(['Model'], function(attr_exists) {
+            if (attr_exists) {
+              var models = [];
+              var counts = [];
+              var stmt = db.prepare("SELECT Model, COUNT(*) AS Count FROM Images WHERE Model IS NOT NULL GROUP BY Model");
+              stmt.each([], function(err, row) {
+                if (err) {
+                  console.error("FAILING: " + err);
+                  callback([], []);
+                  return;
+                }
+
+                models.push(JSON.parse(row['Model']));
+                counts.push(row['Count']);
+              }, function() {
+                callback(models, counts);
+              });
+            } else {
+              console.error("columns DNE: Model");
+              callback([], []);
+            }
+          });
+        } else {
+          console.error('get_locations_for_images:', proj_name, "does not exist");
+          callback([], []);
+        }
+      });
+    });
+  }
+
+  /* Get apertures for images across all projects. */
+  get_all_image_apertures(callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      _this.has_project(proj_name, function(bool) {
+        if (bool) {
+          _this.has_metadata_attr(['Aperture'], function(attr_exists) {
+            if (attr_exists) {
+              var apertures = [];
+              var counts = [];
+              var stmt = db.prepare("SELECT COUNT(*) as Count, Aperture FROM Images WHERE Aperture IS NOT NULL GROUP BY Aperture");
+              stmt.each([], function(err, row) {
+                if (err) {
+                  console.error("FAILING: " + err);
+                  callback([], []);
+                  return;
+                }
+
+                apertures.push(JSON.parse(row['Aperture']));
                 counts.push(row['Count']);
               }, function() {
                 callback(apertures, counts);
@@ -796,6 +959,7 @@ class Database {
               }
             }
             stmt.finalize();
+
             callback(img_path, proj_name, row);
           });
         }

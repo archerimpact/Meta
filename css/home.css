@@ -24,11 +24,11 @@ a {
   color: white;
 }
 a:hover, a:focus {
-  color: #192d42;
+  color: #0d77e2;
 }
 
 a.side-bar:hover, a.side-bar:focus {
-  color: #192d42;
+  color: #0d77e2;
 }
 
 #top-nav {
@@ -41,11 +41,20 @@ a.side-bar:hover, a.side-bar:focus {
 
 #body {
   margin-left: 16.666%;
+<<<<<<< HEAD
   /* max-width: 83.333%; */
 }
 
 #width-mod {
   transition: margin-left .2s;
+=======
+  margin-top: 50px;
+  transition: margin-left .5s;
+  font: "Nunito Sans";
+  min-width: 772px;
+  transition: margin-left .2s;
+  color: #3d3d3d;
+>>>>>>> 3a1381d6ca0ab02a5154bfa55922fc0f9ac29003
 }
 
 header.masthead {
@@ -109,7 +118,7 @@ header.masthead {
 
 .meta-nav {
   color: white;
-  background-color: #192d42;
+  background-color: #0d77e2;
   height: 100%;
 }
 
