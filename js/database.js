@@ -865,7 +865,6 @@ class Database {
 
             coords.push({'lat': JSON.parse(row['GPSLatitude']), 'lng': JSON.parse(row['GPSLongitude'])});
           }, function() {
-            console.log('get_locations_for_images:', coords, 'in', proj_name);
             callback(coords);
           });
           stmt.finalize();

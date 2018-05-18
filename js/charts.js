@@ -106,9 +106,10 @@ function addPieChart(id, labels, values, title) {
 function addMap(id, markers) {
   try {
 		_map = new google.maps.Map(document.getElementById(id), {
-		  zoom: 3,
+		  zoom: 6,
 		  center: {'lat': 0, 'lng': 0},
 		});
+
     bounds  = new google.maps.LatLngBounds();
     for (var ind in markers) {
   		var marker = new google.maps.Marker({
@@ -119,7 +120,9 @@ function addMap(id, markers) {
       bounds.extend(loc);
     }
 
-    _map.fitBounds(bounds)
-    _map.panToBounds(bounds)
-	} catch (e) {}
+    _map.fitBounds(bounds);
+    _map.panToBounds(bounds);
+	} catch (e) {
+    console.error("Failing map: " + e);
+  }
 }
