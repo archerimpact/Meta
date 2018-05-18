@@ -16,12 +16,12 @@ function addLineChart(id, xlabels, ylabel, values) {
 		  labels: xlabels,
 		  datasets: [{
 				label: ylabel,
-				backgroundColor: "rgba(38, 185, 154, 0.31)",
-				borderColor: "rgba(38, 185, 154, 0.7)",
-				pointBorderColor: "rgba(38, 185, 154, 0.7)",
-				pointBackgroundColor: "rgba(38, 185, 154, 0.7)",
-				pointHoverBackgroundColor: "#fff",
-				pointHoverBorderColor: "rgba(220,220,220,1)",
+				backgroundColor: "#fd82cc",
+				borderColor: "#ff0099",
+				pointBorderColor: "#ff0099",
+				pointBackgroundColor: "#ff0099",
+				pointHoverBackgroundColor: "#fd82cc",
+				pointHoverBorderColor: "#ff0099",
 				pointBorderWidth: 1,
 				data: values
 		  }//, {
@@ -68,11 +68,11 @@ function addPieChart(id, labels, values, title) {
   var len = values.length
   // 5 repeating colors, up to 40 total categories
   var colors = [
-    "#455C73",
-		"#9B59B6",
-		"#BDC3C7",
-		"#26B99A",
-		"#3498DB",
+    "#f8e408",
+		"#afec84",
+		"#4baffd",
+		"#fbc0e3",
+		"#f8ef90",
   ]
   colors = colors.concat(colors)
   colors = colors.concat(colors)
