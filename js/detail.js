@@ -251,39 +251,34 @@ function loadHeader(project) {
 
 	document.getElementById("export" + project['name']).onclick = function() {
 		electron.remote.dialog.showSaveDialog(function(filename, bookmark) {
-			var csvString = "";
-			var keys = new Set();
-			for (var row = 0; row < _data.length; row++) {
-				Object.keys(_data[row]).map(function(key) {
-					keys.add(key);
+			database.get_images_in_project(project['name'], function(projName, rows) {
+				database.get_metadata_fields(function(columns) {
+					/* Create CSV Header. */
+					var csvString = "";
+					columns.forEach(function(col) {
+						csvString += col + ", ";
+					});
+					csvString += "\n";
+
+					rows.forEach(function(row) {
+						columns.forEach(function(col) {
+							var value = row[col];
+							console.log("type:", typeof value);
+							if (typeof value != "string") {
+								value = JSON.stringify(value);
+							}
+							console.log("pre:", value);
+							// value.replace(/,/g , "");
+							value = value.split(',').join(" ");
+							//value.replace("", "");
+							console.log("post:", value);
+							csvString += value + ", ";
+						});
+						csvString += "\n";
+					});
+					fs.writeFileSync(filename+".csv", csvString);
 				});
-			}
-			var csvHeader = "";
-			keys.forEach(function(k) {
-				csvHeader += k + ",";
 			});
-			csvString += csvHeader.slice(0, csvHeader.length - 1);
-			csvString += "\n";
-			var rowString;
-			for (var row = 0; row < _data.length; row++) {
-				rowString = "";
-				keys.forEach(function(k) {
-					if (_data[row][k]) {
-						var value = _data[row][k].toString();
-						if (value.includes(',')) {
-							rowString += '"' + value + '",';
-						} else {
-							rowString += _data[row][k] + ",";
-						}
-					}
-					else {
-						rowString += ",";
-					}
-				});
-				csvString += rowString.slice(0, rowString.length - 1);
-				csvString += "\n";
-			}
-			fs.writeFileSync(filename+".csv", csvString);
 		});
 	};
 
