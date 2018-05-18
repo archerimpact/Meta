@@ -609,6 +609,7 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 
 	var template = [
 		'<div class="row">',
+		'<div class="col-xs-11">',
 			'<div class="col-md-4 col-xs-6">',
 				'<div class="row name-row">',
 					'<h3 class="image-name">{{name}}</h3>',
@@ -691,6 +692,7 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 						'<select class="form-control choices__input is-hidden" id="search{{name}}" multiple></select>',
 					'</div>',
 				'</div>',
+			'</div>',
 			'</div>',
 		'</div>',
 
