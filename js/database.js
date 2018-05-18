@@ -831,32 +831,25 @@ class Database {
     var _this = this;
     var db = this.db;
     db.serialize(function() {
-      _this.has_project(proj_name, function(bool) {
-        if (bool) {
-          _this.has_metadata_attr(['GPSLatitude', 'GPSLongitude'], function(attr_exists) {
-            if (attr_exists) {
-              var coords = [];
-              var stmt = db.prepare("SELECT GPSLatitude, GPSLongitude FROM Images WHERE GPSLatitude IS NOT NULL AND GPSLongitude IS NOT NULL");
-              stmt.each([], function(err, row) {
-                if (err) {
-                  console.error("FAILING: " + err);
-                  callback([]);
-                  return;
-                }
-
-                coords.push({'lat': JSON.parse(row['GPSLatitude']), 'lng': JSON.parse(row['GPSLongitude'])});
-              }, function() {
-                console.log('get_locations_for_images:', coords, 'in', proj_name);
-                callback(coords);
-              });
-              stmt.finalize();
-            } else {
-              console.error("column DNE: GPSLatitude, GPSLongitude");
+      _this.has_metadata_attr(['GPSLatitude', 'GPSLongitude'], function(attr_exists) {
+        if (attr_exists) {
+          var coords = [];
+          var stmt = db.prepare("SELECT GPSLatitude, GPSLongitude FROM Images WHERE GPSLatitude IS NOT NULL AND GPSLongitude IS NOT NULL");
+          stmt.each([], function(err, row) {
+            if (err) {
+              console.error("FAILING: " + err);
               callback([]);
+              return;
             }
+
+            coords.push({'lat': JSON.parse(row['GPSLatitude']), 'lng': JSON.parse(row['GPSLongitude'])});
+          }, function() {
+            console.log('get_locations_for_images:', coords, 'in', proj_name);
+            callback(coords);
           });
+          stmt.finalize();
         } else {
-          console.error('get_locations_for_images:', proj_name, "does not exist");
+          console.error("column DNE: GPSLatitude, GPSLongitude");
           callback([]);
         }
       });
@@ -868,32 +861,25 @@ class Database {
     var _this = this;
     var db = this.db;
     db.serialize(function() {
-      _this.has_project(proj_name, function(bool) {
-        if (bool) {
-          _this.has_metadata_attr(['Model'], function(attr_exists) {
-            if (attr_exists) {
-              var models = [];
-              var counts = [];
-              var stmt = db.prepare("SELECT Model, COUNT(*) AS Count FROM Images WHERE Model IS NOT NULL GROUP BY Model");
-              stmt.each([], function(err, row) {
-                if (err) {
-                  console.error("FAILING: " + err);
-                  callback([], []);
-                  return;
-                }
-
-                models.push(JSON.parse(row['Model']));
-                counts.push(row['Count']);
-              }, function() {
-                callback(models, counts);
-              });
-            } else {
-              console.error("columns DNE: Model");
+      _this.has_metadata_attr(['Model'], function(attr_exists) {
+        if (attr_exists) {
+          var models = [];
+          var counts = [];
+          var stmt = db.prepare("SELECT Model, COUNT(*) AS Count FROM Images WHERE Model IS NOT NULL GROUP BY Model");
+          stmt.each([], function(err, row) {
+            if (err) {
+              console.error("FAILING: " + err);
               callback([], []);
+              return;
             }
+
+            models.push(JSON.parse(row['Model']));
+            counts.push(row['Count']);
+          }, function() {
+            callback(models, counts);
           });
         } else {
-          console.error('get_locations_for_images:', proj_name, "does not exist");
+          console.error("columns DNE: Model");
           callback([], []);
         }
       });
@@ -905,33 +891,26 @@ class Database {
     var _this = this;
     var db = this.db;
     db.serialize(function() {
-      _this.has_project(proj_name, function(bool) {
-        if (bool) {
-          _this.has_metadata_attr(['Aperture'], function(attr_exists) {
-            if (attr_exists) {
-              var apertures = [];
-              var counts = [];
-              var stmt = db.prepare("SELECT COUNT(*) as Count, Aperture FROM Images WHERE Aperture IS NOT NULL GROUP BY Aperture");
-              stmt.each([], function(err, row) {
-                if (err) {
-                  console.error("FAILING: " + err);
-                  callback([], []);
-                  return;
-                }
-
-                apertures.push(JSON.parse(row['Aperture']));
-                counts.push(row['Count']);
-              }, function() {
-                callback(apertures, counts);
-              });
-              stmt.finalize();
-            } else {
-              console.error("column DNE: Aperture");
+      _this.has_metadata_attr(['Aperture'], function(attr_exists) {
+        if (attr_exists) {
+          var apertures = [];
+          var counts = [];
+          var stmt = db.prepare("SELECT COUNT(*) as Count, Aperture FROM Images WHERE Aperture IS NOT NULL GROUP BY Aperture");
+          stmt.each([], function(err, row) {
+            if (err) {
+              console.error("FAILING: " + err);
               callback([], []);
+              return;
             }
+
+            apertures.push(JSON.parse(row['Aperture']));
+            counts.push(row['Count']);
+          }, function() {
+            callback(apertures, counts);
           });
+          stmt.finalize();
         } else {
-          console.error('get_apertures:', proj_name, "does not exist");
+          console.error("column DNE: Aperture");
           callback([], []);
         }
       });

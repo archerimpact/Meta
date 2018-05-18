@@ -56,7 +56,6 @@ function(n, dest) {
 
    showStartSection: function() {
      $(this.constants.startSectionMenuItem).click()
-     populate_landing()
      $(this.constants.startSection).show()
      $(this.constants.startSection + ' section').show()
    },
