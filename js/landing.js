@@ -22,6 +22,22 @@ Chart.plugins.register({
 
 var database = electron.remote.getGlobal('sharedObj').db;
 
+function dashSearch() {
+  var searchId = $("#dashSearchId").val();
+  if (searchId) {
+    console.log("searchId:", searchId);
+    database.has_project(searchId, function(bool) {
+      if (!bool) {
+        alert("Search could not find any match.");
+      } else {
+        loadDetail(searchId);
+      }
+    });
+  } else {
+    alert("Please input ____ into Search Bar");
+  }
+}
+
 function create_image_timeline_chart() {
   database.get_all_image_dates(function(dates, counts) {
     console.log(dates);
