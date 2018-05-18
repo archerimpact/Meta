@@ -7,6 +7,8 @@ function addLineChart(id, xlabels, ylabel, values) {
     return;
   }
   var elem = document.getElementById(id);
+  console.log(id + ", " + elem);
+
   var lineChart = new Chart(elem, {
 		type: 'line',
 		data: {
@@ -39,9 +41,9 @@ function addLineChart(id, xlabels, ylabel, values) {
         animateScale: true
       },
       scales: {
-        xAxes: [{
-          display: false
-        }],
+        // xAxes: [{
+        //   display: false
+        // }],
         yAxes: [{
           ticks: {
             beginAtZero: true,
