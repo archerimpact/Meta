@@ -335,6 +335,7 @@ function processData(data, favorites) {
 		"ExifToolVersion",
 		"FileSize",
 		"ExifByteOrder",
+		'errors'
 	];
 	for (var key in data.exifData) {
 		var val = data.exifData[key];
@@ -823,7 +824,7 @@ function loadCharts(proj_name) {
 				"pie1",
 				models,
 				counts,
-				"Cameras"
+				"Camera Make"
 			);
 		}
 	});
@@ -851,7 +852,7 @@ function loadCharts(proj_name) {
 				"pie2",
 				apertures,
 				counts,
-				"Apertures"
+				"Aperture"
 			);
 		}
 	});

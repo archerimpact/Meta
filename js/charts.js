@@ -6,6 +6,7 @@ function addLineChart(id, xlabels, ylabel, values) {
   if (!$('#' + id).length){
     return;
   }
+
   var elem = document.getElementById(id);
   console.log(id + ", " + elem);
 

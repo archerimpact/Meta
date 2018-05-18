@@ -1,85 +1,87 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
-  <script src="../js/charts.js"></script>
 </head>
-<template class="section-template">
-<section id="landing">
-  <div class="inner" style="min-height: 100%; width: device-width">
-    <div class="input-group custom-search-form form-group-lg absolute-center" style="width: 80%">
+<body onload="populate_landing()">
+  <template class="section-template">
+    <section id="landing">
+      <div class="inner" style="min-height: 100%; width: device-width">
+        <div class="input-group custom-search-form form-group-lg absolute-center" style="width: 80%">
 
-          <input type="text" class="form-control" placeholder="Search..." style="margin-top: 10%; margin-left: 18%; width: 80% width: 80%" >
+              <input type="text" class="form-control" placeholder="Search..." style="margin-top: 10%; margin-left: 18%; width: 80% width: 80%" >
 
-              <span class="input-group-btn" style="margin-left: 100%; margin-top: 5%;position: absolute;">
-                <button class="btn btn-default" type="button" >
-                  <i class="material-icons" style="color: #3d3d3d; font-size: 36px">search</i>
-                  </button>
-                  </span>
+                  <span class="input-group-btn" style="margin-left: 100%; margin-top: 5%;position: absolute;">
+                    <button class="btn btn-default" type="button" >
+                      <i class="material-icons" style="color: #3d3d3d; font-size: 36px">search</i>
+                      </button>
+                      </span>
+                    </div>
+                <div class="charts" id="chart-wrapper" style="padding-top:100px">
+                    <div class="col-sm-6" style="padding-right: 15px">
+                                  <div class="panel panel-default">
+                                      <div class="panel-heading">
+                                          Image Creation Date
+                                      </div>
+                                      <!-- /.panel-heading -->
+                                      <div class="panel-body">
+                                          <div class="flot-chart">
+                                              <canvas id="all-image-by-date"></canvas>
+                                          </div>
+                                      </div>
+                                      <!-- /.panel-body -->
+                                  </div>
+                                  <!-- /.panel -->
+                              </div>
+                              <!-- /.col-lg-6 -->
+                              <div class="col-sm-6" style="padding-right: 15px">
+                                  <div class="panel panel-default">
+                                      <div class="panel-heading">
+                                          Image Locations
+                                      </div>
+                                      <!-- /.panel-heading -->
+                                      <div class="panel-body">
+                                          <div class="flot-chart">
+                                              <canvas id="all-image-locations"></canvas>
+                                          </div>
+                                      </div>
+                                      <!-- /.panel-body -->
+                                  </div>
+                                  <!-- /.panel -->
+                              </div>
+                              <!-- /.col-lg-6 -->
+                              <div class="col-sm-6" style="padding-right: 15px">
+                                  <div class="panel panel-default">
+                                      <div class="panel-heading">
+                                          Camera Models
+                                      </div>
+                                      <!-- /.panel-heading -->
+                                      <div class="panel-body">
+                                          <div class="flot-chart">
+                                              <canvas id="all-image-models"></canvas>
+                                          </div>
+                                      </div>
+                                      <!-- /.panel-body -->
+                                  </div>
+                                  <!-- /.panel -->
+                              </div>
+                              <!-- /.col-lg-6 -->
+                              <div class="col-sm-6" style="padding-right: 15px">
+                                  <div class="panel panel-default">
+                                      <div class="panel-heading">
+                                          Camera Apertures
+                                      </div>
+                                      <!-- /.panel-heading -->
+                                      <div class="panel-body">
+                                          <div class="flot-chart">
+                                              <canvas id="all-image-apertures"></canvas>
+                                          </div>
+                                      </div>
+                                      <!-- /.panel-body -->
+                                  </div>
+                                  <!-- /.panel -->
+                              </div>
                 </div>
-            <div class="charts" id="chart-wrapper" style="padding-top:100px">
-                <div class="col-sm-6" style="padding-right: 15px">
-                              <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                      Pie Chart Example
-                                  </div>
-                                  <!-- /.panel-heading -->
-                                  <div class="panel-body">
-                                      <div class="flot-chart">
-                                          <div class="flot-chart-content" id="flot-pie-chart"></div>
-                                      </div>
-                                  </div>
-                                  <!-- /.panel-body -->
-                              </div>
-                              <!-- /.panel -->
-                          </div>
-                          <!-- /.col-lg-6 -->
-                          <div class="col-sm-6" style="padding-right: 15px">
-                              <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                      Multiple Axes Line Chart Example
-                                  </div>
-                                  <!-- /.panel-heading -->
-                                  <div class="panel-body">
-                                      <div class="flot-chart">
-                                          <div class="flot-chart-content" id="flot-line-chart-multi"></div>
-                                      </div>
-                                  </div>
-                                  <!-- /.panel-body -->
-                              </div>
-                              <!-- /.panel -->
-                          </div>
-                          <!-- /.col-lg-6 -->
-                          <div class="col-sm-6" style="padding-right: 15px">
-                              <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                      Moving Line Chart Example
-                                  </div>
-                                  <!-- /.panel-heading -->
-                                  <div class="panel-body">
-                                      <div class="flot-chart">
-                                          <div class="flot-chart-content" id="flot-line-chart-moving"></div>
-                                      </div>
-                                  </div>
-                                  <!-- /.panel-body -->
-                              </div>
-                              <!-- /.panel -->
-                          </div>
-                          <!-- /.col-lg-6 -->
-                          <div class="col-sm-6" style="padding-right: 15px">
-                              <div class="panel panel-default">
-                                  <div class="panel-heading">
-                                      Bar Chart Example
-                                  </div>
-                                  <!-- /.panel-heading -->
-                                  <div class="panel-body">
-                                      <div class="flot-chart">
-                                          <div class="flot-chart-content" id="flot-bar-chart"></div>
-                                      </div>
-                                  </div>
-                                  <!-- /.panel-body -->
-                              </div>
-                              <!-- /.panel -->
-                          </div>
-            </div>
-  </div>
-</section>
-</template>
+      </div>
+    </section>
+    <script src="./js/landing.js"></script>
+  </template>
+</body>
