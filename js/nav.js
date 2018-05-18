@@ -36,23 +36,27 @@ function(n, dest) {
    showSection: function(event) {
      const sectionId = event.target.dataset.section
      console.log(sectionId)
-     if (sectionId == "projects") {
+     if (sectionId === 'projects') {
       refreshProjects();
      }
      if (sectionId !== 'detail') {
        $('#slidebutton').addClass('hidden');
      }
      if (sectionId === 'settings') {
-       clearSettings()
-       loadSettings()
+       clearSettings();
+       loadSettings();
      }
-     checkSlideDrawer()
-     $('#' + sectionId).show()
-     $('#' + sectionId + ' section').show()
+     if (sectionId === 'landing') {
+       populate_landing();
+     }
+     checkSlideDrawer();
+     $('#' + sectionId).show();
+     $('#' + sectionId + ' section').show();
    },
 
    showStartSection: function() {
      $(this.constants.startSectionMenuItem).click()
+     populate_landing()
      $(this.constants.startSection).show()
      $(this.constants.startSection + ' section').show()
    },
