@@ -38,6 +38,7 @@ function create_image_timeline_chart() {
 function create_image_locations_map() {
   database.get_all_image_locations(function(coordinates) {
     console.log(coordinates);
+    console.log(coordinates instanceof Array);
 
 		addMap(
 			"all-image-locations",
