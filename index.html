@@ -46,7 +46,7 @@
           <div class="sidebar-nav">
             <ul class="nav" id="side-menu" style="padding-top: 0;">
               <li>
-                  <a class="side-bar" data-section="landing"><i class="material-icons md-36">home</i> Dashboard</a>
+                  <a class="side-bar" data-section="landing" style="font-size: 18px;"><i class="material-icons md-36">home</i> Dashboard</a>
               </li>
               <li>
                   <a class="side-bar" data-section="new"><i class="material-icons md-36">add</i> New Project</a>
@@ -70,8 +70,8 @@
         </div>
         <!-- Drawer menu! -->
         <div class="sidenav navbar-default sidebar meta-nav" role="navigation" id="drawer-select" style="width:0px; background-color: #eeeeee; color: #3d3d3d; box-shadow: 5px 5px 5px #b1b1b1;">
-          <p>
-            <button id="slidetogglebtn" class="btn btn-primary btn-circle btn-xs">Toggle View</button>
+            <div style="text-align: center">
+            <button id="slidetogglebtn" class="btn btn-primary btn-circle btn-xs" style="background-color: #0d77e2; border-color: #0d77e2">Toggle View</button>
             <h3 style="margin-left: 10px;">Filter Images</h3>
 
             <a id="checkLink" class="menulink">Select All</a>
@@ -82,7 +82,7 @@
         </div>
         <!-- /.navbar-static-side -->
         <div class="col-sm-10" id="body" style="padding: 0px; height: 100%">
-          <div id="wrapper" style="overflow-y: scroll"></div>
+          <div id="wrapper" style="overflow-y: scroll; overflow-x: hidden"></div>
         </div>
       </div>
       <!-- /#wrapper -->
@@ -125,7 +125,6 @@
 
         <script src="./js/charts.js"></script>
         <script src="./js/home.js"></script>
-        <script src="./js/landing.js"></script>
 
         <link rel="stylesheet" href="./node_modules/choices.js/assets/styles/css/choices.min.css">
         <script src="./node_modules/choices.js/assets/scripts/dist/choices.min.js"></script>

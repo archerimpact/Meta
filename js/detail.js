@@ -330,6 +330,7 @@ function processData(data, favorites) {
 		"ExifToolVersion",
 		"FileSize",
 		"ExifByteOrder",
+		'errors'
 	];
 	for (var key in data.exifData) {
 		var val = data.exifData[key];
@@ -416,7 +417,7 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 		.read(imgpath)
 		.then(function(tags) {
 			for (var key in tags) {
-				if (tags[key] && key != "error") {
+				if (tags[key] && key != "error") { // TODO: maybe allow error array?
 					database.add_image_meta(imgname, imgpath, projname, key, tags[key], detail_exif_display_callback);
 				}
 			}
@@ -604,6 +605,7 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 
 	var template = [
 		'<div class="row">',
+		'<div class="col-xs-11">',
 			'<div class="col-md-4 col-xs-6">',
 				'<div class="row name-row">',
 					'<h3 class="image-name">{{name}}</h3>',
@@ -686,6 +688,7 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 						'<select class="form-control choices__input is-hidden" id="search{{name}}" multiple></select>',
 					'</div>',
 				'</div>',
+			'</div>',
 			'</div>',
 		'</div>',
 
@@ -816,7 +819,7 @@ function loadCharts(proj_name) {
 				"pie1",
 				models,
 				counts,
-				"Cameras"
+				"Camera Make"
 			);
 		}
 	});
@@ -844,7 +847,7 @@ function loadCharts(proj_name) {
 				"pie2",
 				apertures,
 				counts,
-				"Apertures"
+				"Aperture"
 			);
 		}
 	});
