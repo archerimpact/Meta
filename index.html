@@ -38,27 +38,6 @@
 
   <body style='min-width: 772px;'>
 
-
-  <!-- Navigation -->
-
-    <!-- <nav class="navbar navbar-default navbar-static-top" id="top-nav" role="navigation" style="margin: 0; padding: 0; background-color: #0d77e2; color: white; width: 100%">
-      <div class="navbar-header" style="margin-right: 0">
-        <a class="navbar-brand" style="color:white" href="index.html">Archer Meta</a>
-
-        <ul class="nav nav-pills n-link" style="display: inline-block; margin-top:5px">
-          <li style="color: white">
-            <a data-section="overall-images">Images</a>
-          </li>
-          <li>
-            <a data-section="landing">Trends</a>
-          </li>
-          <li>
-            <a data-section="overall-compare">Compare</a>
-          </li>
-        </ul>
-      </div>
-    </nav> -->
-
     <div class="row" id="home" style="height:100%">
       <img class="navbar-brand col-sm-2" style="background-color: #0d77e2; position: fixed; height: 64px" href="index.html" src="archer_meta.png"></img>
       <div class="col-sm-2" id="side-nav" style="padding: 0px; height: 100%">
@@ -67,7 +46,7 @@
           <div class="sidebar-nav">
             <ul class="nav" id="side-menu" style="padding-top: 0;">
               <li>
-                  <a class="side-bar" data-section="landing"><i class="material-icons md-36">home</i> Dashboard</a>
+                  <a class="side-bar" data-section="landing" style="font-size: 18px;"><i class="material-icons md-36">home</i> Dashboard</a>
               </li>
               <li>
                   <a class="side-bar" data-section="new"><i class="material-icons md-36">add</i> New Project</a>
@@ -90,19 +69,20 @@
 
         </div>
         <!-- Drawer menu! -->
-        <div class="sidenav navbar-default sidebar meta-nav" role="navigation" id="drawer-select" style="width:0px; background-color: #89cafd; color: #3d3d3d">
-          <p>
-            <button id="slidetogglebtn" class="btn btn-primary btn-circle btn-xs">Toggle View</button>
-            <button id="checkbtn" class="btn btn-primary btn-circle btn-xs">(De)Select All</button>
-          </p>
+        <div class="sidenav navbar-default sidebar meta-nav" role="navigation" id="drawer-select" style="width:0px; background-color: #eeeeee; color: #3d3d3d; box-shadow: 5px 5px 5px #b1b1b1;">
+            <div style="text-align: center">
+            <button id="slidetogglebtn" class="btn btn-primary btn-circle btn-xs" style="background-color: #0d77e2; border-color: #0d77e2">Toggle View</button>
+            <h3 style="margin-left: 10px;">Filter Images</h3>
 
-          <h3 style="margin-left: 10px;">Filter Images</h3>
+            <a id="checkLink" class="menulink">Select All</a>
+            <a id="uncheckLink" class="menulink">Deselect All</a>
+          </div>
           <div id="name-menu"></div>
           <div id="thumb-menu" class="hidden"></div>
         </div>
         <!-- /.navbar-static-side -->
         <div class="col-sm-10" id="body" style="padding: 0px; height: 100%">
-          <div id="wrapper" style="overflow-y: scroll"></div>
+          <div id="wrapper" style="overflow-y: scroll; overflow-x: hidden"></div>
         </div>
       </div>
       <!-- /#wrapper -->

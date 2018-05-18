@@ -41,6 +41,11 @@ a.side-bar:hover, a.side-bar:focus {
 
 #body {
   margin-left: 16.666%;
+  /* max-width: 83.333%; */
+}
+
+#width-mod {
+  transition: margin-left .2s;
   margin-top: 50px;
   transition: margin-left .5s;
   font: "Nunito Sans";
@@ -84,6 +89,7 @@ header.masthead {
   height: 100%;
   padding: 0;
   transition: margin-left .5s;
+  max-width: 100%;
 }
 .absolute-center {
     display: -ms-flexbox;
