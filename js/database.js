@@ -655,8 +655,12 @@ class Database {
 
                 var date = _this.date_to_chart_format(JSON.parse(row['CreateDate']));
 
-                dates.push(date);
-                counts.push(row['Count']);
+                if (dates.indexOf(date) >= 0) {
+                  counts[dates.indexOf(date)] += 1;
+                } else {
+                  dates.push(date);
+                  counts.push(row['Count']);
+                }
               }, function() {
                 callback(dates, counts);
               });
@@ -805,8 +809,12 @@ class Database {
 
             var date = _this.date_to_chart_format(JSON.parse(row['CreateDate']));
 
-            dates.push(date);
-            counts.push(row['Count']);
+            if (dates.indexOf(date) >= 0) {
+              counts[dates.indexOf(date)] += 1;
+            } else {
+              dates.push(date);
+              counts.push(row['Count']);
+            }
           }, function() {
             callback(dates, counts);
           });
