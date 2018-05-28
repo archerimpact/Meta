@@ -9,7 +9,7 @@ var database = electron.remote.getGlobal('sharedObj').db;
 function showProject(name, desc, imgsrc) {
   var displayName = name.replace(/__/g, " ");
   template = [
-    "<div class='col-lg-4 col-sm-6 portfolio-item'>",
+    "<div class='col-lg-4 col-xs-6 portfolio-item'>",
       "<div class='card h-100'>",
         "<a id='photo-{{name}}' href='#'><img style='width: 100%; height: 30vw; object-fit: cover' class='card-img-top img-responsive' src='{{imgsrc}}' alt=''></a>",
         "<div class='card-block well' style='border-radius: 0px'>",

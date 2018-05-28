@@ -104,28 +104,21 @@
 }
 
 .menulink {
-  text-decoration: underline solid #0d77e2;
+  text-decoration: underline solid white;
   margin: 5px;
-  color: #0d77e2;
+  color: #337ab7;
 }
 
 .menulink:hover {
-  color: #4baffd;
+  color: black;
 }
 
-#toggledetail {
-  background-color: #0d77e2;
-  color: white;
-  border-color: #0d77e2;
-  padding: 10px;
-  margin-left: 10px;
+.no-side-margins {
+  margin-left: 0px;
+  margin-right: 0px;
 }
 
-.command-buttons {
-  margin-left: 10px;
-  margin-bottom: 5px;
-}
-
-.choices__item .choices__item--selectable {
-  background-color: #0d77e2;
+.float-right {
+  float: right;
+  clear: right;
 }

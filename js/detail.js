@@ -220,31 +220,28 @@ function setPhotoRemove(name) {
 
 function loadHeader(project) {
   template = [
-		"<div class='row'>",
-			"<div class='col-md-10'>",
-		    "<h1 id='name-header' class='my-4' style='word-wrap:break-word; color: #3d3d3d'>{{displayName}}</h1>",
-				"<h4 style='word-wrap:break-word; color: #b1b1b1'>{{projDesc}}</h4>",
-					"<div class='btn btn-primary btn-md' id='toggledetail'>",
-						"View Trends",
-					"</div>",
-			"</div>",
-			"<div class='col-md-2'>",
-				"<br><br><br>",
-				"<button type='' class='btn btn-primary float-right mb-2 command-buttons' data-toggle='tooltip' data-placement='left' title='Download as CSV' style='border-color: #0d77e2; background-color: #0d77e2; color=white' id='export{{projName}}'>",
-					"<i class='material-icons'>file_download</i>",
-				"</button>",
-				'<br>',
-				"<button type='' class='btn btn-danger float-right mb-2 command-buttons' data-toggle='tooltip' data-placement='left' title='Delete Project' style='border-color:#ff0099; background-color: #ff0099; color=white;' id='delete{{projName}}'>",
-					"<i class='material-icons'>delete</i>",
-				"</button>",
-				"<br>",
-				"<button type='' id='upload{{projName}}' class='btn btn-primary float-right mb-2 command-buttons' data-toggle='tooltip' data-placement='left' title='Add New Image' style='border-color: #0d77e2; background-color: #0d77e2; color: white'>",
-				"<i class='material-icons'>add</i>",
-				"</button>",
-				"<br>",
-			"</div>",
-			"<div id='project-name' hidden=true>{{projName}}</div>",
-		"</div>"
+		"<div class='col-md-6 col-xs-8'>",
+	    "<h1 id='name-header' class='my-4' style='word-wrap:break-word; color: #3d3d3d'>{{displayName}}</h1>",
+			"<h4 style='word-wrap:break-word; color: #b1b1b1'>{{projDesc}}</h4>",
+				"<div class='btn btn-primary btn-md' id='toggledetail'>",
+					"View Trends",
+				"</div>",
+		"</div>",
+		"<div class='col-md-2 col-xs-4 float-right'>",
+			"<button type='' class='btn btn-primary float-right mb-2 command-buttons' data-toggle='tooltip' data-placement='left' title='Download as CSV' style='margin-top:50px; border-color: #0d77e2; background-color: #0d77e2; color=white' id='export{{projName}}'>",
+				"<i class='material-icons'>file_download</i>",
+			"</button>",
+			'<br>',
+			"<button type='' class='btn btn-danger float-right mb-2 command-buttons' data-toggle='tooltip' data-placement='left' title='Delete Project' style='border-color:#ff0099; background-color: #ff0099; color=white;' id='delete{{projName}}'>",
+				"<i class='material-icons'>delete</i>",
+			"</button>",
+			"<br>",
+			"<button type='' id='upload{{projName}}' class='btn btn-primary float-right mb-2 command-buttons' data-toggle='tooltip' data-placement='left' title='Add New Image' style='border-color: #0d77e2; background-color: #0d77e2; color: white'>",
+			"<i class='material-icons'>add</i>",
+			"</button>",
+			"<br>",
+		"</div>",
+		"<div id='project-name' hidden=true>{{projName}}</div>",
   ].join("\n");
   data = {
     projName: project['name'],
@@ -402,7 +399,7 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 		'error': ""
 	};
 	var template = [
-		'<div id="detail-template{{name}}" class="row detail_template">',
+		'<div id="detail-template{{name}}" class="row detail_template no-side-margins">',
 		'</div>',
 		'<hr id="hr{{name}}" class="detail_template">'
 	].join("\n")
@@ -604,8 +601,8 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 	data.sorry = "Sorry, we are not able to display this file. Consider inspecting it on your computer at {{path}}. However, there may still be exif data displayed to the right."
 
 	var template = [
-		'<div class="row">',
-		'<div class="col-xs-11">',
+		//'<div class="row">',
+		//'<div class="col-xs-11">',
 			'<div class="col-md-4 col-xs-6">',
 				'<div class="row name-row">',
 					'<h3 class="image-name">{{name}}</h3>',
@@ -689,10 +686,10 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 					'</div>',
 				'</div>',
 			'</div>',
-			'</div>',
-		'</div>',
+			//'</div>',
+		//'</div>',
 
-		'<div class="row container-fluid" style="height:20px"></div>',
+		//'<div class="row container-fluid" style="height:20px"></div>',
 	].join("\n");
 
 	var filler = Mustache.render(template, data);
@@ -743,7 +740,7 @@ function isStr(maybeString) {
 function loadCharts(proj_name) {
 	template = [
 		'<div class="charts" id="chart-wrapper" style="padding-top:100px">',
-			'<div class="row">',
+			'<div class="row no-side-margins">',
 				'<div class="col-sm-6 col-xs-12" style="padding-right: 15px">',
 					'<div class="panel panel-default">',
 						'<div class="panel-heading"> Image Creation Date </div>',
@@ -765,7 +762,7 @@ function loadCharts(proj_name) {
 				'</div>',
 			'</div>',
 		'</div>',
-		'<div class="row">',
+		'<div class="row no-side-margins">',
 			'<div class="col-sm-6 col-xs-12">',
 				'<div class="panel panel-default">',
 				   '<div class="panel-heading"> Camera Make </div>',
