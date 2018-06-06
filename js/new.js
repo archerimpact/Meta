@@ -4,6 +4,37 @@ var sqlite3 = require('sqlite3').verbose();
 var paths_global = [];
 var database = electron.remote.getGlobal('sharedObj').db;
 
+$("#new-project").submit(function(e) {
+	e.preventDefault();
+	var projectName = createProject();
+    if (projectName) {
+    	clearNew();
+      	load_detail(projectName);
+    }
+});
+
+function createProject(){
+	var name = document.getElementById("name-input").value;
+	name = name.replace(/ /g, '__');
+	name = name.replace(/'/g, '__');
+	name = name.replace(/"/g, '__');
+	name = name.replace(/;/g, '__');
+
+	var desc = document.getElementById("desc-input").value;
+	// file paths stored in paths_global
+
+	if (!name) {
+		alert("Please provide a project name");
+		return
+	} else if (unacceptableFormat(name)) {
+		alert("Please provide a valid project name. Commas, slashes, and periods cannot be used.");
+	}
+
+	database.add_project(name, desc, paths_global, populate_project_with_images);
+
+	return name;
+}
+
 function alert_image_upload(bool, project_name, img_path, index, num_images) {
 	if (!bool) {
 		alert("Unable to add image");
@@ -29,54 +60,16 @@ function populate_project_with_images(bool, project_name, img_paths) {
 	}
 }
 
-function createProject(){
-	var name = document.getElementById("name-input").value;
-	name = name.replace(/ /g, '__');
-	name = name.replace(/'/g, '__');
-	name = name.replace(/"/g, '__');
-	name = name.replace(/;/g, '__');
-
-	var desc = document.getElementById("desc-input").value;
-	// file paths stored in paths_global
-
-	if (!name) {
-		// display: "Please give a project name"
-		console.log("Please give a project name");
-		alert("Please provide a project name");
-		return
-	} else if (unacceptableFormat(name)) {
-		console.log("Please provide a valid project name. Commas, slashes, and periods cannot be used.");
-		alert("Please provide a valid project name. Commas, slashes, and periods cannot be used.");
-	}
-
-	database.add_project(name, desc, paths_global, populate_project_with_images);
-
-	return name;
-}
-
 function unacceptableFormat(name) {
 	return name.includes(".") || name.includes("/") || name.includes(",") ||
-				 name.includes("\\") || name.includes(">") || name.includes("<");
+		   name.includes("\\") || name.includes(">") || name.includes("<");
 }
-
-$("#new-project").submit(function(e) {
-	e.preventDefault();
-	var projectName = createProject();
-    if (projectName) {
-    	clearNew();
-      	load_detail(projectName);
-		// refreshProjects();
-    }
-		// else {
-    //     console.log(projectName + ": project not created")
-    // }
-});
 
 function clearNew() {
 	paths_global = [];
-	document.getElementById("name-input").value = ""
-	document.getElementById("desc-input").value = ""
-	document.getElementById("file-label").innerHTML = ""
+	document.getElementById("name-input").value = "";
+	document.getElementById("desc-input").value = "";
+	document.getElementById("file-label").innerHTML = "";
 }
 
 function setupload() {
@@ -84,7 +77,7 @@ function setupload() {
 	var holder = document.getElementById('upload');
 	if (!holder) {
 		console.log('upload element does not exist');
-	  return false;
+	  	return false;
 	}
 
 	holder.ondragover = () => {
@@ -100,22 +93,22 @@ function setupload() {
 	};
 
 	holder.onclick = () => {
-	  let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
+	  	let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
 		if (!paths) {
 			return false;
 		}
 		paths_global = paths;
-		document.getElementById("file-label").innerHTML = String(paths_global.length) + " files selected"
+		document.getElementById("file-label").innerHTML = String(paths_global.length) + " files selected";
 	};
 
 	holder.ondrop = (e) => {
 	    e.preventDefault();
-			var paths = e.dataTransfer.files;
-			if (!paths) {
-				return false;
-			}
-			paths_global = paths;
-			document.getElementById("file-label").innerHTML = String(paths_global.length) + " files selected"
+		var paths = e.dataTransfer.files;
+		if (!paths) {
+			return false;
+		}
+		paths_global = paths;
+		document.getElementById("file-label").innerHTML = String(paths_global.length) + " files selected";
 	    return false;
 	};
 }
