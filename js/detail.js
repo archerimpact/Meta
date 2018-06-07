@@ -10,6 +10,7 @@ const Chart = require('chart.js');
 // const echarts = require('echarts');
 // const select2 = require('select2');
 const Choices = require('Choices.js')
+const async = require("async");
 
 var _data = [];
 var _currentProj;
@@ -416,13 +417,23 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 	exiftool
 		.read(imgpath)
 		.then(function(tags) {
-			for (var key in tags) {
+			// for (var key in tags) {
+			// 	if (tags[key] && key != "error") { // TODO: maybe allow error array?
+			// 		database.add_image_meta(imgname, imgpath, projname, key, tags[key], detail_exif_display_callback);
+			// 	}
+			// }
+			// insert_detail_template_callback(true, imgname, imgpath, projname, tags);
+			async.eachOfSeries(tags, function(value, key, callback) {
 				if (tags[key] && key != "error") { // TODO: maybe allow error array?
 					database.add_image_meta(imgname, imgpath, projname, key, tags[key], detail_exif_display_callback);
 				}
-			}
+			}, function(err) {
+				if (err) {
+					console.error(err);
+				}
+				
+			});
 			insert_detail_template_callback(true, imgname, imgpath, projname, tags);
-
 		})
 		.catch(function(error) {
 			console.error(error);

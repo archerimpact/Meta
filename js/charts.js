@@ -105,7 +105,13 @@ function addPieChart(id, labels, values, title) {
 // markers is array of lat/lng objects, e.g. [{lat: x, lng:y}, ...]
 function addMap(id, markers) {
   try {
-		_map = new google.maps.Map(document.getElementById(id), {
+    var idElem = document.getElementById(id);
+    if (!idElem) {
+      console.log("addMap: id", id, "does not exist");
+      return
+    }
+    
+		_map = new google.maps.Map(idElem, {
 		  zoom: 6,
 		  center: {'lat': 0, 'lng': 0},
 		});
