@@ -35,7 +35,7 @@ function delete_project_callback(bool) {
 	}
 }
 
-function loadDetail(projectName) {
+function loadDetail(projectName, filter_params = {}) {
 	_currentProj = projectName;
 
 	clearDetailsHtml();
@@ -45,6 +45,10 @@ function loadDetail(projectName) {
 	//document.getElementById('checkbtn').onclick = checkAll
 	document.getElementById('checkLink').onclick = checkAll
 	document.getElementById('uncheckLink').onclick = uncheckAll
+
+	document.getElementById('addfilter').onclick = addFilterRow
+	document.getElementById('removefilter').onclick = removeFilterRow
+	document.getElementById('submitfilter').onclick = performFilter
 
 
 	// document.getElementById('checknonebtn').onclick = uncheckAll
@@ -62,21 +66,25 @@ function loadDetail(projectName) {
 	});
 
 	/* Display images in this project. */
-	database.get_images_in_project(projectName, function(projectName, image_list) {
-		image_list.sort(compareTimestamp);
+	database.get_images_in_project(
+		projectName,
+		function(projectName, image_list) {
+			image_list.sort(compareTimestamp);
 
-		database.get_database().serialize(function() {
-			image_list.forEach(function(image) {
-				var img_path = image['path'];
-				var name = image['img_name'];
-				database.get_image_metadata(img_path, name, projectName, function(bool, name, path, projectName, metadata) {
-					detailExifDisplay__NEW(img_path, name, projectName, metadata);
+			database.get_database().serialize(function() {
+				image_list.forEach(function(image) {
+					var img_path = image['path'];
+					var name = image['img_name'];
+					database.get_image_metadata(img_path, name, projectName, function(bool, name, path, projectName, metadata) {
+						detailExifDisplay__NEW(img_path, name, projectName, metadata);
+					});
 				});
 			});
-		});
-	});
+		},
+		filter_params
+	);
 
-	loadCharts(projectName);
+	loadCharts(projectName, filter_params);
 }
 
 /* Comparator that puts newer images before older ones. */
@@ -374,7 +382,8 @@ $("#add-image").submit(function(e) {
 });
 
 module.exports = {
-	loadDetail: loadDetail
+	loadDetail: loadDetail,
+	clearDetailsHtml: clearDetailsHtml,
 };
 
 function detail_exif_display_callback(bool, imgname, img_path, proj_name, meta_key, meta_value) {
@@ -737,7 +746,7 @@ function isStr(maybeString) {
 	return maybeString && !(maybeString == "");
 }
 
-function loadCharts(proj_name) {
+function loadCharts(proj_name, filter_params) {
 	template = [
 		'<div class="charts" id="chart-wrapper" style="padding-top:100px">',
 			'<div class="row no-side-margins">',
@@ -820,7 +829,9 @@ function loadCharts(proj_name) {
 				counts
 			);
 		}
-	});
+	},
+	filter_params,
+	);
 
 	database.get_camera_models(proj_name, function(models, counts) {
 		console.log("camera models: " + models + ", " + counts);
@@ -836,7 +847,9 @@ function loadCharts(proj_name) {
 				"Camera Make"
 			);
 		}
-	});
+	},
+	filter_params,
+	);
 
 	database.get_locations_for_images(proj_name, function(locations) {
 		/* Set content to "no data exists" image if needed. */
@@ -848,7 +861,9 @@ function loadCharts(proj_name) {
 				locations
 			);
 		}
-	});
+	},
+	filter_params,
+	);
 
 	database.get_apertures(proj_name, function(apertures, counts) {
 		console.log("apertures: " + apertures + ", " + counts);
@@ -864,7 +879,9 @@ function loadCharts(proj_name) {
 				"Aperture"
 			);
 		}
-	});
+	},
+	filter_params,
+	);
 }
 
 function insertIntoSlideMenu(data, id) {

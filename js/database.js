@@ -450,14 +450,22 @@ class Database {
 
   // TODO: add support for only showing images that satisfy a certain condition
   /* Uses callback(proj_name,  list) to return a list of images in a project. */
-  get_images_in_project(proj_name, callback) {
+  get_images_in_project(proj_name, callback, filter_params) {
     // return list of tuples: (img_path, proj_name) — this is the PRIMARY KEY into the Images table
     var _this = this;
     var db = this.db;
     db.serialize(function() {
       _this.has_project(proj_name, function(bool) {
         if (bool) {
-          var stmt = db.prepare("SELECT * FROM Images WHERE proj_name = ?");
+          var stmt_str = "SELECT * FROM Images WHERE proj_name = ?"
+          for (var field in filter_params) {
+            if (field == 'tag' || field == 'tags' || field =='note' || field == 'notes') {
+              stmt_str += " AND " + field + " LIKE '%" + filter_params[field] + "%'"
+            } else {
+              stmt_str += " AND " + field + " = " + filter_params[field]
+            }
+          }
+          var stmt = db.prepare(stmt_str);
           stmt.all([proj_name], function(err, rows) {
             if (err) {
               console.error("FAILING: " + err);
@@ -655,7 +663,7 @@ class Database {
   }
 
   /* Get count of images by the date at which they were taken, for the specified project. */
-  get_images_by_date(proj_name, callback) {
+  get_images_by_date(proj_name, callback, filter_params = {}) {
     var _this = this;
     var db = this.db;
     db.serialize(function() {
@@ -666,7 +674,16 @@ class Database {
               console.log("CreateDate exists");
               var dates = [];
               var counts = [];
-              var stmt = db.prepare("SELECT CreateDate, COUNT(*) as Count FROM Images WHERE proj_name = ? AND CreateDate IS NOT NULL GROUP BY CreateDate");
+              var stmt_str = "SELECT CreateDate, COUNT(*) as Count FROM Images WHERE proj_name = ? AND "
+              for (var field in filter_params) {
+                if (field == 'tag' || field == 'tags' || field =='note' || field == 'notes') {
+                  stmt_str += field + " LIKE '%" + filter_params[field] + "%' AND "
+                } else {
+                  stmt_string += field + " = " + filter_params[field] + " AND "
+                }
+              }
+              stmt_str += "CreateDate IS NOT NULL GROUP BY CreateDate"
+              var stmt = db.prepare(stmt_str);
               stmt.each([proj_name], function(err, row) {
                 if (err) {
                   console.error("FAILING CreateDate: " + err);
@@ -699,7 +716,7 @@ class Database {
   }
 
   /* Get list of (lat, lon) tuples for each image in a specific project, to represent the image location. */
-  get_locations_for_images(proj_name, callback) {
+  get_locations_for_images(proj_name, callback, filter_params = {}) {
     var _this = this;
     var db = this.db;
     db.serialize(function() {
@@ -708,7 +725,16 @@ class Database {
           _this.has_metadata_attr(['GPSLatitude', 'GPSLongitude'], function(attr_exists) {
             if (attr_exists) {
               var coords = [];
-              var stmt = db.prepare("SELECT GPSLatitude, GPSLongitude FROM Images WHERE proj_name = ? AND GPSLatitude IS NOT NULL AND GPSLongitude IS NOT NULL");
+              var stmt_str = "SELECT GPSLatitude, GPSLongitude FROM Images WHERE proj_name = ? AND "
+              for (var field in filter_params) {
+                if (field == 'tag' || field == 'tags' || field =='note' || field == 'notes') {
+                  stmt_str += field + " LIKE '%" + filter_params[field] + "%' AND "
+                } else {
+                  stmt_string += field + " = " + filter_params[field] + " AND "
+                }
+              }
+              stmt_str += "GPSLatitude IS NOT NULL AND GPSLongitude IS NOT NULL"
+              var stmt = db.prepare(stmt_str);
               stmt.each([proj_name], function(err, row) {
                 if (err) {
                   console.error("FAILING: " + err);
@@ -736,7 +762,7 @@ class Database {
   }
 
   /* Get count of images by the camera model used to take the image, for the specified project. */
-  get_camera_models(proj_name, callback) {
+  get_camera_models(proj_name, callback, filter_params = {}) {
     var _this = this;
     var db = this.db;
     db.serialize(function() {
@@ -746,7 +772,16 @@ class Database {
             if (attr_exists) {
               var models = [];
               var counts = [];
-              var stmt = db.prepare("SELECT Model, COUNT(*) AS Count FROM Images WHERE proj_name=? AND Model IS NOT NULL GROUP BY Model");
+              var stmt_str = "SELECT Model, COUNT(*) AS Count FROM Images WHERE proj_name=? AND "
+              for (var field in filter_params) {
+                if (field == 'tag' || field == 'tags' || field =='note' || field == 'notes') {
+                  stmt_str += field + " LIKE '%" + filter_params[field] + "%' AND "
+                } else {
+                  stmt_string += field + " = " + filter_params[field] + " AND "
+                }
+              }
+              stmt_str += "Model IS NOT NULL GROUP BY Model"
+              var stmt = db.prepare(stmt_str);
               stmt.each([proj_name], function(err, row) {
                 if (err) {
                   console.error("FAILING: " + err);
@@ -773,7 +808,7 @@ class Database {
   }
 
   /* Get count of images by aperture, for the specified project. */
-  get_apertures(proj_name, callback) {
+  get_apertures(proj_name, callback, filter_params = {}) {
     var _this = this;
     var db = this.db;
     db.serialize(function() {
@@ -783,7 +818,16 @@ class Database {
             if (attr_exists) {
               var apertures = [];
               var counts = [];
-              var stmt = db.prepare("SELECT COUNT(*) as Count, Aperture FROM Images WHERE proj_name=? AND Aperture IS NOT NULL GROUP BY Aperture");
+              var stmt_str = "SELECT COUNT(*) as Count, Aperture FROM Images WHERE proj_name=? AND "
+              for (var field in filter_params) {
+                if (field == 'tag' || field == 'tags' || field =='note' || field == 'notes') {
+                  stmt_str += field + " LIKE '%" + filter_params[field] + "%' AND "
+                } else {
+                  stmt_str += field + " = " + filter_params[field] + " AND "
+                }
+              }
+              stmt_str += "Aperture IS NOT NULL GROUP BY Aperture"
+              var stmt = db.prepare(stmt_str);
               stmt.each([proj_name], function(err, row) {
                 if (err) {
                   console.error("FAILING: " + err);
