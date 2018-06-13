@@ -107,10 +107,16 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 	exiftool
 		.read(imgpath)
 		.then(function(tags) {
-			async.eachOfSeries(tags, function(key, callback) {
+			async.forEachOfSeries(tags, function(item, key, done) {
 				if (tags[key] && key != "error") { // TODO: maybe allow error array?
 					database.add_image_meta(imgname, imgpath, projname, key, tags[key], detail_exif_display_callback);
 				}
+				done();
+			}, function(err) {
+				if (err) {
+					console.error(err);
+				}
+				console.log("exif done");
 			});
 			insert_detail_template_callback(true, imgname, imgpath, projname, tags);
 		})
@@ -136,10 +142,7 @@ function insert_detail_template_callback(bool, img_name, img_path, proj_name, me
 			data.exifData[key] = metadata_row[key];
 		}
 		database.get_favorite_fields(function(favorites, csv) {
-			console.log("preprocessing");
 			data = processData(data, favorites);
-			console.log("finished processing data: ");
-			console.log(data);
 			insertDetailTemplate__NEW(data, img_name, img_path, proj_name);
 		});
 	} else {
@@ -176,7 +179,6 @@ function toggleDetail() {
 	$('#detail-charts').toggleClass('hidden')
 	$('#image-wrapper').toggleClass('hidden')
 	var btn = $('#toggledetail')
-	console.log(btn.html())
 	if (btn.html().toString().toLowerCase().includes('trends')) {
 		btn.html("View Images")
 	} else {
@@ -715,8 +717,6 @@ function loadCharts(proj_name) {
 	}
 
 	database.get_images_by_date(proj_name, function(dates, counts) {
-		console.log("images by date: " + dates + ", " + counts);
-
 		/* Set content to "no data exists" image if needed. */
 		if (dates.length == 0) {
 
