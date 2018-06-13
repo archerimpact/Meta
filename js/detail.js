@@ -107,8 +107,9 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 	exiftool
 		.read(imgpath)
 		.then(function(tags) {
+			delete tags["errors"];
 			async.forEachOfSeries(tags, function(item, key, done) {
-				if (tags[key] && key != "error") { // TODO: maybe allow error array?
+				if (tags[key]) {
 					database.add_image_meta(imgname, imgpath, projname, key, tags[key], detail_exif_display_callback);
 				}
 				done();
@@ -487,18 +488,12 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 		content += '<div class="table-responsive table-condensed">'
 		content += '<table class="table">'
 		content += '<tbody>'
-		count = 0;
 		var hasData = false
 		for (var key in category) {
 			var hasData = true;
-			if (count == 0) {
-				content += '<tr>';
-			}
+			content += '<tr>';
 			content += '<td style="padding:1.0rem"><strong>' + key + '</strong>: ' + category[key] + '</td>';
-			if (count == 1) {
-				content += '</tr>'
-			}
-			count = 1 - count;
+			content += '</tr>'
 		}
 		if (!hasData) {
 			disableds[name] = 'disabled';
