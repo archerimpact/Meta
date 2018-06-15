@@ -24,7 +24,8 @@ var database = electron.remote.getGlobal('sharedObj').db;
 
 function dashSearch() {
   var searchId = $("#dashSearchId").val();
-  if (searchId) {    database.has_project(searchId, function(bool) {
+  if (searchId) {    
+    database.has_project(searchId, function(bool) {
       if (!bool) {
         alert("Search could not find any match.");
       } else {

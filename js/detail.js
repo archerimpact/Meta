@@ -19,12 +19,14 @@ var database = electron.remote.getGlobal('sharedObj').db;
 var _updated_notes = {};
 
 $("#add-image").submit(function(e) {
+	console.log("addimage?")
 	e.preventDefault();
 	if (!paths_global) {
 		alert('Please select images');
 	}
 
 	async.forEachOfSeries(paths_global, function(item, index, done) {
+		console.log("add image:", item);
 		var filename = path.basename(paths_global[index]).split(".")[0];
 		database.add_image(filename, paths_global[index], _currentProj, alert_image_upload);
 		done();
@@ -468,10 +470,15 @@ function loadHeader(project) {
 
 	document.getElementById("upload" + project['name']).onclick = function() {
 		let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
-		for (var index in paths) {
-			var filename = path.basename(paths[index]).split(".")[index];
+		async.forEachOfSeries(paths, function(item, index, done) {
+			var filename = path.basename(paths[index]).split(".")[0];
 			database.add_image(filename, paths[index], project['name'], index, paths.length, alert_image_upload);
-		}
+			done();
+		}, function(err) {
+			if (err) {
+				console.error(err);
+			}
+		});
 	};
 }
 
