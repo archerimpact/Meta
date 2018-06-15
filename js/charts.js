@@ -8,7 +8,6 @@ function addLineChart(id, xlabels, ylabel, values) {
   }
 
   var elem = document.getElementById(id);
-  console.log(id + ", " + elem);
 
   var lineChart = new Chart(elem, {
 		type: 'line',
@@ -107,7 +106,6 @@ function addMap(id, markers) {
   try {
     var idElem = document.getElementById(id);
     if (!idElem) {
-      console.log("addMap: id", id, "does not exist");
       return
     }
     

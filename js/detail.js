@@ -24,13 +24,24 @@ $("#add-image").submit(function(e) {
 		alert('Please select images');
 	}
 
-	for (var index in paths_global) {
+	async.forEachOfSeries(paths_global, function(item, index, done) {
 		var filename = path.basename(paths_global[index]).split(".")[0];
 		database.add_image(filename, paths_global[index], _currentProj, alert_image_upload);
-	}
+		done();
+	}, function(err) {
+		if (err) {
+			console.error(err);
+		}
+		loadDetail(_currentProj);
+		paths_global = null;
+	});
+	// for (var index in paths_global) {
+	// 	var filename = path.basename(paths_global[index]).split(".")[0];
+	// 	database.add_image(filename, paths_global[index], _currentProj, alert_image_upload);
+	// }
 
-	loadDetail(_currentProj);
-	paths_global = null;
+	// loadDetail(_currentProj);
+	// paths_global = null;
 });
 
 function loadDetail(projectName) {
@@ -117,7 +128,6 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 				if (err) {
 					console.error(err);
 				}
-				console.log("exif done");
 			});
 			insert_detail_template_callback(true, imgname, imgpath, projname, tags);
 		})
@@ -172,7 +182,7 @@ function delete_project_callback(bool) {
 
 function detail_exif_display_callback(bool, imgname, img_path, proj_name, meta_key, meta_value) {
 	if (!bool) {
-		alert("failed to add image metadata");
+		alert("Failed to add image metadata");
 	}
 }
 

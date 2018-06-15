@@ -24,9 +24,7 @@ var database = electron.remote.getGlobal('sharedObj').db;
 
 function dashSearch() {
   var searchId = $("#dashSearchId").val();
-  if (searchId) {
-    console.log("searchId:", searchId);
-    database.has_project(searchId, function(bool) {
+  if (searchId) {    database.has_project(searchId, function(bool) {
       if (!bool) {
         alert("Search could not find any match.");
       } else {
@@ -40,8 +38,6 @@ function dashSearch() {
 
 function create_image_timeline_chart() {
   database.get_all_image_dates(function(dates, counts) {
-    console.log(dates);
-
 		addLineChart(
 			"all-image-by-date",
 			dates,
@@ -53,9 +49,6 @@ function create_image_timeline_chart() {
 
 function create_image_locations_map() {
   database.get_all_image_locations(function(coordinates) {
-    console.log(coordinates);
-    console.log(coordinates instanceof Array);
-
 		addMap(
 			"all-image-locations",
 			coordinates
@@ -65,8 +58,6 @@ function create_image_locations_map() {
 
 function create_image_models_chart() {
   database.get_all_image_models(function(models, counts) {
-    console.log(models);
-
 		addPieChart(
 			"all-image-models",
 			models,
@@ -78,8 +69,6 @@ function create_image_models_chart() {
 
 function create_image_apertures_chart() {
   database.get_all_image_apertures(function(apertures, counts) {
-    console.log(apertures);
-
 		addPieChart(
 			"all-image-apertures",
 			apertures,
@@ -97,10 +86,11 @@ function clear_charts() {
 }
 
 function populate_landing() {
-  console.log("invoked");
   clear_charts();
   create_image_timeline_chart();
   create_image_locations_map();
   create_image_models_chart();
   create_image_apertures_chart();
 }
+
+populate_landing();

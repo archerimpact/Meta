@@ -40,8 +40,6 @@ function alert_image_upload(bool, project_name, img_path, index, num_images) {
 		alert("Unable to add image");
 		return
 	} else if (index == num_images - 1) {
-		console.log("added all images");
-
 		/* Load project view. */
 		load_detail(project_name);
 	}
@@ -73,10 +71,8 @@ function clearNew() {
 }
 
 function setupload() {
-	console.log('setting upload');
 	var holder = document.getElementById('upload');
 	if (!holder) {
-		console.log('upload element does not exist');
 	  	return false;
 	}
 
