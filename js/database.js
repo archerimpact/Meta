@@ -457,15 +457,8 @@ class Database {
     db.serialize(function() {
       _this.has_project(proj_name, function(bool) {
         if (bool) {
-          var stmt_str = "SELECT * FROM Images WHERE proj_name = ?"
-          for (var field in filter_params) {
-            if (field == 'tag' || field == 'tags' || field =='note' || field == 'notes') {
-              stmt_str += " AND " + field + " LIKE '%" + filter_params[field] + "%'"
-            } else {
-              stmt_str += " AND " + field + " = " + filter_params[field]
-            }
-          }
-          var stmt = db.prepare(stmt_str);
+          var stmt = "SELECT * FROM Images WHERE proj_name = ?"
+          var stmt = db.prepare(stmt + _this.filter_stmt(filter_params));
           stmt.all([proj_name], function(err, rows) {
             if (err) {
               console.error("FAILING: " + err);
@@ -674,15 +667,9 @@ class Database {
               console.log("CreateDate exists");
               var dates = [];
               var counts = [];
-              var stmt_str = "SELECT CreateDate, COUNT(*) as Count FROM Images WHERE proj_name = ? AND "
-              for (var field in filter_params) {
-                if (field == 'tag' || field == 'tags' || field =='note' || field == 'notes') {
-                  stmt_str += field + " LIKE '%" + filter_params[field] + "%' AND "
-                } else {
-                  stmt_string += field + " = " + filter_params[field] + " AND "
-                }
-              }
-              stmt_str += "CreateDate IS NOT NULL GROUP BY CreateDate"
+              var stmt_str = "SELECT CreateDate, COUNT(*) as Count FROM Images WHERE proj_name = ?"
+              stmt_str += _this.filter_stmt(filter_params)
+              stmt_str += " AND CreateDate IS NOT NULL GROUP BY CreateDate"
               var stmt = db.prepare(stmt_str);
               stmt.each([proj_name], function(err, row) {
                 if (err) {
@@ -725,15 +712,9 @@ class Database {
           _this.has_metadata_attr(['GPSLatitude', 'GPSLongitude'], function(attr_exists) {
             if (attr_exists) {
               var coords = [];
-              var stmt_str = "SELECT GPSLatitude, GPSLongitude FROM Images WHERE proj_name = ? AND "
-              for (var field in filter_params) {
-                if (field == 'tag' || field == 'tags' || field =='note' || field == 'notes') {
-                  stmt_str += field + " LIKE '%" + filter_params[field] + "%' AND "
-                } else {
-                  stmt_string += field + " = " + filter_params[field] + " AND "
-                }
-              }
-              stmt_str += "GPSLatitude IS NOT NULL AND GPSLongitude IS NOT NULL"
+              var stmt_str = "SELECT GPSLatitude, GPSLongitude FROM Images WHERE proj_name = ?"
+              stmt_str += _this.filter_stmt(filter_params)
+              stmt_str += " AND GPSLatitude IS NOT NULL AND GPSLongitude IS NOT NULL"
               var stmt = db.prepare(stmt_str);
               stmt.each([proj_name], function(err, row) {
                 if (err) {
@@ -772,15 +753,9 @@ class Database {
             if (attr_exists) {
               var models = [];
               var counts = [];
-              var stmt_str = "SELECT Model, COUNT(*) AS Count FROM Images WHERE proj_name=? AND "
-              for (var field in filter_params) {
-                if (field == 'tag' || field == 'tags' || field =='note' || field == 'notes') {
-                  stmt_str += field + " LIKE '%" + filter_params[field] + "%' AND "
-                } else {
-                  stmt_string += field + " = " + filter_params[field] + " AND "
-                }
-              }
-              stmt_str += "Model IS NOT NULL GROUP BY Model"
+              var stmt_str = "SELECT Model, COUNT(*) AS Count FROM Images WHERE proj_name=?"
+              stmt_str += _this.filter_stmt(filter_params)
+              stmt_str += " AND Model IS NOT NULL GROUP BY Model"
               var stmt = db.prepare(stmt_str);
               stmt.each([proj_name], function(err, row) {
                 if (err) {
@@ -818,15 +793,9 @@ class Database {
             if (attr_exists) {
               var apertures = [];
               var counts = [];
-              var stmt_str = "SELECT COUNT(*) as Count, Aperture FROM Images WHERE proj_name=? AND "
-              for (var field in filter_params) {
-                if (field == 'tag' || field == 'tags' || field =='note' || field == 'notes') {
-                  stmt_str += field + " LIKE '%" + filter_params[field] + "%' AND "
-                } else {
-                  stmt_str += field + " = " + filter_params[field] + " AND "
-                }
-              }
-              stmt_str += "Aperture IS NOT NULL GROUP BY Aperture"
+              var stmt_str = "SELECT COUNT(*) as Count, Aperture FROM Images WHERE proj_name=?"
+              stmt_str += _this.filter_stmt(filter_params)
+              stmt_str += " AND Aperture IS NOT NULL GROUP BY Aperture"
               var stmt = db.prepare(stmt_str);
               stmt.each([proj_name], function(err, row) {
                 if (err) {
@@ -1135,6 +1104,21 @@ class Database {
   clear_database(callback) {
     this.db.run("DROP TABLE Projects; DROP TABLE Images; DROP TABLE Settings;");
     callback();
+  }
+
+  // this function returns a string that
+  // BEGINS with a space and "AND", but
+  // DOES NOT END with a space (or "AND")
+  filter_stmt(filter_params) {
+    var stmt_str = ""
+    for (var field in filter_params) {
+      if (field == 'tag' || field == 'tags' || field =='note' || field == 'notes') {
+        stmt_str += " AND " + field + " LIKE '%" + filter_params[field] + "%'"
+      } else {
+        stmt_str += " AND " + field + " = " + filter_params[field]
+      }
+    }
+    return stmt_str
   }
 }
 
