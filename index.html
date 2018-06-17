@@ -66,9 +66,30 @@
         <!-- Drawer menu! -->
         <div class="sidenav navbar-default sidebar meta-nav" role="navigation" id="drawer-select" style="width:0px; background-color: #eeeeee; color: #3d3d3d; box-shadow: 5px 5px 5px #b1b1b1;">
             <div style="text-align: center">
-            <button id="slidetogglebtn" class="btn btn-primary btn-circle btn-xs" style="background-color: #0d77e2; border-color: #0d77e2">Toggle View</button>
             <h3 style="margin-left: 10px;">Filter Images</h3>
-
+            <hr class='drawer-hr'>
+            <p>By EXIF Field<br>(or 'tags'/'notes')</p>
+            <div id="filters">
+              <div class="row" id="filter1">
+                <!-- Any changes must also be added to the filter.js template-->
+                <div class="col-xs-6" style="padding-right:5px; padding-left:20px;">
+                  <input id="filter-field-1" type="text" class="form-control" placeholder="Field">
+                </div>
+                <div class="col-xs-6" style="padding-left:0px; padding-right:20px;">
+                  <input id="filter-value-1" type="text" class="form-control" placeholder="Value">
+                </div>
+              </div>
+            </div>
+            <div class="row no-side-margins">
+              <button id="addfilter" class="btn btn-default btn-circle btn-xs" style="margin-top:5px;margin-left:5px;float:left"><i class="material-icons" style="font-size: 18px">add</i></button>
+              <button id="removefilter" class="btn btn-default btn-circle btn-xs" style="margin-top:5px;margin-left:3px;float:left"><i class="material-icons" style="font-size: 18px">remove</i></button>
+              <button id="submitfilter" class="btn btn-success btn-circle btn-sm float-right" style="margin-top:5px;margin-right:5px;">Filter</button>
+            </div>
+            <hr class="drawer-hr">
+            <p>Select Manually</p>
+            <div style="text-align:center">
+              <button id="slidetogglebtn" class="btn btn-primary btn-circle btn-xs" style="background-color: #0d77e2; border-color: #0d77e2">Toggle View</button>
+            </div>
             <a id="checkLink" class="menulink">Select All</a>
             <a id="uncheckLink" class="menulink">Deselect All</a>
           </div>
@@ -90,7 +111,7 @@
       <script src="./js/nav.js"></script>
       <script src="./js/charts.js"></script>
       <script src="./js/home.js"></script>
-
+      <script src="./js/filter.js"></script>
       <script src="https://maps.googleapis.com/maps/api/js" async defer></script>
       <script type="text/javascript">
         $('#myModal').on('shown.bs.modal', function () {

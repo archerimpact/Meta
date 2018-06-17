@@ -51,7 +51,6 @@
     top: 0; /* Stay at the top */
     left: 0;
     overflow-x: hidden; /* Disable horizontal scroll */
-    padding-top: 10px; /* Place content 60px from the top */
     transition: 0.2s; /* 0.5 second transition effect to slide in the sidenav */
     margin-left: 16.666%;
     border-left: 2px solid white;
@@ -121,4 +120,13 @@
 .float-right {
   float: right;
   clear: right;
+}
+
+.drawer-hr {
+  margin: 10px;
+  border-color: #646464;
+}
+
+.drawer-input-col {
+  padding
 }
