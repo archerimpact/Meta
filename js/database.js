@@ -5,7 +5,6 @@ const sqlite3 = require('sqlite3')
 // Get the user data path, the directory in which the information will be stored.
 const userDataPath = (electron.app || electron.remote.app).getPath('userData');
 const db_filename = path.join(userDataPath, 'meta.db');
-
 console.log(db_filename);
 
 class Database {
@@ -92,8 +91,6 @@ class Database {
 
   /* Uses callback(boolean) to return if image was added successfully or not. */
   add_image(img_name, img_path, proj_name, index, num_images, callback) {
-    console.log("adding image: " + img_name);
-
     // Check if image has been made yet, if not create it
     var _this = this;
     var db = this.db;
@@ -328,14 +325,11 @@ class Database {
         if (bool) {
           var fave_int = fave_bool ? 1 : 0;
           var query = "UPDATE Images SET favorited=? WHERE path=? AND proj_name=?";
-          console.log(query, "query");
           var stmt = db.prepare(query);
           stmt.run([fave_int, img_path, proj_name]);
           stmt.finalize();
           success = true;
-          console.log('add_favorite_image: image', img_path, 'favorited', proj_name);
         } else {
-          console.log('add_favorite_image: image', img_path, 'does not exist in', proj_name);
         }
         callback(img_path, proj_name, fave_bool, success);
       });
@@ -357,13 +351,10 @@ class Database {
               stmt.run([new_name, old_name]);
               stmt.finalize();
               success = true;
-              console.log('update_project_name: proj', old_name, 'updated', new_name);
             } else {
-              console.log("update_project_name: proj", new_name, "is already a project");
             }
           });
         } else {
-          console.log('update_project_name: proj', old_name, 'does not exist');
         }
         callback(old_name, new_name, success);
       });
@@ -494,7 +485,6 @@ class Database {
 
             images.push(row);
           }, function() {
-            console.log('get_favorite_images_in_project:', images, 'in', proj_name);
             callback(proj_name, images);
           });
           stmt.finalize();
@@ -567,7 +557,6 @@ class Database {
       }
       stmt.run(type, tag);
       stmt.finalize();
-      console.log("added favorite: " + tag + ", " + type + ", " + checked);
     });
   }
 
@@ -613,6 +602,29 @@ class Database {
           }
         }
         callback(true);
+      });
+    });
+  }
+
+  /* Uses callback(bool, img_name, proj_names) to return list of projects containing img_name. */
+  get_projects_with_image(img_name, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      var stmt = db.prepare("SELECT proj_name FROM Images WHERE img_name=?");
+      stmt.all([img_name], function(err, rows) {
+        if (err) {
+          console.error(err);
+        }
+        if (rows != null && rows.length > 0) {
+          var proj_names = [];
+          for (var index in rows) {
+            proj_names.push(rows[index]['proj_name']);
+          }
+          callback(true, img_name, proj_names); 
+        } else {
+          callback(false, img_name, rows);          
+        }
       });
     });
   }
@@ -664,7 +676,6 @@ class Database {
         if (bool) {
           _this.has_metadata_attr(['CreateDate'], function(attr_exists) {
             if (attr_exists) {
-              console.log("CreateDate exists");
               var dates = [];
               var counts = [];
               var stmt_str = "SELECT CreateDate, COUNT(*) as Count FROM Images WHERE proj_name = ?"
@@ -725,7 +736,6 @@ class Database {
 
                 coords.push({'lat': JSON.parse(row['GPSLatitude']), 'lng': JSON.parse(row['GPSLongitude'])});
               }, function() {
-                console.log('get_locations_for_images:', coords, 'in', proj_name);
                 callback(coords);
               });
               stmt.finalize();
@@ -830,7 +840,6 @@ class Database {
     db.serialize(function() {
       _this.has_metadata_attr(['CreateDate'], function(attr_exists) {
         if (attr_exists) {
-          console.log("CreateDate exists");
           var dates = [];
           var counts = [];
           var stmt = db.prepare("SELECT CreateDate, COUNT(*) as Count FROM Images WHERE CreateDate IS NOT NULL GROUP BY CreateDate");

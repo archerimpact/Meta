@@ -23,18 +23,53 @@ Chart.plugins.register({
 var database = electron.remote.getGlobal('sharedObj').db;
 
 function dashSearch() {
+  clearSearchResults();
+
+  var results = [];
   var searchId = $("#dashSearchId").val();
   if (searchId) {    
     database.has_project(searchId, function(bool) {
-      if (!bool) {
-        alert("Search could not find any match.");
+      var result;
+      if (bool) {
+        result = searchId;
       } else {
-        loadDetail(searchId);
+        result = "No Projects Found: " + searchId;
+      }
+      insertSearchResults(result);
+      //loadDetail(searchId);
+    });
+
+    database.get_projects_with_image(searchId, function(bool, img_name, proj_names) {
+      if (bool) {
+        for (var index in proj_names) {
+          insertSearchResults(proj_names[index]);
+        };
+      } else {
+        insertSearchResults("No Images Found: " + searchId);
       }
     });
   } else {
     alert("Please input ____ into Search Bar");
   }
+}
+
+function insertSearchResults(results) {
+  var template = [
+    '<div id="" role="tablist" aria-multiselectable="true">',
+      '<div class="panel panel-default data-panel">',
+        '<div class="panel-body">',
+          results,
+        '</div>',
+      '</div>',
+    '</div>',
+  ].join("\n");
+
+  var filler = Mustache.render(template, results);
+  $("#result-wrapper").append(filler);
+}
+
+function clearSearchResults() {
+  document.getElementById("result-wrapper").innerHTML = "";
 }
 
 function create_image_timeline_chart() {
