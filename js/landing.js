@@ -30,22 +30,25 @@ function dashSearch() {
   if (searchId) {    
     database.has_project(searchId, function(bool) {
       var result;
+      var error = false;
       if (bool) {
         result = searchId;
       } else {
+        error = true;
         result = "No Projects Found: " + searchId;
       }
-      insertSearchResults(result);
+      insertSearchResults(error, result);
       //loadDetail(searchId);
     });
 
-    database.get_projects_with_image(searchId, function(bool, img_name, proj_names) {
+    database.get_projects_with_image(searchId, function(bool, img_name, projects) {
       if (bool) {
-        for (var index in proj_names) {
-          insertSearchResults(proj_names[index]);
+        for (var index in projects) {
+          console.log(projects[index])
+          insertSearchResults(false, projects[index]);
         };
       } else {
-        insertSearchResults("No Images Found: " + searchId);
+        insertSearchResults(true, "No Images Found: " + searchId);
       }
     });
   } else {
@@ -53,16 +56,37 @@ function dashSearch() {
   }
 }
 
-function insertSearchResults(results) {
-  var template = [
-    '<div id="" role="tablist" aria-multiselectable="true">',
-      '<div class="panel panel-default data-panel">',
-        '<div class="panel-body">',
-          results,
+function insertSearchResults(error, results) {
+  if (error) {
+    var template = [
+      '<div id="" role="tablist" aria-multiselectable="true">',
+        '<div class="panel panel-default data-panel">',
+          '<div class="panel-body">',
+            results,
+          '</div>',
         '</div>',
       '</div>',
-    '</div>',
-  ].join("\n");
+    ].join("\n");
+  } else {
+    var template = [
+      "<div class='col-lg-4 col-xs-6 portfolio-item'>",
+        "<div class='card h-100'>",
+          "<a id='photo-{{proj_name}}' href='#'><img style='width: 100%; height: 15vw; object-fit: cover' class='card-img-top img-responsive' src='{{path}}' alt=''></a>",
+          "<div class='card-block well' style='border-radius: 0px'>",
+            "<h4 class='card-title'>",
+              "<a style='padding: 0px; margin: -10px; color: #3d3d3d' id='link-{{proj_name}}' href='#'>{{proj_name}}</a>",
+            "</h4>",
+            "<a class='btn btn-primary' style='background-color: #0d77e2; color: white' id='btn-{{proj_name}}' href='#'>View</a>",
+          "</div>",
+        "</div>",
+      "</div>",
+    ].join("\n");
+    // data = {
+    //   displayName: results.proj_name,
+    //   name: results.proj_name,
+    //   imgsrc: results.path,
+    // };
+  }
 
   var filler = Mustache.render(template, results);
   $("#result-wrapper").append(filler);

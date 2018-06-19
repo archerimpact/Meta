@@ -606,22 +606,22 @@ class Database {
     });
   }
 
-  /* Uses callback(bool, img_name, proj_names) to return list of projects containing img_name. */
+  /* Uses callback(bool, img_name, projects) to return list of projects containing img_name. */
   get_projects_with_image(img_name, callback) {
     var _this = this;
     var db = this.db;
     db.serialize(function() {
-      var stmt = db.prepare("SELECT proj_name FROM Images WHERE img_name=?");
+      var stmt = db.prepare("SELECT * FROM Images WHERE img_name=?");
       stmt.all([img_name], function(err, rows) {
         if (err) {
           console.error(err);
         }
         if (rows != null && rows.length > 0) {
-          var proj_names = [];
+          var projects = [];
           for (var index in rows) {
-            proj_names.push(rows[index]['proj_name']);
+            projects.push(rows[index]);
           }
-          callback(true, img_name, proj_names); 
+          callback(true, img_name, projects); 
         } else {
           callback(false, img_name, rows);          
         }
