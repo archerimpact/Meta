@@ -90,6 +90,16 @@ function insertSearchResults(error, results) {
 
   var filler = Mustache.render(template, results);
   $("#result-wrapper").append(filler);
+
+  document.getElementById('link-' + results.proj_name).onclick = function() {
+    loadDetail(results.proj_name);
+  };
+  document.getElementById('btn-' + results.proj_name).onclick = function() {
+    loadDetail(results.proj_name);
+  };
+  document.getElementById('photo-' + results.proj_name).onclick = function() {
+    loadDetail(results.proj_name);
+  };
 }
 
 function clearSearchResults() {
