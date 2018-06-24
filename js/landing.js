@@ -29,15 +29,16 @@ function dashSearch() {
   var searchId = $("#dashSearchId").val();
   if (searchId) {    
     database.has_project(searchId, function(bool) {
-      var result;
-      var error = false;
       if (bool) {
-        result = searchId;
+        database.get_project_thumbnail(searchId, function(path) {
+          var results = {};
+          results.path = path;
+          results.proj_name = searchId;
+          insertSearchResults(false, results);
+        }); 
       } else {
-        error = true;
-        result = "No Projects Found: " + searchId;
+        insertSearchResults(true, "No Projects Found: " + searchId);
       }
-      insertSearchResults(error, result);
       //loadDetail(searchId);
     });
 
