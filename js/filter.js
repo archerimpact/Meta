@@ -23,7 +23,6 @@ function addFilterRow() {
 }
 
 function removeFilterRow() {
-  console.log(rows_showing)
   if (rows_showing == 0) {
     return;
   }

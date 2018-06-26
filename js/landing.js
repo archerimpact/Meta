@@ -45,7 +45,6 @@ function dashSearch() {
     database.get_projects_with_image(searchId, function(bool, img_name, projects) {
       if (bool) {
         for (var index in projects) {
-          console.log(projects[index])
           insertSearchResults(false, projects[index]);
         };
       } else {

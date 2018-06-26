@@ -53,7 +53,6 @@ function loadDetail(projectName, filter_params = {}) {
 
 	$('#slidebutton').removeClass('hidden');
 	document.getElementById('slidetogglebtn').onclick = toggleSlideView
-	//document.getElementById('checkbtn').onclick = checkAll
 	document.getElementById('checkLink').onclick = checkAll
 	document.getElementById('uncheckLink').onclick = uncheckAll
 
@@ -83,12 +82,17 @@ function loadDetail(projectName, filter_params = {}) {
 			image_list.sort(compareTimestamp);
 
 			database.get_database().serialize(function() {
-				image_list.forEach(function(image) {
+				var count = 0;
+				async.forEachOfSeries(image_list, function(image, index, done) {
 					var img_path = image['path'];
 					var name = image['img_name'];
 					database.get_image_metadata(img_path, name, projectName, function(bool, name, path, projectName, metadata) {
 						detailExifDisplay__NEW(img_path, name, projectName, metadata);
 					});
+					done();
+				}, function(err) {
+					console.log('hellox')
+					loadCharts(projectName, filter_params);
 				});
 			});
 		},
@@ -672,6 +676,7 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 }
 
 function loadCharts(proj_name, filter_params) {
+	console.log('chart')
 	template = [
 		'<div class="charts" id="chart-wrapper" style="padding-top:100px">',
 			'<div class="row no-side-margins">',
@@ -872,7 +877,6 @@ function checkAll() {
 			template.classList.remove('hidden')
 		}
 	}
-	document.getElementById('checkbtn').onclick = uncheckAll
 }
 
 function uncheckAll() {
@@ -893,7 +897,6 @@ function uncheckAll() {
 			template.classList.add('hidden')
 		}
 	}
-	document.getElementById('checkbtn').onclick = checkAll
 }
 
 function setPhotoRemove(name) {
