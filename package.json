@@ -7,7 +7,8 @@
   "scripts": {
     "start": "electron .",
     "postinstall": "install-app-deps",
-    "rebuild": "electron-rebuild -f -w sqlite3"
+    "rebuild": "electron-rebuild -f -w sqlite3",
+    "dist": "build"
   },
   "productName": "Archer Meta",
   "repository": "https://github.com/venkatvarsha/archer-hrc-metadata",

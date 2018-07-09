@@ -11,7 +11,7 @@ function showProject(name, desc, imgsrc) {
   template = [
     "<div class='col-lg-4 col-xs-6 portfolio-item'>",
       "<div class='card h-100'>",
-        "<a id='photo-{{name}}' href='#'><img style='width: 100%; height: 30vw; object-fit: cover' class='card-img-top img-responsive' src='{{imgsrc}}' alt=''></a>",
+        "<a id='photo-{{name}}' href='#'><img style='width: 100%; height: 30vw; object-fit: cover' class='card-img-top img-responsive' src='{{imgsrc}}' alt='No images in this project yet.'></a>",
         "<div class='card-block well' style='border-radius: 0px'>",
           "<h4 class='card-title'>",
             "<a style='padding: 0px; margin: -10px; color: #3d3d3d' id='link-{{name}}' href='#'>{{displayName}}</a>",
