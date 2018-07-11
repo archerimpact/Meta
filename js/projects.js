@@ -63,7 +63,9 @@ function showNewProject() {
 }
 
 function populateProjectsScreen() {
+  document.getElementById("projects-body").innerHTML = "";
   database.get_projects(function (projects_list) {
+    console.log(projects_list);
 
     projects_list.sort(compareTimestamp);
 
@@ -99,9 +101,4 @@ function compareTimestamp(proj1, proj2) {
     return 0;
   else
     return 1;
-}
-
-function refreshProjects() {
-  document.getElementById("projects-body").innerHTML = "";
-  populateProjectsScreen()
 }

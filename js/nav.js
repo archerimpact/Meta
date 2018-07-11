@@ -36,7 +36,7 @@ function(n, dest) {
    showSection: function(event) {
      const sectionId = event.target.dataset.section
      if (sectionId === 'projects') {
-      refreshProjects();
+       populateProjectsScreen();
      }
      if (sectionId !== 'detail') {
        $('#slidebutton').addClass('hidden');
@@ -79,7 +79,7 @@ function(n, dest) {
 
 function redirect(destination) {
   if (destination == "projects") {
-    refreshProjects();
+    populateProjectsScreen();
   }
   var event = new CustomEvent('redirect', { detail: destination });
   document.body.dispatchEvent(event);

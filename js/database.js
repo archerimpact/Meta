@@ -1003,7 +1003,6 @@ class Database {
         }
       });
       stmt.finalize();
-      callback(true);
     });
 
     /* Delete project from Projects table. */

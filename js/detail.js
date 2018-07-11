@@ -19,14 +19,12 @@ var database = electron.remote.getGlobal('sharedObj').db;
 var _updated_notes = {};
 
 $("#add-image").submit(function(e) {
-	console.log("addimage?")
 	e.preventDefault();
 	if (!paths_global) {
 		alert('Please select images');
 	}
 
 	async.forEachOfSeries(paths_global, function(item, index, done) {
-		console.log("add image:", item);
 		var filename = path.basename(paths_global[index]).split(".")[0];
 		database.add_image(filename, paths_global[index], _currentProj, alert_image_upload);
 		done();
@@ -68,7 +66,10 @@ function loadDetail(projectName, filter_params = {}) {
 	/* Display project header. */
 	database.get_project(projectName, function(row) {
 		loadHeader(row);
-		document.getElementById('toggledetail').onclick = toggleDetail
+		document.getElementById('toggledetail').onclick = function() {
+			loadCharts(projectName, null); // somehow add filter params?
+			toggleDetail();
+		}
 		if ($('#image-wrapper').hasClass('hidden')) {
 			$('#toggledetail').html('View Images')
 		}
@@ -91,7 +92,6 @@ function loadDetail(projectName, filter_params = {}) {
 					});
 					done();
 				}, function(err) {
-					console.log('hellox')
 					loadCharts(projectName, filter_params);
 				});
 			});
@@ -676,7 +676,6 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 }
 
 function loadCharts(proj_name, filter_params) {
-	console.log('chart')
 	template = [
 		'<div class="charts" id="chart-wrapper" style="padding-top:100px">',
 			'<div class="row no-side-margins">',
