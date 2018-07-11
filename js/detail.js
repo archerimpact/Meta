@@ -500,7 +500,8 @@ function insertDetailTemplate(img_name, img_path, proj_name) {
 
 function insertDetailTemplate__NEW(data, id, path, projname) {
 	insertIntoSlideMenu(data, id);
-
+	console.log('id', id)
+	console.log('path', path)
 	data.id = id;
 
 	if (data.error) {
@@ -635,6 +636,7 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 	].join("\n");
 
 	var filler = Mustache.render(template, data);
+	data.name = data.name.replace(/ /g, "\\ ");
 	$("#detail-template" + data.name).append(filler);
 
 	var latitude;
