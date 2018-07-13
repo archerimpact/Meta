@@ -28,6 +28,7 @@ function createProject(){
 		return
 	} else if (unacceptableFormat(name)) {
 		alert("Please provide a valid project name. Commas, slashes, and periods cannot be used.");
+		return
 	}
 
 	database.add_project(name, desc, paths_global, populate_project_with_images);
