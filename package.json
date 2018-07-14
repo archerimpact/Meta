@@ -35,6 +35,7 @@
     "appId": "com.archer.meta",
     "mac": {
       "category": "public.app-category.photography"
-    }
+    },
+    "asar": false
   }
 }
