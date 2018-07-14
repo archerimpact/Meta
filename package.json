@@ -8,7 +8,7 @@
     "start": "electron .",
     "postinstall": "install-app-deps",
     "rebuild": "electron-rebuild -f -w sqlite3",
-    "dist": "build"
+    "dist": "build --win --mac --linux"
   },
   "productName": "Archer Meta",
   "repository": "https://github.com/venkatvarsha/archer-hrc-metadata",
@@ -34,7 +34,12 @@
   "build": {
     "appId": "com.archer.meta",
     "mac": {
-      "category": "public.app-category.photography"
+      "category": "public.app-category.photography",
+      "icon": "./assets/archerlogoa.png.icns"
+    },
+    "win": {
+      "icon": "./assets/archerlogoa.png.ico",
+      "target": "NSIS"
     },
     "asar": false
   }
