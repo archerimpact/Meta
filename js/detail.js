@@ -88,9 +88,8 @@ function loadDetail(projectName, filter_params = {}) {
 					var img_path = image['path'];
 					var name = image['img_name'];
 					database.get_image_metadata(img_path, name, projectName, function(bool, name, path, projectName, metadata) {
-						detailExifDisplay__NEW(img_path, name, projectName, metadata);
+						detailExifDisplay__NEW(img_path, name, projectName, metadata, done);
 					});
-					done();
 				}, function(err) {
 					loadCharts(projectName, filter_params);
 				});
@@ -107,7 +106,7 @@ function loadDetail(projectName, filter_params = {}) {
 ** only when needed, then calling .end() after it is done batch processing
 ** (it does also have a batch mode)
 */
-function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
+function detailExifDisplay__NEW(imgpath, imgname, projname, metadata, callback) {
 	var data = {
 		'name': imgname,
 		'path': imgpath,
@@ -127,6 +126,7 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 	if (Object.keys(metadata).length > 0) {
 		data.exifData = metadata;
 		insertDetailTemplate(imgname, imgpath, projname);
+		callback();
 		return;
 	}
 	exiftool
@@ -142,6 +142,7 @@ function detailExifDisplay__NEW(imgpath, imgname, projname, metadata) {
 				if (err) {
 					console.error(err);
 				}
+				callback();
 			});
 			insert_detail_template_callback(true, imgname, imgpath, projname, tags);
 		})
