@@ -621,9 +621,9 @@ class Database {
           for (var index in rows) {
             projects.push(rows[index]);
           }
-          callback(true, img_name, projects); 
+          callback(true, img_name, projects);
         } else {
-          callback(false, img_name, rows);          
+          callback(false, img_name, rows);
         }
       });
     });

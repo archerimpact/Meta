@@ -1,15 +1,16 @@
 <template class="section-template">
 <section id="new" class="wrapper style1 fullscreen intro">
-    <div class="container">
+    <div class="container" style="margin-left: 10px;">
       <link href="css/new.css" rel="stylesheet">
       <!-- Page Heading -->
-      <h1 style="color: #3d3d3d; padding:0px; margin-top: 20px; margin-bottom: 20px;">Create a New Project</h1>
+
 
       <div class="row">
-        <div class="col-sm-8">
+        <div class="col-xs-8">
+          <h1 style="color: #3d3d3d; padding:0px; margin-top: 20px; margin-bottom: 20px;">Create a New Project</h1>
           <form id='new-project'>
             <div class="form-group input-group">
-                <span class="input-group-addon">PROJECT NAME</span>
+                <span class="input-group-addon" style="padding-left: 37.5px; padding-right:37.5px;">PROJECT NAME</span>
                     <input id="name-input" type="text" class="form-control" placeholder="Enter a project name...">
             </div>
             <div class="form-group input-group">
@@ -26,10 +27,10 @@
               <!-- <div id="upload"><i class="material-icons icon-blue">file upload</i></div> -->
 
               <!-- <img src="assets/upload.svg" id="upload" style="display: inline"> -->
-              <button type="button" id="upload" class="btn btn-default btn-circle btn-xl"><i class="material-icons icon-blue">add_to_photos</i></button>
+              <button type="button" id="upload" class="btn btn-default btn-circle btn-xl" style="width:100%;"><i class="material-icons icon-blue">add_to_photos</i></button>
                <div><p id="file-label"></p></div>
             </div>
-             <button type="submit" style="background-color: #0d77e2;" class="btn btn-primary btn-lg">Create Project</button>
+             <button type="submit" style="background-color: #0d77e2; float:right;" class="btn btn-primary btn-lg">Create Project</button>
           </form>
           <script src="./js/new.js"></script>
               <!-- Choose image: TODO: take image selection out and put in details.html -->

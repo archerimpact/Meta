@@ -72,7 +72,8 @@ function populateProjectsScreen() {
     projects_list.forEach(function (proj) {
       database.get_project_thumbnail(proj['name'], function (thumbnail_path) {
         if (thumbnail_path == "" || !fs.existsSync(thumbnail_path)) {
-          thumbnail_path = "https://static1.squarespace.com/static/5a6557ae692ebe609770a2a7/t/5a67a1be0852291d033bb08b/1518849801599/?format=1500w";
+          //thumbnail_path = "https://static1.squarespace.com/static/5a6557ae692ebe609770a2a7/t/5a67a1be0852291d033bb08b/1518849801599/?format=1500w";
+          thumbnail_path = "assets/no-images.png"
         }
         showProject(proj['name'], proj['description'], thumbnail_path);// "https://upload.wikimedia.org/wikipedia/commons/d/d1/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg");
       });

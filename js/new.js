@@ -95,7 +95,11 @@ function setupload() {
 			return false;
 		}
 		paths_global = paths;
-		document.getElementById("file-label").innerHTML = String(paths_global.length) + " files selected";
+		var selected_str = " files selected";
+		if (paths_global.length == 1) {
+			selected_str = " file selected"
+		}
+		document.getElementById("file-label").innerHTML = String(paths_global.length) + selected_str;
 	};
 
 	holder.ondrop = (e) => {
@@ -105,7 +109,11 @@ function setupload() {
 			return false;
 		}
 		paths_global = paths;
-		document.getElementById("file-label").innerHTML = String(paths_global.length) + " files selected";
+		var selected_str = " files selected";
+		if (paths_global.length == 1) {
+			selected_str = " file selected"
+		}
+		document.getElementById("file-label").innerHTML = String(paths_global.length) + selected_str;
 	    return false;
 	};
 }

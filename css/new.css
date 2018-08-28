@@ -14,3 +14,8 @@
 .form-group {
   margin-bottom: 40px;
 }
+
+.centered {
+  float: none;
+  margin: auto;
+}

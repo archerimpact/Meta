@@ -1,3 +1,11 @@
 .card-title {
   word-wrap: break-word;
 }
+
+.text-truncate {
+  word-wrap: break-word;
+  overflow:hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2em;
+  max-height: 2.4em;
+}
