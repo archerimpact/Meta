@@ -9,7 +9,7 @@ var database = electron.remote.getGlobal('sharedObj').db;
 function showProject(name, desc, imgsrc) {
   var displayName = name.replace(/__/g, " ");
   template = [
-    "<div class='col-lg-4 col-xs-6 portfolio-item'>",
+    "<div class='col-lg-3 col-xs-6 col-sm-4 portfolio-item'>",
       "<div class='card h-100'>",
         "<a id='photo-{{name}}' href='#'><img style='width: 100%; height: 30vw; object-fit: cover' class='card-img-top img-responsive' src='{{imgsrc}}' alt='No images in this project yet.'></a>",
         "<div class='card-block well' style='border-radius: 0px'>",
@@ -44,7 +44,7 @@ function showProject(name, desc, imgsrc) {
 function showNewProject() {
   data = {};
   template = [
-    "<div class='col-lg-4 col-sm-6 portfolio-item'>",
+    "<div class='col-lg-3 col-sm-4 portfolio-item'>",
       "<div class='card h-100'>",
         "<a id='new-project-photo' href='#'><img style='width: 100%; height: 30vw; object-fit: cover' data-section='new' class='card-img-top img-responsive' src='./assets/add-proj.png' alt=''></a>",
         "<div class='card-block well'>",

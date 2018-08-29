@@ -10,7 +10,7 @@ function slideDrawer() {
 		// var newWidth = body.offsetWidth + wid
 		// body.style.width = newWidth.toString() + 'px'
 	} else {
-		menu.style.width = "16.666%"
+		menu.style.width = '170px' //"16.666%"
 		//wid = document.getElementById('side-nav').offsetWidth + 15
 		//wrapper.style.marginLeft = wid.toString() + 'px'
 		// body.style.width = "83.333%"
@@ -22,7 +22,7 @@ function slideDrawer() {
 }
 
 function checkSlideDrawer() {
-	if (document.getElementById('drawer-select').style.width === '16.666%') {
+	if (document.getElementById('drawer-select').style.width === '170px') {
 		slideDrawer()
 	}
 }

@@ -52,7 +52,7 @@
     left: 0;
     overflow-x: hidden; /* Disable horizontal scroll */
     transition: 0.2s; /* 0.5 second transition effect to slide in the sidenav */
-    margin-left: 16.666%;
+    margin-left: 50px;
     border-left: 2px solid white;
     color: white;
 }
@@ -62,15 +62,6 @@
   margin-left: 4%;
   margin-top: 4%;
   margin-bottom: 4%;
-}
-
-#slidebutton {
-  width: 60px;
-  height: 40px;
-  position: absolute;
-  top: 45vh;
-  left: calc(100% - 70px);
-
 }
 
 .menu-check {

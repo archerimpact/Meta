@@ -35,32 +35,31 @@
   <body style='min-width: 772px;'>
 
     <div class="row" id="home" style="height:100%">
-      <img class="navbar-brand col-sm-2" style="background-color: #0d77e2; position: fixed; height: 64px" href="index.html" src="archer_meta.png"></img>
-      <div class="col-sm-2" id="side-nav" style="padding: 0px; height: 100%">
+      <img src="assets/A_white.png" id="home-logo"></img>
+      <div class="navbar-default sidebar meta-nav" role="navigation" id="side-nav">
 
-        <div class="navbar-default sidebar meta-nav" role="navigation">
           <div class="sidebar-nav">
             <ul class="nav" id="side-menu" style="padding-top: 0;">
               <li>
-                  <a class="side-bar" data-section="landing" style="font-size: 18px;"><i class="material-icons" style="font-size: 36px">home</i> Dashboard</a>
+                  <a class="side-bar side-button" data-section="landing" style="font-size: 18px;"><i class="material-icons" data-section="landing" style="font-size: 36px">home</i></a>
               </li>
               <li>
-                  <a class="side-bar" data-section="new" style="font-size: 18px;"><i class="material-icons" style="font-size: 36px">add</i> New Project</a>
+                  <a class="side-bar side-button" data-section="new" style="font-size: 18px;"><i class="material-icons" data-section="new" style="font-size: 36px">add</i></a>
               </li>
 
               <li>
-                  <a class="side-bar" data-section="projects" style="font-size: 18px;"><i class="material-icons" style="font-size: 36px">folder</i> Projects</a>
+                  <a class="side-bar side-button" data-section="projects" style="font-size: 18px;"><i class="material-icons" data-section="projects" style="font-size: 36px">folder</i></a>
                   <!--TODO: eventually, we'll want to put this together so that it has a listed projects underneath it, but for now we'll just redirect to the existing project page like we had beofre -->
               </li>
               <li>
-                  <a class="side-bar" data-section="settings" style="font-size: 18px;"><i class="material-icons" style="font-size: 36px">settings</i> Settings</a>
+                  <a class="side-bar side-button" data-section="settings" style="font-size: 18px;"><i class="material-icons" data-section="settings" style="font-size: 36px">settings</i></a>
               </li>
-                  <button class="btn btn-primary btn-circle hidden" id="slidebutton" onclick="slideDrawer()" style="border-color: white; background-color: white; color: #0d77e2"><i class="material-icons">compare_arrows</i></button>
+              <li>
+                  <a class="side-bar side-button hidden" id="slidebutton" onclick="slideDrawer()" style="font-size: 18px;"><i class="material-icons" style="font-size: 36px">filter_list</i></a>
+              </li>
             </ul>
           </div>
           <!-- /.sidebar-collapse -->
-
-         </div>
 
 
         </div>
@@ -98,7 +97,7 @@
           <div id="thumb-menu" class="hidden"></div>
         </div>
         <!-- /.navbar-static-side -->
-        <div class="col-sm-10" id="body" style="padding: 0px; height: 100%">
+        <div id="body" style="padding: 0px; height: 100%">
           <div id="wrapper" style="overflow-y: scroll; overflow-x: hidden"></div>
         </div>
       </div>

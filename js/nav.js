@@ -19,7 +19,7 @@ function(n, dest) {
    },
 
    setMenuOnClickEvent: function () {
-     document.body.addEventListener('click', function (event) {
+     document.getElementById('side-nav').addEventListener('click', function (event) {
        if (event.target.dataset.section) {
          navigation.menu.hideAllSections()
          navigation.menu.showSection(event)

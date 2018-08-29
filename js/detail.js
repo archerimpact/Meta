@@ -812,7 +812,7 @@ function insertIntoSlideMenu(data, id) {
 		'<div class="row thumb-row">',
 			'<label class="menu-check">',
 				'<input id="{{name}}check" class="name-checkbox" type="checkbox" checked>',
-				'{{name}}',
+				'{{displayName}}',
 			'</label>',
 		'</div>',
 	].join('\n')
