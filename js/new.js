@@ -55,7 +55,7 @@ function populate_project_with_images(bool, project_name, img_paths) {
 	/* Populate newly created project with provided images. */
 	for (var index in img_paths) {
 		var filename = path.basename(img_paths[index]).split(".")[0];
-		database.add_image(filename, img_paths[index], project_name, index, img_paths.length, alert_image_upload);
+		database.add_image(nospaces(filename), img_paths[index], project_name, index, img_paths.length, alert_image_upload);
 	}
 }
 

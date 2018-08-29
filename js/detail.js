@@ -26,7 +26,7 @@ $("#add-image").submit(function(e) {
 
 	async.forEachOfSeries(paths_global, function(item, index, done) {
 		var filename = path.basename(paths_global[index]).split(".")[0];
-		database.add_image(filename, paths_global[index], _currentProj, alert_image_upload);
+		database.add_image(nospaces(filename), paths_global[index], _currentProj, alert_image_upload);
 		done();
 	}, function(err) {
 		if (err) {
@@ -380,7 +380,7 @@ function insertErrorTemplate(error, id) {
 		'<div class="col-md-8">',
 			'<div class="row">',
 				'<div class="col-md-9">',
-					'<h3 style="word-wrap:break-word;" style="display: inline;">{{name}}</h3>',
+					'<h3 style="word-wrap:break-word;" style="display: inline;">{{displayName}}</h3>',
 				'</div>',
 				'<div class="col-md-3">',
 					'<div style="display: inline;" class="dropdown">',
@@ -485,6 +485,7 @@ function loadHeader(project) {
 		let paths = electron.remote.dialog.showOpenDialog({properties: ['openFile', 'multiSelections']});
 		async.forEachOfSeries(paths, function(item, index, done) {
 			var filename = path.basename(paths[index]).split(".")[0];
+			filename = nospaces(filename)
 			database.add_image(filename, paths[index], project['name'], index, paths.length, alert_image_upload);
 			done();
 		}, function(err) {
@@ -500,9 +501,8 @@ function insertDetailTemplate(img_name, img_path, proj_name) {
 }
 
 function insertDetailTemplate__NEW(data, id, path, projname) {
+	data.displayName = withspaces(data.name)
 	insertIntoSlideMenu(data, id);
-	console.log('id', id)
-	console.log('path', path)
 	data.id = id;
 
 	if (data.error) {
@@ -559,7 +559,7 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 	var template = [
 		'<div class="col-md-4 col-xs-6">',
 			'<div class="row name-row">',
-				'<h3 class="image-name">{{name}}</h3>',
+				'<h3 class="image-name">{{displayName}}</h3>',
 				'<div class="dropdown" style="display:inline; float:right">',
 					'<button class="settings-button btn btn-outline-secondary float-right dropdown-toggle" style="background-color: #89cafd; margin-bottom: 2px; color: white" type="button" id="dropdown' + id + '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
 						'<i class="material-icons icon" style="height:25px;width:15px;font-size:15px;">settings</i>',
