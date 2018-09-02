@@ -959,6 +959,37 @@ class Database {
     });
   }
 
+  /* Get data for one field across all projects. */
+  get_data_by_field(field, callback) {
+    var _this = this;
+    var db = this.db;
+    db.serialize(function() {
+      _this.has_metadata_attr([field], function(attr_exists) {
+        if (attr_exists) {
+          var apertures = [];
+          var counts = [];
+          var stmt = db.prepare("SELECT COUNT(*) as Count, " + field + " FROM Images WHERE " + field + " IS NOT NULL GROUP BY " + field);
+          stmt.each([], function(err, row) {
+            if (err) {
+              console.error("FAILING: " + err);
+              callback([], []);
+              return;
+            }
+
+            apertures.push(JSON.parse(row[field]));
+            counts.push(row['Count']);
+          }, function() {
+            callback(apertures, counts);
+          });
+          stmt.finalize();
+        } else {
+          console.error("column DNE: " + field);
+          callback([], []);
+        }
+      });
+    });
+  }
+
   /* Uses callback(img_path, proj_name, dictionary) to return dict of metafields to metadata.
    * Ignores any fields that are not filled in or not selected. */
   get_selected_image_metadata(img_path, proj_name, selected, callback) {

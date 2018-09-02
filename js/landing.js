@@ -27,7 +27,7 @@ function dashSearch() {
 
   var results = [];
   var searchId = $("#dashSearchId").val();
-  if (searchId) {    
+  if (searchId) {
     database.has_project(searchId, function(bool) {
       if (bool) {
         database.get_project_thumbnail(searchId, function(path) {
@@ -35,7 +35,7 @@ function dashSearch() {
           results.path = path;
           results.proj_name = searchId;
           insertSearchResults(false, results);
-        }); 
+        });
       } else {
         insertSearchResults(true, "No Projects Found: " + searchId);
       }
@@ -126,10 +126,55 @@ function create_image_locations_map() {
   });
 }
 
+function create_data_charts() {
+  database.get_metadata_fields(charts_helper)
+}
+
+function charts_helper(fields) {
+  var options = ""
+  var template = "<option value='field'>field</option>"
+  for (var ind in fields) {
+    var field = fields[ind]
+    options += template.replace(/field/g, field)
+  }
+  var data1 = document.getElementById('field-select-1')
+  var data2 = document.getElementById('field-select-2')
+  data1.innerHTML = "<option selected hidden disabled>Camera Make</option>" + options
+  data2.innerHTML = "<option selected hidden disabled>Aperture</option>" + options
+
+  var _ = new Choices(data1, {
+    searchPlaceholderValue: "Type to search",
+  })
+  _ = new Choices(data2, {
+    searchPlaceholderValue: "Type to search"
+  })
+
+  function selectorFunction(event) {
+    database.get_data_by_field(event.detail.choice.value, function(labels, counts) {
+      if (event.path[0].id === 'field-select-1') {
+        var target = 'chart-1'
+        document.getElementById('chart1-parent').innerHTML = "<canvas id='chart-1'></canvas>"
+      } else {
+        var target = 'chart-2'
+        document.getElementById('chart2-parent').innerHTML = "<canvas id='chart-2'></canvas>"
+      }
+      addPieChart(
+        target,
+        labels,
+        counts,
+        event.detail.choice.value,
+      )
+    })
+  }
+
+  data1.addEventListener('choice', selectorFunction)
+  data2.addEventListener('choice', selectorFunction)
+}
+
 function create_image_models_chart() {
   database.get_all_image_models(function(models, counts) {
 		addPieChart(
-			"all-image-models",
+			"chart-1",
 			models,
 			counts,
 			"Camera Make"
@@ -140,7 +185,7 @@ function create_image_models_chart() {
 function create_image_apertures_chart() {
   database.get_all_image_apertures(function(apertures, counts) {
 		addPieChart(
-			"all-image-apertures",
+			"chart-2",
 			apertures,
 			counts,
 			"Aperture"
@@ -151,8 +196,8 @@ function create_image_apertures_chart() {
 function clear_charts() {
   $("#all-image-by-date").html("");
   $("#all-image-locations").html("");
-  $("#all-image-models").html("");
-  $("#all-image-apertures").html("");
+  $("#chart-1").html("");
+  $("#chart-2").html("");
 }
 
 function populate_landing() {
@@ -161,6 +206,7 @@ function populate_landing() {
   create_image_locations_map();
   create_image_models_chart();
   create_image_apertures_chart();
+  create_data_charts();
 }
 
 populate_landing();
