@@ -130,6 +130,23 @@ function create_data_charts() {
   database.get_metadata_fields(charts_helper)
 }
 
+function selectorFunction(event) {
+  var maybe_proj = document.getElementById('project-name')
+  maybe_proj = maybe_proj ? maybe_proj.innerHTML : ""
+  database.get_data_by_field(event.detail.choice.value, function(labels, counts) {
+    var target = event.path[0].dataset.section
+    document.getElementById(target).outerHTML = "<canvas id='" + target + "'></canvas>"
+    addPieChart(
+      target,
+      labels,
+      counts,
+      event.detail.choice.value,
+    )
+  },
+  maybe_proj,
+  )
+}
+
 function charts_helper(fields) {
   var options = ""
   var template = "<option value='field'>field</option>"
@@ -137,38 +154,17 @@ function charts_helper(fields) {
     var field = fields[ind]
     options += template.replace(/field/g, field)
   }
-  var data1 = document.getElementById('field-select-1')
-  var data2 = document.getElementById('field-select-2')
-  data1.innerHTML = "<option selected hidden disabled>Camera Make</option>" + options
-  data2.innerHTML = "<option selected hidden disabled>Aperture</option>" + options
-
-  var _ = new Choices(data1, {
-    searchPlaceholderValue: "Type to search",
-  })
-  _ = new Choices(data2, {
-    searchPlaceholderValue: "Type to search"
-  })
-
-  function selectorFunction(event) {
-    database.get_data_by_field(event.detail.choice.value, function(labels, counts) {
-      if (event.path[0].id === 'field-select-1') {
-        var target = 'chart-1'
-        document.getElementById('chart1-parent').innerHTML = "<canvas id='chart-1'></canvas>"
-      } else {
-        var target = 'chart-2'
-        document.getElementById('chart2-parent').innerHTML = "<canvas id='chart-2'></canvas>"
-      }
-      addPieChart(
-        target,
-        labels,
-        counts,
-        event.detail.choice.value,
-      )
-    })
+  for (var i = 1; i <= 4; i++) { //4 is number of select fields/charts
+    var target = document.getElementById('field-select-' + i)
+    if (target) {
+      var text = i % 2 == 0 ? "Aperture" : "Model"
+      target.innerHTML = "<option selected hidden disabled>" + text + "</option>" + options
+      var _ = new Choices(target, {
+        searchPlaceholderValue: "Type to search",
+      })
+      target.addEventListener('choice', selectorFunction)
+    }
   }
-
-  data1.addEventListener('choice', selectorFunction)
-  data2.addEventListener('choice', selectorFunction)
 }
 
 function create_image_models_chart() {
@@ -177,7 +173,7 @@ function create_image_models_chart() {
 			"chart-1",
 			models,
 			counts,
-			"Camera Make"
+			"Model"
 		);
   });
 }

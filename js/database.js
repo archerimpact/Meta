@@ -959,27 +959,34 @@ class Database {
     });
   }
 
-  /* Get data for one field across all projects. */
-  get_data_by_field(field, callback) {
+  /* Get data for one field across all projects.
+  /* Or one project, if the project field is specified (leave null otherwise) */
+  get_data_by_field(field, callback, project=null) {
     var _this = this;
     var db = this.db;
     db.serialize(function() {
       _this.has_metadata_attr([field], function(attr_exists) {
         if (attr_exists) {
-          var apertures = [];
+          var buckets = [];
           var counts = [];
-          var stmt = db.prepare("SELECT COUNT(*) as Count, " + field + " FROM Images WHERE " + field + " IS NOT NULL GROUP BY " + field);
-          stmt.each([], function(err, row) {
+          if (project) {
+            var stmt = db.prepare("SELECT COUNT(*) as Count, " + field + " FROM Images WHERE " + field + " IS NOT NULL AND proj_name=? GROUP BY " + field)
+            var entries = [project]
+          } else {
+            var stmt = db.prepare("SELECT COUNT(*) as Count, " + field + " FROM Images WHERE " + field + " IS NOT NULL GROUP BY " + field)
+            var entries = []
+          }
+          stmt.each(entries, function(err, row) {
             if (err) {
               console.error("FAILING: " + err);
               callback([], []);
               return;
             }
 
-            apertures.push(JSON.parse(row[field]));
+            buckets.push(JSON.parse(row[field]));
             counts.push(row['Count']);
           }, function() {
-            callback(apertures, counts);
+            callback(buckets, counts);
           });
           stmt.finalize();
         } else {

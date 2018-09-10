@@ -67,7 +67,6 @@ function loadDetail(projectName, filter_params = {}) {
 	database.get_project(projectName, function(row) {
 		loadHeader(row);
 		document.getElementById('toggledetail').onclick = function() {
-			loadCharts(projectName, null); // somehow add filter params?
 			toggleDetail();
 		}
 		if ($('#image-wrapper').hasClass('hidden')) {
@@ -91,7 +90,7 @@ function loadDetail(projectName, filter_params = {}) {
 						detailExifDisplay__NEW(img_path, name, projectName, metadata, done);
 					});
 				}, function(err) {
-					loadCharts(projectName, filter_params);
+					// returns null error, nothing to do
 				});
 			});
 		},
@@ -704,20 +703,24 @@ function loadCharts(proj_name, filter_params) {
 			'<div class="row no-side-margins">',
 				'<div class="col-sm-6 col-xs-12">',
 					'<div class="panel panel-default">',
-					   '<div class="panel-heading"> Camera Make </div>',
+					   '<div class="panel-heading">',
+						 '<select class="form-control" data-trigger data-section="chart-3" name="choices-single" id="field-select-3"></select>',
+						 '</div>',
 					 	'<div class="panel-body">',
 				 			'<div class="flot-chart">',
-					   			'<canvas id="pie1"></canvas>',
+					   			'<canvas id="chart-3"></canvas>',
 					  		'</div>',
 					 	'</div>',
 				 	'</div>',
 			 	'</div>',
 				'<div class=" col-sm-6 col-xs-12">',
 					'<div class="panel panel-default">',
-					   	'<div class="panel-heading"> Image Aperture </div>',
+					   	'<div class="panel-heading">',
+							'<select class="form-control" data-trigger data-section="chart-4" name="choices-single" id="field-select-4"></select>',
+							'</div>',
 					 	'<div class="panel-body">',
 					 		'<div class="flot-chart">',
-					   			'<canvas id="pie2"></canvas>',
+					   			'<canvas id="chart-4"></canvas>',
 					 		'</div>',
 						'</div>',
 				 	'</div>',
@@ -733,6 +736,10 @@ function loadCharts(proj_name, filter_params) {
 	].join("\n");
 
 	$("#detail-charts").append(template);
+
+	create_data_charts();
+
+
 
 	var ref = document.getElementById('lineChart');
 	var div = document.getElementById('trendsmap')
@@ -765,10 +772,10 @@ function loadCharts(proj_name, filter_params) {
 
 		} else {
 			addPieChart(
-				"pie1",
+				"chart-3",
 				models,
 				counts,
-				"Camera Make"
+				"Model"
 			);
 		}
 	},
@@ -795,7 +802,7 @@ function loadCharts(proj_name, filter_params) {
 
 		} else {
 			addPieChart(
-				"pie2",
+				"chart-4",
 				apertures,
 				counts,
 				"Aperture"

@@ -46,6 +46,8 @@ function(n, dest) {
        loadSettings();
      }
      if (sectionId === 'landing') {
+       var name = document.getElementById("project-name")
+     	 if (name) { name.innerHTML = "" }
        populate_landing();
      }
      checkSlideDrawer();
