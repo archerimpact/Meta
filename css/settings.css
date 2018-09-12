@@ -88,3 +88,22 @@
           transition-property: width;
 
 }
+
+.settings-subheading {
+  display: inline;
+  color: #3d3d3d;
+  padding-left: 20px;
+}
+
+.settings-table {
+  padding-top: 20px;
+  margin-left: -10px;
+  margin-right: 0px;
+}
+
+.settings-label {
+  max-width: calc(100% - 18px);
+  /* This is ideal but causes weird vertical spacing */
+  /* text-overflow: ellipsis; */
+  /* overflow: hidden; */
+}

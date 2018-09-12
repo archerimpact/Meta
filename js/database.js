@@ -516,7 +516,7 @@ class Database {
           fields.push(name);
         }
       }, function() {
-        callback(fields);
+        callback(fields.sort());
       });
     });
   }

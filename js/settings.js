@@ -15,18 +15,18 @@ function populate_settings_view(fields, favorite_fields, csv_fields) {
       'tag': tag,
     }
     var fav_template = [
-      '<div class="col col-sm-4 col-md-3 form-check">',
+      '<div class="col-xs-4 col-md-3 form-check">',
         '<input class="form-check-input" type="checkbox" value="{{tag}}" id="favcheck{{tag}}">',
-        '<label class="form-check-label" for="check{{tag}}">',
+        '<label class="form-check-label settings-label" for="check{{tag}}">',
           tag,
         '</label>',
       '</div>',
 
     ].join("\n");
     var csv_template = [
-      '<div class="col col-sm-4 col-md-3 form-check">',
+      '<div style="overflow: hidden; word-" class="col-xs-4 col-md-3 form-check">',
         '<input class="form-check-input" type="checkbox" value="{{tag}}" id="csvcheck{{tag}}">',
-        '<label class="form-check-label" for="check{{tag}}">',
+        '<label class="form-check-label settings-label" for="check{{tag}}">',
           tag,
         '</label>',
       '</div>',
