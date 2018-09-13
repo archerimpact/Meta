@@ -103,12 +103,24 @@ function addPieChart(id, labels, values, title) {
 // id is id of div into which map will go
 // markers is array of lat/lng objects, e.g. [{lat: x, lng:y}, ...]
 function addMap(id, markers) {
+
+  var elem = document.getElementById(id)
+
+  if (!markers || markers.length == 0) {
+    elem.innerHTML = "Sorry, no images in this project have location info."
+  } else {
+    elem.innerHTML = "<button class='btn btn-default btn-circle btn-xl' style='margin-top: calc(30% - 10px);' data-markers='" + JSON.stringify(markers) +"'>Load Map</button>"
+    elem.onclick = actuallyAddMap
+  }
+}
+
+function actuallyAddMap(event) {
+  var idElem = event.path[1]
   try {
-    var idElem = document.getElementById(id);
     if (!idElem) {
       return
     }
-    
+    var markers = JSON.parse(event.srcElement.dataset.markers)
 		_map = new google.maps.Map(idElem, {
 		  zoom: 6,
 		  center: {'lat': 0, 'lng': 0},

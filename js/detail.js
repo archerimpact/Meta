@@ -639,18 +639,6 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 	data.name = data.name.replace(/ /g, "\\ ");
 	$("#detail-template" + data.name).append(filler);
 
-	var latitude;
-	var longitude;
-	if ('GPSLatitude' in data.gpsData) {
-		latitude = data.gpsData.GPSLatitude
-		longitude = data.gpsData.GPSLongitude
-	}
-
-	addMap(
-		"map" + data.name,
-		[{'lat':latitude, 'lng':longitude}],
-	)
-
 	$('[data-toggle="tooltip"]').tooltip();
 
 	setPhotoRemove(data.name);
@@ -694,8 +682,8 @@ function loadCharts(proj_name, filter_params) {
 				'<div class="col-sm-6 col-xs-12">',
 					'<div class="panel panel-default">',
 						'<div class="panel-heading"> Image Locations </div>',
-						'<div class="panel-body">',
-							'<div style="width:100%;" id="trendsmap"></div>',
+						'<div class="panel-body" style="text-align: center;">',
+							'<div style="width:95%; height: 30vh;" id="trendsmap"></div>',
 						'</div>',
 					'</div>',
 				'</div>',
@@ -739,17 +727,6 @@ function loadCharts(proj_name, filter_params) {
 
 	create_data_charts();
 
-
-
-	var ref = document.getElementById('lineChart');
-	var div = document.getElementById('trendsmap')
-	var width = ref.offsetWidth / 2
-	if (width > 0) {
-		div.style.height = width.toString() + 'px';
-	} else {
-		div.style.height = '400px';
-	}
-
 	database.get_images_by_date(proj_name, function(dates, counts) {
 		/* Set content to "no data exists" image if needed. */
 		if (dates.length == 0) {
@@ -784,14 +761,10 @@ function loadCharts(proj_name, filter_params) {
 
 	database.get_locations_for_images(proj_name, function(locations) {
 		/* Set content to "no data exists" image if needed. */
-		if (locations.length == 0) {
-
-		} else {
-			addMap(
-				"trendsmap",
-				locations
-			);
-		}
+		addMap(
+			"trendsmap",
+			locations
+		);
 	},
 	filter_params,
 	);
