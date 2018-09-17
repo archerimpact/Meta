@@ -13,6 +13,8 @@ To run the app as a developer:
 3. Run 'npm rebuild'.
 4. Run 'npm start' to start up the app.
 
+Note that our Google Maps API key is hidden in this repo. As of now, the maps still usually (up to a certain number of loads) work without it, you will just get a missing key warning.
+
 To build the app using electron-builder:
 1. Make sure the app works by running "npm install" and then running "npm start".
 2. Run "npm run dist" to start electron-builder.
