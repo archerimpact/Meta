@@ -106,19 +106,20 @@
       </script>
 
       <script type="text/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
+      <script type="text/javascript" src="./js/config.js"></script>
       <script src="main.js"></script>
       <script src="./js/utils.js"></script>
       <script src="./js/nav.js"></script>
       <script src="./js/charts.js"></script>
       <script src="./js/home.js"></script>
       <script src="./js/filter.js"></script>
-      <script src="https://maps.googleapis.com/maps/api/js" async defer></script>
-      <script type="text/javascript">
-        $('#myModal').on('shown.bs.modal', function () {
-          console.log('hello');
-        $('#myInput').focus()
-      });
-        </script>
+      <script>
+        var key = typeof config === 'undefined' ? "" : config.map_key
+        var map_src = "https://maps.googleapis.com/maps/api/js?key=" + key
+        var script = document.createElement('script')
+        script.src = map_src
+        document.getElementsByTagName('head')[0].appendChild(script);
+      </script>
 
       <script>
         const {Menu, MenuItem} = electron.remote

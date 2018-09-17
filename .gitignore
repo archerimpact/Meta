@@ -1,5 +1,7 @@
 # gitignore file recommended by Github for Node dev env (we do not use all of these)
 
+config.js
+
 .DS_Store
 dist*
 
