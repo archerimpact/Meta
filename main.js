@@ -28,6 +28,9 @@ function createWindow () {
     height: 800,
     'minHeight': 500,
     'minWidth': 770,
+    webPreferences: {
+      plugins: true,
+    },
   })
   mainWindow.setFullScreen(false)
 
@@ -58,12 +61,12 @@ if (app) {
 
   // Quit when all windows are closed.
   app.on('window-all-closed', function () {
-    db.close();
 
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform !== 'darwin') {
       app.quit()
+      db.close()
     }
   })
 

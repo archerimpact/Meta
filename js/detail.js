@@ -277,26 +277,27 @@ function isStr(maybeString) {
 
 function getType(info) {
 	info = info.toLowerCase()
-	if (
-		info.includes('jpg') ||
-		info.includes('jpeg') ||
-		info.includes('png') ||
-		info.includes('svg') ||
-		info.includes('gif') ||
-		info.includes('apng') ||
-		info.includes('pdf') ||
-		info.includes('bmp')
+	if (info.includes('.pdf')) {
+		return 'pdf'
+	} else if (
+		info.includes('.jpg') ||
+		info.includes('.jpeg') ||
+		info.includes('.png') ||
+		info.includes('.svg') ||
+		info.includes('.gif') ||
+		info.includes('.apng') ||
+		info.includes('.bmp')
 	) {
 		return 'img'
 	} else if (
-		info.includes('mp4') ||
-		info.includes('mov') ||
-		info.includes('mpeg') ||
-		info.includes('mpg') ||
-		info.includes('avi') ||
-		info.includes('wmv') ||
-		info.includes('ogg') ||
-		info.includes('webm')
+		info.includes('.mp4') ||
+		info.includes('.mov') ||
+		info.includes('.mpeg') ||
+		info.includes('.mpg') ||
+		info.includes('.avi') ||
+		info.includes('.wmv') ||
+		info.includes('.ogg') ||
+		info.includes('.webm')
 	) {
 		return 'video'
 	} else {
@@ -552,9 +553,17 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 	data.flag = flag_trigger
 	data.flag_str = flag_string
 
-	data.media = getType(contents.file)
+	data.media = getType(data.fileData.SourceFile)
 	data.sorry = "Sorry, we are not able to display this file. Consider inspecting it on your computer at {{path}}. However, there may still be exif data displayed to the right."
-
+	var mediacontents
+	if (data.media != 'pdf') {
+		mediacontents = '<{{media}} class="img-responsive rounded" src="{{path}}" alt="' + data.sorry + '" controls>'
+	} else {
+		//mediacontents = '<object type="application/pdf" data="{{path}}"><p>' + data.sorry + '</p></object>'
+		var path_nospace = data.path.replace(/ /g, '%20')
+		console.log(path_nospace)
+		mediacontents = "<webview src='{{path}}' plugins></webview>"
+	}
 	var template = [
 		'<div class="col-md-4 col-xs-6">',
 			'<div class="row name-row">',
@@ -567,9 +576,9 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 						'<li id="remove{{name}}" class="dropdown-item"><a href="#">Remove</a></li>',
 					'</ul>',
 				'</div>',
-				'<i class="material-icons" style="color: #f8e408; height:25px; display:inline; float:right;" data-toggle="tooltip" data-placement="auto" title="{{flag_str}}">error</i/>',
+				'<i class="material-icons {{flag}}" style="color: #f8e408; height:25px; display:inline; float:right;" data-toggle="tooltip" data-placement="auto" title="{{flag_str}}">error</i/>',
 			'</div>',
-			'<{{media}} class="img-responsive rounded" src="{{path}}" alt="{{sorry}}" controls>',
+			mediacontents,
 		'</div>',
 		'<div class="col-md-8 col-xs-6">',
 			'<div class="row">',
@@ -667,7 +676,7 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 
 function loadCharts(proj_name, filter_params) {
 	template = [
-		'<div class="charts" id="chart-wrapper" style="padding-top:100px">',
+		'<div class="charts" id="chart-wrapper" style="padding-top:30px">',
 			'<div class="row no-side-margins">',
 				'<div class="col-sm-6 col-xs-12" style="padding-right: 15px">',
 					'<div class="panel panel-default">',

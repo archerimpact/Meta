@@ -1,8 +1,8 @@
 {
   "name": "ArcherMeta",
-  "version": "1.0.0",
+  "version": "2.2.0",
   "author": "Archer HRC Team",
-  "description": "A desktop tool for Mac, Windows, and Linux made with Electron for viewing and exporting photo and video metadata online.",
+  "description": "A desktop tool for Mac, Windows, and Linux for viewing, analyzing, and exporting photo and video metadata offline.",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -40,6 +40,12 @@
     "win": {
       "icon": "./assets/archerlogoa.png.ico",
       "target": "NSIS"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
     },
     "asar": false
   }
