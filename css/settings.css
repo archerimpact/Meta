@@ -107,3 +107,16 @@
   /* text-overflow: ellipsis; */
   /* overflow: hidden; */
 }
+
+.settings-selector {
+  float: right;
+  max-width: 40%;
+  display: inline;
+}
+
+.choices-fav {
+  display: inline-block;
+  vertical-align: middle;
+  width: 200px;
+  margin-left: 10px;
+}

@@ -8,7 +8,7 @@ var database = electron.remote.getGlobal('sharedObj').db;
 function populate_settings_view(fields, favorite_fields, csv_fields) {
   var favwrapper = $("#fav-settings-wrapper")
   var csvwrapper = $("#csv-settings-wrapper")
-
+  var options = ""
   for (var ind in fields) {
     var tag = fields[ind]
     var data = {
@@ -39,12 +39,16 @@ function populate_settings_view(fields, favorite_fields, csv_fields) {
 
     /* Update settings when a box is checked. */
     $("#favcheck" + tag).click(function() {
+      console.log('triggering click fxn for ' + $(this).val() + ", " + $(this).is(":checked"))
       database.update_favorites_field($(this).val(), "f", $(this).is(":checked"));
     });
 
     $("#csvcheck" + tag).click(function() {
       database.update_favorites_field($(this).val(), "c", $(this).is(":checked"));
     });
+
+    var template = "<option value='field'>field</option>"
+    options += template.replace(/field/g, tag)
   }
 
   /* Check favorites. */
@@ -58,6 +62,35 @@ function populate_settings_view(fields, favorite_fields, csv_fields) {
     var csv_tag = csv_fields[ind_csv];
     $("#csvcheck" + csv_tag).prop('checked', true);
   }
+
+  var favtarget = document.getElementById('select-fav')
+  var csvtarget = document.getElementById('select-csv')
+  favtarget.innerHTML = options
+  csvtarget.innerHTML = options
+  var _ = new Choices(favtarget, {
+    searchPlaceholderValue: "Search to select favorites",
+    itemSelectText: "",
+    classNames: {containerOuter: "choices choices-fav"}
+  })
+  _ = new Choices(csvtarget, {
+    searchPlaceholderValue: "Search to select csv fields",
+    itemSelectText: "",
+    classNames: {containerOuter: "choices choices-fav"}
+  })
+  favtarget.addEventListener('choice', selectFav)
+  csvtarget.addEventListener('choice', selectcsv)
+
+  function selectFav(event) {
+    var box = $("#favcheck" + event.detail.choice.value)
+    box.prop('checked', true) // !box.is(":checked")) only use the box to select, not un-select
+    database.update_favorites_field(event.detail.choice.value, "f", box.is(":checked"));
+  }
+  function selectcsv(event) {
+    var box = $("#csvcheck" + event.detail.choice.value)
+    box.prop('checked', true) // !box.is(":checked")) only use the box to select, not un-select
+    database.update_favorites_field(event.detail.choice.value, "c", box.is(":checked"));
+  }
+
 }
 
 function get_favorites_helper(fields) {
