@@ -10,7 +10,6 @@ console.log(db_filename);
 class Database {
   constructor(opts) {
     this.db = this.init_database();
-    // this.last_image_id = 0;
   }
 
   /* Uses callback(boolean) to return if Projects contains name. */
@@ -220,62 +219,6 @@ class Database {
     });
   }
 
-  /* Uses callback(img_path, proj_name, meta_dict, success) to add metadata in a dictionary. */
-  // add_image_meta(img_path, proj_name, meta_dict, callback) {
-  //   var _this = this;
-  //   var db = this.db;
-  //   db.serialize(function() {
-  //     var columns = [];
-  //     db.each("PRAGMA table_info(Images)", function(err, col) {
-  //       if (err) {
-  //         console.error("FAILING: " + err);
-  //       }
-  //       columns.push(col.name);
-  //     }, function() {
-  //       console.log('add_project: columns', columns);
-  //       for (var meta_key in meta_dict) {
-  //         meta_key = meta_key.replace("-", "_");
-  //         var col_exists = (columns.indexOf(meta_key) >= 0);
-  //         var meta_value = meta_dict[meta_key];
-  //         if (!col_exists) {
-  //           var meta_type = typeof meta_value;
-  //           db.run("ALTER TABLE Images ADD " + meta_key + " " + meta_type + ";");
-  //           console.log('add_project: col added', meta_key, meta_type);
-  //         } else {
-  //           console.log('contains column', columns[meta_key])
-  //         }
-  //       }
-  //
-  //       var success = false;
-  //       _this.has_image(img_path, proj_name, function(bool) {
-  //         if (bool) {
-  //           var add_meta = "";
-  //           var meta_length = Object.keys(meta_dict).length;
-  //           var count = 0;
-  //           var meta_values = [];
-  //           for (var meta_key in meta_dict) {
-  //             add_meta += meta_key + "=?";
-  //             meta_values.push(meta_dict[meta_key]);
-  //             if (count < meta_length - 1) {
-  //               add_meta += ", ";
-  //             }
-  //             count++;
-  //           }
-  //           console.log(meta_values);
-  //           var query = "UPDATE Images SET " + add_meta + " WHERE path=? AND proj_name=?";
-  //           console.log(query, "query");
-  //           var stmt = db.prepare(query);
-  //           var params = meta_values + [img_path, proj_name];
-  //           stmt.run(params);
-  //           stmt.finalize();
-  //           success = true;
-  //         }
-  //
-  //         callback(success);
-  //       });
-  //     });
-  //   });
-  // }
   add_image_meta(imgname, img_path, proj_name, meta_key, meta_value, callback) {
     // set metadata for image
     // if column doesn't exist, add column

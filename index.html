@@ -120,31 +120,8 @@
         script.src = map_src
         document.getElementsByTagName('head')[0].appendChild(script);
       </script>
-
-      <script>
-        const {Menu, MenuItem} = electron.remote
-        let rightClickPosition = null
-
-        const menu = new Menu()
-        const menuItem = new MenuItem({
-          label: 'Inspect Element',
-          click: () => {
-            remote.getCurrentWindow().inspectElement(rightClickPosition.x, rightClickPosition.y)
-          }
-        })
-        menu.append(menuItem)
-
-        window.addEventListener('contextmenu', (e) => {
-          e.preventDefault()
-          rightClickPosition = {x: e.x, y: e.y}
-          menu.popup(remote.getCurrentWindow())
-        }, false)
-      </script>
-
-
-
-        <link rel="stylesheet" href="./node_modules/choices.js/assets/styles/css/choices.min.css">
-        <script src="./node_modules/choices.js/assets/scripts/dist/choices.min.js"></script>
+      <link rel="stylesheet" href="./node_modules/choices.js/assets/styles/css/choices.min.css">
+      <script src="./node_modules/choices.js/assets/scripts/dist/choices.min.js"></script>
   </body>
 
 </html>

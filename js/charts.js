@@ -23,17 +23,7 @@ function addLineChart(id, xlabels, ylabel, values) {
 				pointHoverBorderColor: "#ff0099",
 				pointBorderWidth: 1,
 				data: values
-		  }//, {
-				// label: "My Second dataset",
-				// backgroundColor: "rgba(3, 88, 106, 0.3)",
-				// borderColor: "rgba(3, 88, 106, 0.70)",
-				// pointBorderColor: "rgba(3, 88, 106, 0.70)",
-				// pointBackgroundColor: "rgba(3, 88, 106, 0.70)",
-				// pointHoverBackgroundColor: "#fff",
-				// pointHoverBorderColor: "rgba(151,187,205,1)",
-				// pointBorderWidth: 1,
-				// data: [82, 23, 66, 9, 99, 4, 2]
-		  //}]
+		  }
     ]},
     options: {
       responsive: true,
@@ -41,9 +31,6 @@ function addLineChart(id, xlabels, ylabel, values) {
         animateScale: true
       },
       scales: {
-        // xAxes: [{
-        //   display: false
-        // }],
         yAxes: [{
           ticks: {
             beginAtZero: true,

@@ -41,7 +41,7 @@ function createWindow () {
     slashes: true
   }))
 
-  // Open the DevTools.
+  // Open the DevTools (not for prod)
   // mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
@@ -80,6 +80,3 @@ if (app) {
     }
   })
 }
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.

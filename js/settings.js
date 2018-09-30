@@ -39,7 +39,6 @@ function populate_settings_view(fields, favorite_fields, csv_fields) {
 
     /* Update settings when a box is checked. */
     $("#favcheck" + tag).click(function() {
-      console.log('triggering click fxn for ' + $(this).val() + ", " + $(this).is(":checked"))
       database.update_favorites_field($(this).val(), "f", $(this).is(":checked"));
     });
 

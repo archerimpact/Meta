@@ -3,12 +3,9 @@ const path = require('path')
 const fs = require('fs')
 const remote = require('electron').remote
 const Mustache = require('Mustache')
-// const ExifImage = require('exif').ExifImage;
 const { ExifTool } = require("exiftool-vendored");
 const exiftool = new ExifTool();
 const Chart = require('chart.js');
-// const echarts = require('echarts');
-// const select2 = require('select2');
 const Choices = require('Choices.js')
 const async = require("async");
 
@@ -35,13 +32,6 @@ $("#add-image").submit(function(e) {
 		loadDetail(_currentProj);
 		paths_global = null;
 	});
-	// for (var index in paths_global) {
-	// 	var filename = path.basename(paths_global[index]).split(".")[0];
-	// 	database.add_image(filename, paths_global[index], _currentProj, alert_image_upload);
-	// }
-
-	// loadDetail(_currentProj);
-	// paths_global = null;
 });
 
 function loadDetail(projectName, filter_params = {}) {
@@ -57,9 +47,6 @@ function loadDetail(projectName, filter_params = {}) {
 	document.getElementById('addfilter').onclick = addFilterRow
 	document.getElementById('removefilter').onclick = removeFilterRow
 	document.getElementById('submitfilter').onclick = performFilter
-
-
-	// document.getElementById('checknonebtn').onclick = uncheckAll
 
 	redirect('detail');
 
@@ -464,9 +451,7 @@ function loadHeader(project) {
 							if (typeof value != "string") {
 								value = JSON.stringify(value);
 							}
-							// value.replace(/,/g , "");
 							value = value.split(',').join(" ");
-							//value.replace("", "");
 							csvString += value + ", ";
 						});
 						csvString += "\n";
@@ -562,9 +547,7 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 		mediacontents = '<{{media}} class="img-responsive rounded" src="{{path}}" alt="' + data.sorry + '" controls>'
 		data.thumbcontents = '<{{media}} class="img-responsive rounded thumb" src="{{path}}" alt="{{displayName}}" controls>'
 	} else {
-		//mediacontents = '<object type="application/pdf" data="{{path}}"><p>' + data.sorry + '</p></object>'
 		var path_nospace = data.path.replace(/ /g, '%20')
-		console.log(path_nospace)
 		mediacontents = '<webview src="{{path}}" plugins></webview>'
 		data.thumbcontents = '<webview src="{{path}}" class="thumb" plugins></webview>'
 	}
@@ -731,12 +714,6 @@ function loadCharts(proj_name, filter_params) {
 				 	'</div>',
 			 	'</div>',
 		 	'</div>',
-			// '<div class=" col-md-4 col-xs-12">',
-			// 	'<div class="clearfix"></div>',
-			// 	'<div class="x_content">',
-			// 		'<canvas id="pie3"></canvas>',
-			// 	'</div>',
-			// '</div>',
 		'</div>',
 	].join("\n");
 
@@ -921,6 +898,7 @@ function setPhotoRemove(name) {
 	};
 }
 
+// TODO: a project for the future
 // function setPhotoRename(name) {
 // 	var projName = document.getElementById('project-name').innerHTML;
 // 	document.getElementById("rename" + name).onclick = function() {
@@ -949,7 +927,6 @@ function clearDetailsHtml() {
 	document.getElementById("detail-charts").innerHTML = ""
 	document.getElementById("name-menu").innerHTML = ""
 	document.getElementById("thumb-menu").innerHTML = ""
-	// document.getElementById("file-label2").innerHTML = ""
 }
 
 module.exports = {

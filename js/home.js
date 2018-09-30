@@ -5,19 +5,8 @@ function slideDrawer() {
 	var wid = menu.style.width
 	if (wid != '0px') {
 		menu.style.width = '0px'
-		//wrapper.style.marginLeft = '15px'
-		// wid = document.getElementById('side-nav').offsetWidth
-		// var newWidth = body.offsetWidth + wid
-		// body.style.width = newWidth.toString() + 'px'
 	} else {
-		menu.style.width = '170px' //"16.666%"
-		//wid = document.getElementById('side-nav').offsetWidth + 15
-		//wrapper.style.marginLeft = wid.toString() + 'px'
-		// body.style.width = "83.333%"
-		// body.style.marginLeft =  wid.toString() + 'px'
-		//body.style.width = "66.666%"
-		// var newWidth = body.offsetWidth - wid
-		// body.style.width = newWidth.toString() + 'px'
+		menu.style.width = '170px'
 	}
 }
 

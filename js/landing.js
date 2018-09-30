@@ -81,11 +81,6 @@ function insertSearchResults(error, results) {
         "</div>",
       "</div>",
     ].join("\n");
-    // data = {
-    //   displayName: results.proj_name,
-    //   name: results.proj_name,
-    //   imgsrc: results.path,
-    // };
   }
 
   var filler = Mustache.render(template, results);
