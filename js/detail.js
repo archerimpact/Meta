@@ -447,9 +447,12 @@ function loadHeader(project) {
 	document.getElementById("export" + project['name']).onclick = function() {
 		electron.remote.dialog.showSaveDialog(function(filename, bookmark) {
 			database.get_images_in_project(project['name'], function(projName, rows) {
-				database.get_metadata_fields(function(columns) {
+				database.get_favorite_fields(function(_, columns_dup) {
 					/* Create CSV Header. */
 					var csvString = "";
+					var columns = columns_dup.filter(function(item, pos) {
+    				return columns_dup.indexOf(item) == pos;
+					})
 					columns.forEach(function(col) {
 						csvString += col + ", ";
 					});
@@ -502,7 +505,6 @@ function insertDetailTemplate(img_name, img_path, proj_name) {
 
 function insertDetailTemplate__NEW(data, id, path, projname) {
 	data.displayName = withspaces(data.name)
-	insertIntoSlideMenu(data, id);
 	data.id = id;
 
 	if (data.error) {
@@ -558,12 +560,18 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 	var mediacontents
 	if (data.media != 'pdf') {
 		mediacontents = '<{{media}} class="img-responsive rounded" src="{{path}}" alt="' + data.sorry + '" controls>'
+		data.thumbcontents = '<{{media}} class="img-responsive rounded thumb" src="{{path}}" alt="{{displayName}}" controls>'
 	} else {
 		//mediacontents = '<object type="application/pdf" data="{{path}}"><p>' + data.sorry + '</p></object>'
 		var path_nospace = data.path.replace(/ /g, '%20')
 		console.log(path_nospace)
-		mediacontents = "<webview src='{{path}}' plugins></webview>"
+		mediacontents = '<webview src="{{path}}" plugins></webview>'
+		data.thumbcontents = '<webview src="{{path}}" class="thumb" plugins></webview>'
 	}
+
+	insertIntoSlideMenu(data, id);
+
+
 	var template = [
 		'<div class="col-md-4 col-xs-6">',
 			'<div class="row name-row">',
@@ -825,7 +833,7 @@ function insertIntoSlideMenu(data, id) {
 		'<div class="row thumb-row">',
 			'<input id="{{name}}check_thumb" type="checkbox" checked class="menu-check-thumb">',
 			'<div class="panel panel-defualt data-panel clearfix thumb-panel">',
-				'<img src="{{path}}" alt="{{name}}" class="thumb">',
+				data.thumbcontents,
 			'</div>',
 		'</div>',
 	].join('\n')
