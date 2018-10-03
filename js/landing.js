@@ -102,14 +102,16 @@ function clearSearchResults() {
 }
 
 function create_image_timeline_chart() {
-  database.get_all_image_dates(function(dates, counts) {
-		addLineChart(
-			"all-image-by-date",
-			dates,
-			"Photos Taken",
-			counts
-		);
-  });
+  document.getElementById('granularity-landing').addEventListener('change', function(event) {
+		document.getElementById('landing-line-holder').innerHTML = '<div class="flot-chart"><canvas id="all-image-by-date"></canvas></div>'
+		renderLineChart('', {})
+	})
+  document.getElementById('gmt-landing').addEventListener('click', function(event) {
+		document.getElementById('landing-line-holder').innerHTML = '<div class="flot-chart"><canvas id="all-image-by-date"></canvas></div>'
+		renderLineChart('', {})
+	})
+  
+  renderLineChart('', {})
 }
 
 function create_image_locations_map() {

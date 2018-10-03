@@ -96,7 +96,7 @@ function addMap(id, markers) {
   if (!markers || markers.length == 0) {
     elem.innerHTML = "Sorry, no images in this project have location info."
   } else {
-    elem.innerHTML = "<button class='btn btn-default btn-circle btn-xl' style='margin-top: calc(30% - 10px);' data-markers='" + JSON.stringify(markers) +"'>Load Map</button>"
+    elem.innerHTML = "<button class='btn btn-default btn-circle btn-xl' style='margin-top: calc(25% - 10px);' data-markers='" + JSON.stringify(markers) +"'>Load Map</button>"
     elem.onclick = actuallyAddMap
   }
 }
@@ -128,4 +128,100 @@ function actuallyAddMap(event) {
 	} catch (e) {
     console.error("Failing map: " + e);
   }
+}
+
+// leave project name as empty string for landing page chart
+function renderLineChart(proj_name, filter_params) {
+  if (proj_name == '') {
+    //do landing page chart here
+    database.get_all_image_dates(function(dates, counts) {
+      if (dates.length == 0) {
+
+      } else {
+        var data = processDates(
+          dates,
+          counts,
+          document.getElementById('gmt-landing').checked,
+          document.getElementById('granularity-landing').value,
+        )
+        var chart_dates = data.dates
+        var chart_counts = data.counts
+
+        addLineChart(
+          "all-image-by-date",
+          chart_dates,
+          "Photos Taken",
+          chart_counts,
+        )
+      }
+    }
+  )
+  } else {
+    database.get_images_by_date(proj_name, function(dates, counts) {
+      /* Set content to "no data exists" image if needed. */
+      if (dates.length == 0) {
+
+      } else {
+        var data = processDates(
+          dates,
+          counts,
+          document.getElementById('gmt-detail').checked,
+          document.getElementById('granularity-detail').value
+        )
+        var chart_dates = data.dates
+        var chart_counts = data.counts
+
+      	addLineChart(
+      		"lineChart",
+      		chart_dates,
+      		"Photos Taken",
+      		chart_counts
+      	);
+      }
+    },
+    filter_params,
+    );
+  }
+}
+
+function processDates(old_dates, old_counts, gmt, granularity) {
+  for (i in old_dates) {
+    var obj = JSON.parse(old_dates[i])
+    var min = obj.minute
+    if (gmt) {
+      min = obj.minute - obj.tzoffsetMinutes
+    }
+    old_dates[i] = new Date(obj.year, obj.month - 1, obj.day, obj.hour, min, obj.second, obj.millis)
+  }
+  old_dates.sort(function(a,b) {return a - b;})
+
+  var new_dates = []
+  var new_counts = []
+  var new_date
+  for (i in old_dates) {
+    var date = old_dates[i]
+    if (granularity === 'Year') {
+      new_date = yearStr(date)
+    } else if (granularity === 'Month') {
+      new_date = monthStr(date)
+    } else if (granularity === 'Day') {
+      new_date = dayStr(date)
+    } else if (granularity === 'Hour') {
+      new_date = hourStr(date)
+    } else if (granularity === 'Minute') {
+      new_date = minStr(date)
+    } else {
+      new_date = secStr(date)
+    }
+
+    if (new_dates.indexOf(new_date) >= 0) {
+      new_counts[new_dates.indexOf(new_date)] += 1;
+    } else {
+      new_dates.push(new_date)
+      new_counts.push(old_counts[i])
+    }
+  }
+  console.log(new_dates)
+  console.log(new_counts)
+  return {'dates': new_dates, 'counts': new_counts}
 }

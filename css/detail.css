@@ -137,3 +137,8 @@
   color: #b1b1b1;
   margin-top: 5px;
 }
+
+.custom-tooltip {
+  color: black;
+  text-decoration: underline dotted black;
+}

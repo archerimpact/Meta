@@ -167,9 +167,6 @@ function alert_image_upload(bool, project_name, img_path, index, num_images) {
 	if (!bool) {
 		alert("Unable to add image");
 		return
-	} else if (index == num_images - 1) {
-		/* Load project view. */
-		load_detail(project_name);
 	}
 }
 
@@ -196,6 +193,7 @@ function toggleDetail() {
 	} else {
 		btn.html("View Trends")
 	}
+	$('#refreshCharts').toggleClass('hidden')
 }
 
 function processData(data, favorites) {
@@ -218,6 +216,10 @@ function processData(data, favorites) {
 	];
 	for (var key in data.exifData) {
 		var val = data.exifData[key];
+		if (String(val).includes('tzoffsetMinutes')) {
+			val = displayDate(JSON.parse(val))
+			data.exifData[key] = val
+		}
 		data.ref.push({
 		  value: '',
 		  label: key + ": " + val,
@@ -406,13 +408,16 @@ function loadHeader(project) {
 			"<div class='btn btn-primary btn-md' style='margin-left: 10px;' id='toggledetail'>",
 				"View Trends",
 			"</div>",
+			"<div class='btn hidden btn-default btn-md' style='margin-left: 10px;' id='refreshCharts'>",
+				"Refresh Charts",
+			"</div>",
 		"</div>",
 		"<div class='col-md-2 col-xs-4 float-right'>",
 			"<button type='' class='btn btn-primary float-right mb-2 command-buttons' data-toggle='tooltip' data-placement='left' title='Download as CSV' style='margin-top:50px; border-color: #0d77e2; background-color: #0d77e2; color=white' id='export{{projName}}'>",
 				"<i class='material-icons'>file_download</i>",
 			"</button>",
 			'<br>',
-			"<button type='' id='upload{{projName}}' class='btn btn-primary float-right mb-2 command-buttons' data-toggle='tooltip' data-placement='left' title='Add New Image' style='border-color: #0d77e2; background-color: #0d77e2; color: white'>",
+			"<button type='' id='upload{{projName}}' class='btn btn-primary float-right mb-2 command-buttons' data-toggle='tooltip' data-placement='left' title='Add New File' style='border-color: #0d77e2; background-color: #0d77e2; color: white'>",
 				"<i class='material-icons'>add</i>",
 			"</button>",
 			"<br>",
@@ -480,8 +485,13 @@ function loadHeader(project) {
 			if (err) {
 				console.error(err);
 			}
+			loadDetail(project['name'])
 		});
 	};
+
+	document.getElementById('refreshCharts').onclick = function() {
+		refreshCharts(project['name'])
+	}
 }
 
 function insertDetailTemplate(img_name, img_path, proj_name) {
@@ -666,13 +676,28 @@ function insertDetailTemplate__NEW(data, id, path, projname) {
 }
 
 function loadCharts(proj_name, filter_params) {
+	var msg = 'Check to convert all times to GMT (for comparison across timezones). Otherwise, times will be left in local capture times, so cross-timezone chronology may be lost'
 	template = [
 		'<div class="charts" id="chart-wrapper" style="padding-top:30px">',
 			'<div class="row no-side-margins">',
 				'<div class="col-sm-6 col-xs-12" style="padding-right: 15px">',
 					'<div class="panel panel-default">',
-						'<div class="panel-heading"> Image Creation Date </div>',
-						'<div class="panel-body">',
+						'<div class="panel-heading"> Creation Date',
+							'<div style="float:right">',
+								'<a href="#" class="custom-tooltip" data-toggle="tooltip" data-placement="auto" title="' + msg + '">GMT: </a>',
+								'<input class="form-check-input" type="checkbox" id="gmt-detail">',
+								'Granularity:',
+								'<select id="granularity-detail">',
+									'<option>Year</option>',
+									'<option>Month</option>',
+									'<option selected>Day</option>',
+									'<option>Hour</option>',
+									'<option>Minute</option>',
+									'<option>Second</option>',
+								'</select>',
+							'</div>',
+						'</div>',
+						'<div id="detail-line-holder" class="panel-body">',
 							'<div class="flot-chart">',
 								'<canvas id="lineChart"></canvas>',
 							'</div>',
@@ -683,7 +708,7 @@ function loadCharts(proj_name, filter_params) {
 					'<div class="panel panel-default">',
 						'<div class="panel-heading"> Image Locations </div>',
 						'<div class="panel-body" style="text-align: center;">',
-							'<div style="width:95%; height: 30vh;" id="trendsmap"></div>',
+							'<div style="width:95%; height: 21vw;" id="trendsmap"></div>',
 						'</div>',
 					'</div>',
 				'</div>',
@@ -721,21 +746,19 @@ function loadCharts(proj_name, filter_params) {
 
 	create_data_charts();
 
-	database.get_images_by_date(proj_name, function(dates, counts) {
-		/* Set content to "no data exists" image if needed. */
-		if (dates.length == 0) {
+	document.getElementById('granularity-detail').addEventListener('change', function(event) {
+		document.getElementById('detail-line-holder').innerHTML = '<div class="flot-chart"><canvas id="lineChart"></canvas></div>'
+		renderLineChart(proj_name, filter_params)
+	})
 
-		} else {
-			addLineChart(
-				"lineChart",
-				dates,
-				"Photos Taken",
-				counts
-			);
-		}
-	},
-	filter_params,
-	);
+	document.getElementById('gmt-detail').addEventListener('click', function(event) {
+		document.getElementById('detail-line-holder').innerHTML = '<div class="flot-chart"><canvas id="lineChart"></canvas></div>'
+		renderLineChart(proj_name, filter_params)
+	})
+
+	renderLineChart(proj_name, filter_params)
+
+
 
 	database.get_camera_models(proj_name, function(models, counts) {
 		/* Set content to "no data exists" image if needed. */
@@ -927,6 +950,11 @@ function clearDetailsHtml() {
 	document.getElementById("detail-charts").innerHTML = ""
 	document.getElementById("name-menu").innerHTML = ""
 	document.getElementById("thumb-menu").innerHTML = ""
+}
+
+function refreshCharts(projName) {
+	document.getElementById("detail-charts").innerHTML = ""
+	loadCharts(projName, {})
 }
 
 module.exports = {

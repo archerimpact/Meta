@@ -101,10 +101,11 @@ class Database {
                                 "creation, last_modified, tags, favorited, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
           var created = Date.now();
           stmt.run(img_name, img_path, proj_name, created, created, "", "", "");
-          stmt.finalize();
+          stmt.finalize(function() {
+            callback(success, proj_name, img_path, index, num_images);
+          });
           success = true;
         }
-        callback(success, proj_name, img_path, index, num_images);
       });
     });
   }
@@ -599,17 +600,6 @@ class Database {
     });
   }
 
-  /* Helper function to convert an ExifDateTime instance to an appropriate format for the timeline chart. */
-  date_to_chart_format(exifDateTime) {
-    var year = exifDateTime.year;
-    var month = exifDateTime.month;
-    var day = exifDateTime.day;
-    var hour = exifDateTime.hour;
-    var minute = exifDateTime.minute;
-
-    return month + "/" + day + "/" + year + " at " + hour + ":" + minute;
-  }
-
   /* Get count of images by the date at which they were taken, for the specified project. */
   get_images_by_date(proj_name, callback, filter_params = {}) {
     var _this = this;
@@ -623,7 +613,7 @@ class Database {
               var counts = [];
               var stmt_str = "SELECT CreateDate, COUNT(*) as Count FROM Images WHERE proj_name = ?"
               stmt_str += _this.filter_stmt(filter_params)
-              stmt_str += " AND CreateDate IS NOT NULL GROUP BY CreateDate"
+              stmt_str += " AND CreateDate IS NOT NULL GROUP BY CreateDate ORDER BY CreateDate"
               var stmt = db.prepare(stmt_str);
               stmt.each([proj_name], function(err, row) {
                 if (err) {
@@ -632,7 +622,7 @@ class Database {
                   return;
                 }
 
-                var date = _this.date_to_chart_format(JSON.parse(row['CreateDate']));
+                var date = row['CreateDate']
 
                 if (dates.indexOf(date) >= 0) {
                   counts[dates.indexOf(date)] += 1;
@@ -793,7 +783,7 @@ class Database {
               return;
             }
 
-            var date = _this.date_to_chart_format(JSON.parse(row['CreateDate']));
+            var date = row['CreateDate']
 
             if (dates.indexOf(date) >= 0) {
               counts[dates.indexOf(date)] += 1;
