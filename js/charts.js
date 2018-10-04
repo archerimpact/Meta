@@ -97,7 +97,7 @@ function addMap(id, markers) {
     elem.innerHTML = "Sorry, no images in this project have location info."
   } else {
     elem.innerHTML = "<button class='btn btn-default btn-circle btn-xl' style='margin-top: calc(25% - 10px);' data-markers='" + JSON.stringify(markers) +"'>Load Map</button>"
-    elem.onclick = actuallyAddMap
+    elem.children[0].onclick = actuallyAddMap
   }
 }
 
@@ -118,7 +118,23 @@ function actuallyAddMap(event) {
   		var marker = new google.maps.Marker({
   	    position: markers[ind],
   	    map: _map,
+        title: markers[ind]['title']
   	  });
+      if ('project' in markers[ind]) {
+        var content = '<strong>Name: </strong>' + withspaces(markers[ind]['title']) + '<br>' + '<strong>Project: </strong>' + markers[ind]['project']
+      } else {
+        var content = '<div>' + markers[ind]['title'] + '</div>'
+      }
+      var infowindow = new google.maps.InfoWindow({
+          content: content,
+        });
+      google.maps.event.addListener(marker,'click', (function(marker,content,infowindow){
+        return function() {
+          infowindow.setContent(content);
+          infowindow.open(_map,marker);
+        };
+      })(marker,content,infowindow));
+
       loc = new google.maps.LatLng(marker.position.lat(), marker.position.lng());
       bounds.extend(loc);
     }
@@ -221,7 +237,5 @@ function processDates(old_dates, old_counts, gmt, granularity) {
       new_counts.push(old_counts[i])
     }
   }
-  console.log(new_dates)
-  console.log(new_counts)
   return {'dates': new_dates, 'counts': new_counts}
 }

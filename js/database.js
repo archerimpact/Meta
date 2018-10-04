@@ -656,7 +656,7 @@ class Database {
           _this.has_metadata_attr(['GPSLatitude', 'GPSLongitude'], function(attr_exists) {
             if (attr_exists) {
               var coords = [];
-              var stmt_str = "SELECT GPSLatitude, GPSLongitude FROM Images WHERE proj_name = ?"
+              var stmt_str = "SELECT img_name, GPSLatitude, GPSLongitude FROM Images WHERE proj_name = ?"
               stmt_str += _this.filter_stmt(filter_params)
               stmt_str += " AND GPSLatitude IS NOT NULL AND GPSLongitude IS NOT NULL"
               var stmt = db.prepare(stmt_str);
@@ -667,7 +667,7 @@ class Database {
                   return;
                 }
 
-                coords.push({'lat': JSON.parse(row['GPSLatitude']), 'lng': JSON.parse(row['GPSLongitude'])});
+                coords.push({'lat': JSON.parse(row['GPSLatitude']), 'lng': JSON.parse(row['GPSLongitude']), 'title': row['img_name']});
               }, function() {
                 callback(coords);
               });
@@ -810,7 +810,7 @@ class Database {
       _this.has_metadata_attr(['GPSLatitude', 'GPSLongitude'], function(attr_exists) {
         if (attr_exists) {
           var coords = [];
-          var stmt = db.prepare("SELECT GPSLatitude, GPSLongitude FROM Images WHERE GPSLatitude IS NOT NULL AND GPSLongitude IS NOT NULL");
+          var stmt = db.prepare("SELECT img_name, proj_name, GPSLatitude, GPSLongitude FROM Images WHERE GPSLatitude IS NOT NULL AND GPSLongitude IS NOT NULL");
           stmt.each([], function(err, row) {
             if (err) {
               console.error("FAILING: " + err);
@@ -818,7 +818,7 @@ class Database {
               return;
             }
 
-            coords.push({'lat': JSON.parse(row['GPSLatitude']), 'lng': JSON.parse(row['GPSLongitude'])});
+            coords.push({'lat': JSON.parse(row['GPSLatitude']), 'lng': JSON.parse(row['GPSLongitude']), 'title': row['img_name'], 'project': row['proj_name']});
           }, function() {
             callback(coords);
           });

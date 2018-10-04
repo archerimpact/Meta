@@ -110,8 +110,9 @@ function create_image_timeline_chart() {
 		document.getElementById('landing-line-holder').innerHTML = '<div class="flot-chart"><canvas id="all-image-by-date"></canvas></div>'
 		renderLineChart('', {})
 	})
-  
+
   renderLineChart('', {})
+  $('#GMTtooltip').tooltip()
 }
 
 function create_image_locations_map() {

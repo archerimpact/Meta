@@ -30,14 +30,17 @@ function pad(num) {
 function displayDate(jsondate) {
   var day = jsondate.day + ' ' + months[jsondate.month - 1] + ' ' + jsondate.year
   var time = ' at ' + jsondate.hour + ':' + pad(jsondate.minute) + ':' + pad(jsondate.second)
-  var hrdiff = jsondate.tzoffsetMinutes/60
-  if (hrdiff > 0) {
-    hrdiff = '+' + hrdiff
-  } else if (hrdiff == 0) {
-    hrdiff = ''
+  var zone = ''
+  if ('tzoffsetMinutes' in jsondate) {
+    var hrdiff = jsondate.tzoffsetMinutes/60
+    if (hrdiff > 0) {
+      hrdiff = '+' + hrdiff
+    } else if (hrdiff == 0) {
+      hrdiff = ''
+    }
+    zone = ', GMT' + hrdiff
   }
-  var zone = ', GMT' + hrdiff
-  return day + time + zone
+  return (day + time + zone).replace(/undefined/g, '')
 }
 
 function yearStr(date) {
@@ -50,7 +53,7 @@ function dayStr(date) {
   return date.getDate() + ' ' + monthStr(date)
 }
 function hourStr(date) {
-  return dayStr(date) + date.getHours()
+  return dayStr(date) + ' at ' + date.getHours()
 }
 function minStr(date) {
   return hourStr(date) + ':' + pad(date.getMinutes())
