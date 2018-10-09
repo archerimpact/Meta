@@ -1,3 +1,6 @@
+const { version } = require('./package.json');
+var shell = require('electron').shell;
+
 function clearSettings() {
   document.getElementById('fav-settings-wrapper').innerHTML = ''
   document.getElementById('csv-settings-wrapper').innerHTML = ''
@@ -6,6 +9,13 @@ function clearSettings() {
 var database = electron.remote.getGlobal('sharedObj').db;
 
 function populate_settings_view(fields, favorite_fields, csv_fields) {
+
+  document.getElementById('version').innerHTML = version
+  $('#github_link').click(function(event) {
+      event.preventDefault();
+      shell.openExternal(this.href);
+  });
+
   var favwrapper = $("#fav-settings-wrapper")
   var csvwrapper = $("#csv-settings-wrapper")
   var options = ""
