@@ -3,7 +3,7 @@
 A desktop tool for Mac, Windows, and Linux made with Electron for viewing and exporting photo and video metadata online.
 
 The most current stable build is **2.2.0**.
-All of the builds (2.2.0 and later) can be found at [bit.ly/archermeta].
+All of the builds (2.2.0 and later) can be found at [https://bit.ly/archermeta](bit.ly/archermeta).
 
 To run the app as an executable:
 1. Navigate to the "Packaged App" folder in this github.
